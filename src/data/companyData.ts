@@ -1,0 +1,64 @@
+// Company information and static data for AA Uganda
+
+export const companyInfo = {
+  name: "Automobile Association of Uganda",
+  shortName: "AA Uganda",
+  founded: "1955",
+  address: {
+    street: "Plot 4 Old Port Bell Rd",
+    city: "Kampala",
+    country: "Uganda",
+    coordinates: {
+      lat: 0.3476,
+      lng: 32.6204,
+    },
+  },
+  contact: {
+    phone: "+256 414 250 362",
+    email: "info@aauganda.co.ug",
+    website: "www.aauganda.co.ug",
+  },
+  social: {
+    facebook: "https://facebook.com/aauganda",
+    twitter: "https://twitter.com/aauganda",
+    linkedin: "https://linkedin.com/company/aauganda",
+    instagram: "https://instagram.com/aauganda",
+  },
+  mission: "To provide reliable motoring solutions by responding to members' needs while ensuring organizational growth and excellence in service delivery.",
+  vision: "To be the leading motoring organization in Uganda, providing comprehensive automotive services and promoting road safety across the nation.",
+  values: [
+    "Excellence in Service",
+    "Integrity and Trust",
+    "Innovation and Growth",
+    "Customer Satisfaction",
+    "Safety First",
+  ],
+};
+
+export const navigationItems = [
+  { label: "Home", path: "/" },
+  { label: "About", path: "/about" },
+  { label: "Services", path: "/services" },
+  { label: "Membership", path: "/membership" },
+  { label: "Contact Us", path: "/contact" },
+];
+
+export const heroContent = {
+  title: "Your Trusted Partner on Uganda's Roads",
+  subtitle: "For over 65 years, AA Uganda has been providing reliable motoring solutions, driving education, and rescue services across Uganda.",
+  ctaText: "Become a Member Today",
+  ctaLink: "/membership",
+  backgroundImage: "/images/hero-bg.jpg",
+  features: [
+    "24/7 Rescue Services",
+    "Professional Driving School",
+    "Comprehensive Insurance",
+    "Expert Automotive Advice",
+  ],
+};
+
+export default {
+  companyInfo,
+  navigationItems,
+  heroContent,
+};
