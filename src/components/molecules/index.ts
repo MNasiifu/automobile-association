@@ -4,3 +4,7 @@ export { default as IDPCard } from './IDPCard';
 export { default as VerificationModal } from './VerificationModal';
 export { default as Navigation } from './Navigation';
 export { default as PageHeader } from './PageHeader';
+
+// PageHeader subcomponents
+export { default as DecorativeBackground } from './DecorativeBackground';
+export { default as PageHeaderContent } from './PageHeaderContent';
