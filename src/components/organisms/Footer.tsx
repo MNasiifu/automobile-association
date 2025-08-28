@@ -3,6 +3,7 @@ import { Box, Container, Typography, Grid } from '@mui/material';
 import { Facebook, Twitter, LinkedIn, Instagram, Phone, Email, LocationOn } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import { companyInfo, navigationItems } from '../../data/companyData';
+import AAULogo from '../../assets/images/aau-logo.png';
 
 const FooterSection = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.primary.dark,
@@ -15,7 +16,7 @@ const FooterContent = styled(Container)(({ theme }) => ({
 }));
 
 const FooterBottom = styled(Box)(({ theme }) => ({
-  borderTop: `1px solid rgba(255, 255, 255, 0.1)`,
+  borderTop: `1px solid rgba(255, 255, 255, 0.3)`,
   paddingTop: theme.spacing(3),
   textAlign: 'center',
 }));
@@ -33,7 +34,19 @@ const ContactItem = styled(Box)(({ theme }) => ({
   
   '& .MuiSvgIcon-root': {
     marginRight: theme.spacing(1),
-    color: theme.palette.secondary.main,
+    color: theme.palette.grey[300],
+  },
+}));
+
+const LogoSection = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  marginBottom: theme.spacing(3),
+  
+  '& img': {
+    height: 50,
+    width: 'auto',
+    marginRight: theme.spacing(2),
   },
 }));
 
@@ -46,9 +59,12 @@ const Footer: React.FC = () => {
         <Grid container spacing={4}>
           {/* Company Info */}
           <Grid item xs={12} md={4}>
-            <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
-              {companyInfo.name}
-            </Typography>
+            <LogoSection>
+              <img src={AAULogo} alt="AA Uganda Logo" />
+              <Typography variant="h6" sx={{ fontWeight: 600, color: 'inherit' }}>
+                {companyInfo.shortName}
+              </Typography>
+            </LogoSection>
             
             <Typography variant="body2" sx={{ mb: 3, opacity: 0.9, lineHeight: 1.6 }}>
               {companyInfo.mission}
@@ -68,11 +84,12 @@ const Footer: React.FC = () => {
                   height: 40,
                   borderRadius: '50%',
                   backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                  color: 'inherit',
+                  color: 'white',
                   textDecoration: 'none',
                   '&:hover': {
                     backgroundColor: 'secondary.main',
                     transform: 'translateY(-2px)',
+                    color: 'grey.100',
                   },
                 }}
               >
@@ -91,11 +108,12 @@ const Footer: React.FC = () => {
                   height: 40,
                   borderRadius: '50%',
                   backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                  color: 'inherit',
+                  color: 'white',
                   textDecoration: 'none',
                   '&:hover': {
                     backgroundColor: 'secondary.main',
                     transform: 'translateY(-2px)',
+                    color: 'grey.100',
                   },
                 }}
               >
@@ -114,11 +132,12 @@ const Footer: React.FC = () => {
                   height: 40,
                   borderRadius: '50%',
                   backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                  color: 'inherit',
+                  color: 'white',
                   textDecoration: 'none',
                   '&:hover': {
                     backgroundColor: 'secondary.main',
                     transform: 'translateY(-2px)',
+                    color: 'grey.100',
                   },
                 }}
               >
@@ -137,11 +156,12 @@ const Footer: React.FC = () => {
                   height: 40,
                   borderRadius: '50%',
                   backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                  color: 'inherit',
+                  color: 'white',
                   textDecoration: 'none',
                   '&:hover': {
                     backgroundColor: 'secondary.main',
                     transform: 'translateY(-2px)',
+                    color: 'grey.100',
                   },
                 }}
               >
@@ -168,8 +188,8 @@ const Footer: React.FC = () => {
                       textDecoration: 'none',
                       opacity: 0.8,
                       '&:hover': {
-                        opacity: 1,
-                        textDecoration: 'underline',
+                        color: 'grey.50',
+                        fontWeight: 600,
                       },
                     }}
                   >

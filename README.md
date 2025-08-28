@@ -49,8 +49,8 @@ src/
 
 ### Color Palette
 
-- **Primary**: #1B4332 (Deep forest green)
-- **Secondary**: #FFA726 (Warm orange)
+- **Primary**: #ffcb0a (Bright yellow)
+- **Secondary**: #02793f (Forest green)
 - **Background**: #FFFFFF (White)
 - **Surface**: #F8F9FA (Light gray)
 

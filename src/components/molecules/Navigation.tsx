@@ -4,6 +4,7 @@ import { Menu as MenuIcon } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import { Button } from '../atoms';
 import { navigationItems, companyInfo } from '../../data/companyData';
+import AAULogo from '../../assets/images/aau-logo.png';
 
 interface NavigationProps {
   onMenuClick?: () => void;
@@ -19,11 +20,24 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
 const Logo = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  fontWeight: 700,
-  fontSize: '1.5rem',
-  color: theme.palette.primary.main,
   textDecoration: 'none',
   cursor: 'pointer',
+  
+  '& img': {
+    height: 40,
+    width: 'auto',
+    marginRight: theme.spacing(1),
+  },
+  
+  '& .logo-text': {
+    fontWeight: 700,
+    fontSize: '1.2rem',
+    color: theme.palette.primary.main,
+    
+    [theme.breakpoints.down('sm')]: {
+      display: 'none',
+    },
+  },
 }));
 
 const NavLinks = styled(Box)(({ theme }) => ({
@@ -56,7 +70,8 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
             cursor: 'pointer'
           }}
         >
-          {companyInfo.shortName}
+          <img src={AAULogo} alt="AA Uganda Logo" />
+          <Box className="logo-text">{companyInfo.shortName}</Box>
         </Logo>
         
         <NavLinks>
@@ -81,7 +96,13 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
             variant="contained"
             color="primary"
             href="/membership"
-            sx={{ ml: 2 }}
+            sx={{ 
+              ml: 2,
+              '&:hover': {
+                color: 'secondary.main',
+                fontWeight: 600
+              }
+            }}
           >
             Become a Member
           </Button>
