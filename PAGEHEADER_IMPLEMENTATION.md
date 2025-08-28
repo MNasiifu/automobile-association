@@ -22,8 +22,8 @@ src/components/
 ```
 
 ### Brand Identity
-- **Primary Color**: `#ffcb0a` (Vibrant Yellow)
-- **Secondary Color**: `#02793f` (Forest Green)
+- **Primary Color**: `#024f31` (Dark Green)
+- **Secondary Color**: `#f1c50e` (Golden Yellow)
 - **Design Theme**: Professional automotive industry aesthetic
 
 ## ✨ PageHeader Component Features

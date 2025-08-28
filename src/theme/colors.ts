@@ -2,16 +2,16 @@
 export const colors = {
   // Primary brand colors inspired by automotive industry and Uganda
   primary: {
-    main: '#ffcb0a', // Bright yellow - automotive and vibrant branding
-    light: '#ffd54f',
-    dark: '#cc9900',
-    contrastText: '#000000',
+    main: '#024f31', // Dark green - professional and trustworthy branding
+    light: '#679583',
+    dark: '#013722',
+    contrastText: '#ffffff',
   },
   secondary: {
-    main: '#02793f', // Forest green - natural and trust-building accent
-    light: '#4caf50',
-    dark: '#004d25',
-    contrastText: '#ffffff',
+    main: '#f1c50e', // Golden yellow - vibrant and attention-grabbing accent
+    light: '#f7dc6e',
+    dark: '#a98a0a',
+    contrastText: '#000000',
   },
   // Neutral colors
   neutral: {

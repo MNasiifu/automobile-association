@@ -40,16 +40,16 @@ subtleFloat: 6s ease-in-out (minimal movement)
 - **Breadcrumb Hover States**: Clean background highlights
 
 ### 4. **Professional Color Scheme**
-- **Primary Background**: Clean forest green (`#02793f`) gradient
+- **Primary Background**: Clean dark green (`#024f31`) gradient
 - **Content Container**: Enhanced glass morphism with 15% opacity
-- **Decorative Elements**: Minimal yellow accents at 5-10% opacity
+- **Decorative Elements**: Minimal golden yellow accents at 5-10% opacity
 - **Text Colors**: Pure white with professional shadows
 
 ## 🎨 **Design Improvements**
 
 ### **Background Design**
 ```css
-background: linear-gradient(135deg, #02793f 0%, #004d25 100%)
+background: linear-gradient(135deg, #024f31 0%, #013722 100%)
 backgroundAttachment: fixed (parallax effect on desktop)
 ```
 

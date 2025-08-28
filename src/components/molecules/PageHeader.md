@@ -136,8 +136,8 @@ The PageHeader component has been integrated into the following pages:
 
 The component integrates seamlessly with the Material-UI theme system and uses the AA Uganda brand colors:
 
-- **Primary Color**: `#ffcb0a` (Yellow)
-- **Secondary Color**: `#02793f` (Green)
+- **Primary Color**: `#024f31` (Dark Green)
+- **Secondary Color**: `#f1c50e` (Golden Yellow)
 - **Text Colors**: High contrast white text with shadows
 - **Glass Effect**: Backdrop blur with transparency
 

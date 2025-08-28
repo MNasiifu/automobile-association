@@ -49,8 +49,8 @@ src/
 
 ### Color Palette
 
-- **Primary**: #ffcb0a (Bright yellow)
-- **Secondary**: #02793f (Forest green)
+- **Primary**: #024f31 (Dark green)
+- **Secondary**: #f1c50e (Golden yellow)
 - **Background**: #FFFFFF (White)
 - **Surface**: #F8F9FA (Light gray)
 
