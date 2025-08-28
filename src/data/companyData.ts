@@ -39,14 +39,14 @@ export const navigationItems = [
   { label: "Home", path: "/" },
   { label: "About", path: "/about" },
   { label: "Services", path: "/services" },
-  { label: "Membership", path: "/membership" },
+  { label: "IDP", path: "/idp" },
   { label: "Contact Us", path: "/contact" },
 ];
 
 export const heroContent = {
   title: "Your Trusted Partner on Uganda's Roads",
   subtitle: "For over 65 years, AA Uganda has been providing reliable motoring solutions, driving education, and rescue services across Uganda.",
-  ctaText: "Become a Member Today",
+  ctaText: "Apply for IDP",
   ctaLink: "/membership",
   backgroundImage: "/images/hero-bg.jpg",
   features: [

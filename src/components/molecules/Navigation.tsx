@@ -104,7 +104,7 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
               }
             }}
           >
-            Become a Member
+            Apply for IDP
           </Button>
         </NavLinks>
         
