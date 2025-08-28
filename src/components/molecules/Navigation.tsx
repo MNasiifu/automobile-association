@@ -2,6 +2,7 @@ import React from 'react';
 import { AppBar, Toolbar, Box, IconButton } from '@mui/material';
 import { Menu as MenuIcon } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
+import { useLocation, Link } from 'react-router-dom';
 import { Button } from '../atoms';
 import { navigationItems, companyInfo } from '../../data/companyData';
 import AAULogo from '../../assets/images/aau-logo.png';
@@ -60,11 +61,22 @@ const MobileMenuButton = styled(IconButton)(({ theme }) => ({
 }));
 
 const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
+  const location = useLocation();
+  
+  // Helper function to determine if a navigation item is active
+  const isActiveRoute = (path: string) => {
+    if (path === '/') {
+      return location.pathname === '/';
+    }
+    return location.pathname.startsWith(path);
+  };
+
   return (
     <StyledAppBar position="sticky" elevation={0}>
       <Toolbar sx={{ px: { xs: 2, sm: 3, md: 4 } }}>
         <Logo 
-          onClick={() => window.location.href = '/'}
+          component={Link}
+          {...({ to: '/' } as any)}
           sx={{ 
             textDecoration: 'none',
             cursor: 'pointer'
@@ -75,27 +87,34 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
         </Logo>
         
         <NavLinks>
-          {navigationItems.map((item) => (
-            <Button
-              key={item.path}
-              variant="text"
-              href={item.path}
-              sx={{
-                color: 'text.primary',
-                '&:hover': {
-                  backgroundColor: 'primary.main',
-                  color: 'primary.contrastText',
-                },
-              }}
-            >
-              {item.label}
-            </Button>
-          ))}
+          {navigationItems.map((item) => {
+            const isActive = isActiveRoute(item.path);
+            return (
+              <Button
+                key={item.path}
+                variant="text"
+                component={Link}
+                {...({ to: item.path } as any)}
+                sx={{
+                  color: isActive ? 'primary.dark' : 'text.primary',
+                  fontWeight: isActive ? 600 : 400,
+                  position: 'relative',
+                  '&:hover': {
+                    backgroundColor: 'primary.main',
+                    color: 'primary.contrastText',
+                  },
+                }}
+              >
+                {item.label}
+              </Button>
+            );
+          })}
           
           <Button
             variant="contained"
             color="primary"
-            href="/membership"
+            component={Link}
+            {...({ to: '/membership' } as any)}
             sx={{ 
               ml: 2,
               '&:hover': {

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Link } from 'react-router-dom';
 import { ThemeProvider, CssBaseline, Box, Drawer, List, ListItem, ListItemText, IconButton } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import theme from './theme';
@@ -7,6 +7,65 @@ import { Navigation } from './components/molecules';
 import { Footer } from './components/organisms';
 import { Home, About, Services, Membership, Contact } from './pages';
 import { navigationItems } from './data/companyData';
+
+// Mobile Menu Component
+const MobileMenu: React.FC<{ open: boolean; onClose: () => void }> = ({ open, onClose }) => {
+  const location = useLocation();
+  
+  const isActiveRoute = (path: string) => {
+    if (path === '/') {
+      return location.pathname === '/';
+    }
+    return location.pathname.startsWith(path);
+  };
+
+  return (
+    <Drawer
+      anchor="right"
+      open={open}
+      onClose={onClose}
+      sx={{ '& .MuiDrawer-paper': { width: 250 } }}
+    >
+      <Box sx={{ p: 2, display: 'flex', justifyContent: 'flex-end' }}>
+        <IconButton onClick={onClose}>
+          <CloseIcon />
+        </IconButton>
+      </Box>
+      
+      <List>
+        {navigationItems.map((item) => {
+          const isActive = isActiveRoute(item.path);
+          return (
+            <ListItem 
+              key={item.path} 
+              onClick={onClose}
+              component={Link}
+              {...({ to: item.path } as any)}
+              sx={{
+                textDecoration: 'none',
+                color: 'inherit',
+                '&:hover': {
+                  backgroundColor: 'primary.light',
+                }
+              }}
+            >
+              <ListItemText 
+                primary={item.label}
+                sx={{ 
+                  cursor: 'pointer',
+                  '& .MuiTypography-root': {
+                    color: isActive ? 'secondary.main' : 'text.primary',
+                    fontWeight: isActive ? 600 : 400,
+                  }
+                }}
+              />
+            </ListItem>
+          );
+        })}
+      </List>
+    </Drawer>
+  );
+};
 
 const App: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -28,30 +87,7 @@ const App: React.FC = () => {
           <Navigation onMenuClick={handleMobileMenuToggle} />
           
           {/* Mobile Menu Drawer */}
-          <Drawer
-            anchor="right"
-            open={mobileMenuOpen}
-            onClose={handleMobileMenuClose}
-            sx={{ '& .MuiDrawer-paper': { width: 250 } }}
-          >
-            <Box sx={{ p: 2, display: 'flex', justifyContent: 'flex-end' }}>
-              <IconButton onClick={handleMobileMenuClose}>
-                <CloseIcon />
-              </IconButton>
-            </Box>
-            
-            <List>
-              {navigationItems.map((item) => (
-                <ListItem key={item.path} onClick={handleMobileMenuClose}>
-                  <ListItemText 
-                    primary={item.label}
-                    sx={{ cursor: 'pointer' }}
-                    onClick={() => window.location.href = item.path}
-                  />
-                </ListItem>
-              ))}
-            </List>
-          </Drawer>
+          <MobileMenu open={mobileMenuOpen} onClose={handleMobileMenuClose} />
           
           {/* Main Content */}
           <Box sx={{ flexGrow: 1 }}>
