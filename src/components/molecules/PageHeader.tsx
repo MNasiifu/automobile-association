@@ -3,20 +3,15 @@ import {
   Box, 
   Container, 
   Typography, 
-  Breadcrumbs,
-  Link as MuiLink,
   useTheme,
   useMediaQuery,
   Chip,
   Stack,
   Divider
 } from '@mui/material';
-import { 
-  Home as HomeIcon,
-  NavigateNext as NavigateNextIcon,
-} from '@mui/icons-material';
 import { styled, keyframes } from '@mui/material/styles';
 import { Heading } from '../atoms';
+import type { borderTop } from '@mui/system';
 
 // Professional animation keyframes
 const subtleFloat = keyframes`
@@ -36,17 +31,6 @@ const slideInUp = keyframes`
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-`;
-
-const scaleIn = keyframes`
-  from {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
   }
 `;
 
@@ -116,79 +100,6 @@ const DecorativeElement = styled(Box)<{ $size?: number; $left?: number; $top?: n
   zIndex: 1,
 }));
 
-// Enhanced content container with advanced UI/UX practices
-const ContentContainer = styled(Container)(({ theme }) => ({
-  position: 'relative',
-  zIndex: 10,
-  marginTop: theme.spacing(1),
-  marginBottom: theme.spacing(1),
-  
-  '& .page-header-content': {
-    background: 'rgba(255, 255, 255, 0.15)',
-    backdropFilter: 'blur(20px)',
-    borderRadius: theme.spacing(4),
-    border: '1px solid rgba(255, 255, 255, 0.3)',
-    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
-    transition: 'all 0.3s ease',
-    overflow: 'hidden',
-    position: 'relative',
-    
-    // Progressive spacing system
-    padding: theme.spacing(3, 0),
-    
-    '&:hover': {
-      transform: 'translateY(-5px)',
-      boxShadow: '0 30px 60px rgba(0, 0, 0, 0.15)',
-    },
-    
-    // Enhanced responsive spacing
-    [theme.breakpoints.down('lg')]: {
-      padding: theme.spacing(5, 5),
-    },
-    [theme.breakpoints.down('md')]: {
-      padding: theme.spacing(4, 4),
-    },
-    [theme.breakpoints.down('sm')]: {
-      padding: theme.spacing(3, 3),
-      borderRadius: theme.spacing(3),
-    },
-    
-    // Inner content wrapper for better organization
-    '& .content-inner': {
-      maxWidth: '900px',
-      margin: '0 auto',
-      textAlign: 'center',
-    },
-    
-    // Visual hierarchy improvements
-    '& .header-section': {
-      marginBottom: theme.spacing(3),
-      
-      [theme.breakpoints.down('md')]: {
-        marginBottom: theme.spacing(2),
-      },
-    },
-    
-    '& .main-content': {
-      position: 'relative',
-      zIndex: 2,
-    },
-    
-    // Subtle background pattern
-    '&::before': {
-      content: '""',
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: 'radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%)',
-      pointerEvents: 'none',
-      zIndex: 1,
-    },
-  },
-}));
-
 // Enhanced title with superior typography
 const AnimatedTitle = styled(Heading)(({ theme }) => ({
   color: '#ffffff',
@@ -248,6 +159,7 @@ const AnimatedSubtitle = styled(Typography)(({ theme }) => ({
   maxWidth: '700px',
   margin: '0 auto',
   animation: `${slideInUp} 1s ease-out 0.2s both`,
+  marginTop: theme.spacing(3),
   
   // Better text rendering
   textRendering: 'optimizeLegibility',
@@ -270,89 +182,77 @@ const AnimatedSubtitle = styled(Typography)(({ theme }) => ({
   },
 }));
 
-// Enhanced breadcrumbs with modern UX patterns
-const StyledBreadcrumbs = styled(Breadcrumbs)(({ theme }) => ({
-  background: 'rgba(255, 255, 255, 0.25)',
-  backdropFilter: 'blur(15px)',
-  padding: theme.spacing(1.5, 3),
-  borderRadius: theme.spacing(5),
-  border: '1px solid rgba(255, 255, 255, 0.4)',
-  boxShadow: '0 8px 16px rgba(0, 0, 0, 0.1)',
-  animation: `${scaleIn} 0.6s ease-out 0.3s both`,
-  display: 'inline-flex', // Better centering
+// Enhanced content container with advanced UI/UX practices
+const ContentContainer = styled(Container)(({ theme }) => ({
+  position: 'relative',
+  zIndex: 10,
+  marginTop: theme.spacing(1), // Back to original spacing
+  marginBottom: theme.spacing(1),
   
-  // Enhanced accessibility
-  '&:focus-within': {
-    outline: '2px solid rgba(255, 255, 255, 0.8)',
-    outlineOffset: '2px',
-  },
-  
-  '& .MuiBreadcrumbs-separator': {
-    color: 'rgba(255, 255, 255, 0.8)',
-    margin: theme.spacing(0, 1.5),
-    fontSize: '1rem',
-  },
-  
-  '& .MuiTypography-root': {
-    color: 'rgba(255, 255, 255, 0.95)',
-    fontWeight: 600,
-    display: 'flex',
-    alignItems: 'center',
-    gap: theme.spacing(0.75),
-    fontSize: '0.95rem',
-    letterSpacing: '0.02em',
-  },
-  
-  '& .MuiLink-root': {
-    color: 'rgba(255, 255, 255, 0.9)',
-    textDecoration: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    gap: theme.spacing(0.75),
-    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-    padding: theme.spacing(0.75, 1.25),
-    borderRadius: theme.spacing(2.5),
-    fontWeight: 500,
+  '& .page-header-content': {
+    background: 'rgba(255, 255, 255, 0.15)',
+    backdropFilter: 'blur(20px)',
+    borderTopLeftRadius: theme.spacing(12),
+    borderBottomRightRadius: theme.spacing(12),
+    border: '1px solid rgba(255, 255, 255, 0.3)',
+    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
+    transition: 'all 0.3s ease',
+    overflow: 'hidden',
+    position: 'relative',
     
-    '&:hover, &:focus': {
-      color: '#ffffff',
-      background: 'rgba(255, 255, 255, 0.15)',
-      transform: 'translateY(-1px) scale(1.02)',
-      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+    // Progressive spacing system
+    padding: theme.spacing(6, 0), // More vertical padding for better balance
+    
+    '&:hover': {
+      transform: 'translateY(-5px)',
+      boxShadow: '0 30px 60px rgba(0, 0, 0, 0.15)',
     },
     
-    '&:active': {
-      transform: 'translateY(0) scale(0.98)',
+    // Enhanced responsive spacing
+    [theme.breakpoints.down('lg')]: {
+      padding: theme.spacing(5, 5),
     },
-  },
-  
-  // Mobile optimization
-  [theme.breakpoints.down('sm')]: {
-    padding: theme.spacing(1, 2),
-    
-    '& .MuiTypography-root, & .MuiLink-root': {
-      fontSize: '0.875rem',
-      gap: theme.spacing(0.5),
+    [theme.breakpoints.down('md')]: {
+      padding: theme.spacing(4, 4),
+    },
+    [theme.breakpoints.down('sm')]: {
+      padding: theme.spacing(4, 3),
+      borderRadius: theme.spacing(3),
     },
     
-    '& .MuiBreadcrumbs-separator': {
-      margin: theme.spacing(0, 1),
+    // Inner content wrapper for better organization
+    '& .content-inner': {
+      maxWidth: '900px',
+      margin: '0 auto',
+      textAlign: 'center',
+    },
+    
+    // Main content positioning
+    '& .main-content': {
+      position: 'relative',
+      zIndex: 2,
+    },
+    
+    // Subtle background pattern
+    '&::before': {
+      content: '""',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      background: 'radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%)',
+      pointerEvents: 'none',
+      zIndex: 1,
     },
   },
 }));
 
 // Interfaces
-interface BreadcrumbItem {
-  label: string;
-  href?: string;
-  icon?: React.ReactNode;
-}
-
 interface PageHeaderProps {
   title: string;
   subtitle?: string;
   backgroundImage?: string;
-  breadcrumbs?: BreadcrumbItem[];
   badge?: string; // Optional badge/tag
   description?: string; // Additional description
   actions?: React.ReactNode; // Call-to-action buttons
@@ -362,21 +262,12 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   title,
   subtitle,
   backgroundImage,
-  breadcrumbs = [],
   badge,
   description,
   actions
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
-  // Default breadcrumbs if none provided
-  const defaultBreadcrumbs: BreadcrumbItem[] = [
-    { label: 'Home', href: '/', icon: <HomeIcon sx={{ fontSize: '1rem' }} /> },
-    { label: title }
-  ];
-
-  const finalBreadcrumbs = breadcrumbs.length > 0 ? breadcrumbs : defaultBreadcrumbs;
 
   // Decorative elements for visual appeal
   const decorativeElements = [
@@ -402,46 +293,24 @@ const PageHeader: React.FC<PageHeaderProps> = ({
       <ContentContainer maxWidth="md">
         <Box className="page-header-content">
           <Box className="content-inner">
-            <Box className="header-section">
-              <Stack direction="row" justifyContent="center" sx={{ mb: 2 }}>
-                <StyledBreadcrumbs
-                  separator={<NavigateNextIcon fontSize="small" />}
-                  aria-label="breadcrumb"
-                >
-                  {finalBreadcrumbs.map((crumb, index) => (
-                    crumb.href ? (
-                      <MuiLink key={index} href={crumb.href}>
-                        {crumb.icon}
-                        {crumb.label}
-                      </MuiLink>
-                    ) : (
-                      <Typography key={index}>
-                        {crumb.icon}
-                        {crumb.label}
-                      </Typography>
-                    )
-                  ))}
-                </StyledBreadcrumbs>
-              </Stack>
-
-              {badge && (
-                <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center' }}>
-                  <Chip
-                    label={badge}
-                    sx={{
-                      background: 'rgba(255, 203, 10, 0.2)',
-                      color: 'rgba(255, 255, 255, 0.95)',
-                      fontWeight: 600,
-                      border: '1px solid rgba(255, 203, 10, 0.3)',
-                      fontSize: '0.875rem',
-                      '&:hover': {
-                        background: 'rgba(255, 203, 10, 0.3)',
-                      },
-                    }}
-                  />
-                </Box>
-              )}
-            </Box>
+            {badge && (
+              <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center' }}>
+                <Chip
+                  label={badge}
+                  sx={{
+                    background: 'rgba(255, 203, 10, 0.2)',
+                    color: 'rgba(255, 255, 255, 0.95)',
+                    fontWeight: 600,
+                    border: '1px solid rgba(255, 203, 10, 0.3)',
+                    fontSize: '0.875rem',
+                    animation: `${slideInUp} 0.8s ease-out 0.2s both`,
+                    '&:hover': {
+                      background: 'rgba(255, 203, 10, 0.3)',
+                    },
+                  }}
+                />
+              </Box>
+            )}
 
             <Box className="main-content">
               <AnimatedTitle variant="h1" component="h1">

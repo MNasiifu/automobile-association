@@ -104,10 +104,6 @@ const InternationalDrivingPermit: React.FC = () => {
       <PageHeader
         title="International Driving Permit"
         subtitle="Get your IDP through AAU - your gateway to driving internationally with confidence and legal compliance."
-        breadcrumbs={[
-          { label: 'Home', href: '/' },
-          { label: 'IDP' }
-        ]}
       />
 
       {/* Application Types Section */}

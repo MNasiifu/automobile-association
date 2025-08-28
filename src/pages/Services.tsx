@@ -9,10 +9,6 @@ const Services: React.FC = () => {
       <PageHeader
         title="Our Services"
         subtitle="Comprehensive automotive solutions designed to keep you safe and confident on Uganda's roads."
-        breadcrumbs={[
-          { label: 'Home', href: '/' },
-          { label: 'Services' }
-        ]}
       />
 
       <Box sx={{ pt: 0 }}>

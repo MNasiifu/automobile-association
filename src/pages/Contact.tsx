@@ -88,10 +88,6 @@ const Contact: React.FC = () => {
       <PageHeader
         title="Contact Us"
         subtitle="Get in touch with AAU for emergency assistance, inquiries, or to learn more about our services."
-        breadcrumbs={[
-          { label: 'Home', href: '/' },
-          { label: 'Contact' }
-        ]}
       />
 
       {/* Contact Methods Section */}

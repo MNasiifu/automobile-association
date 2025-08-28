@@ -53,22 +53,19 @@ const PageHeaderDemo: React.FC = () => {
         />`
     },
     {
-      title: 'Header with Custom Breadcrumbs',
+      title: 'Header with Description',
       component: (
         <PageHeader
           title="Team Management"
           subtitle="Manage your team members and permissions"
-          breadcrumbs={[
-            { label: 'Home', href: '/' },
-            { label: 'Admin', href: '/admin' },
-            { label: 'Team Management' }
-          ]}
+          description="Advanced user management tools for team collaboration"
         />
       ),
       code: `        <PageHeader
           title="Team Management"
           subtitle="Manage your team members, roles, and permissions efficiently."
-          breadcrumbs={[`
+          description="Advanced user management tools for team collaboration"
+        />`
     },
     {
       title: 'Header with Background Image',
@@ -93,11 +90,7 @@ const PageHeaderDemo: React.FC = () => {
       <PageHeader
         title="PageHeader Component Demo"
         subtitle="Explore different variations and configurations of the PageHeader component"
-        breadcrumbs={[
-          { label: 'Home', href: '/' },
-          { label: 'Components' },
-          { label: 'PageHeader Demo' }
-        ]}
+        description="Interactive showcase of the redesigned PageHeader component with various configuration options"
       />
 
       {/* Demo Content */}

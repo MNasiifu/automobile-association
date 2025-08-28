@@ -61,10 +61,6 @@ const About: React.FC = () => {
       <PageHeader
         title="About AAU"
         subtitle="Uganda's trusted partner for road safety, insurance, and automotive excellence since establishment."
-        breadcrumbs={[
-          { label: 'Home', href: '/' },
-          { label: 'About' }
-        ]}
       />
 
       {/* Main Content Section */}
