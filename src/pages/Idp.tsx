@@ -15,11 +15,11 @@ import {
 import { 
   ExpandMore as ExpandMoreIcon, 
   Verified as VerifiedIcon,
-  Search as SearchIcon,
+  Search as SearchIcon
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import { Heading, Button } from '../components/atoms';
-import { IDPCard } from '../components/molecules';
+import { IDPCard, PageHeader } from '../components/molecules';
 import { 
   idpApplicationTypes, 
   idpBenefits, 
@@ -101,20 +101,20 @@ const InternationalDrivingPermit: React.FC = () => {
 
   return (
     <Box>
-      {/* Hero Section */}
+      <PageHeader
+        title="International Driving Permit"
+        subtitle="Get your IDP through AAU - your gateway to driving internationally with confidence and legal compliance."
+        breadcrumbs={[
+          { label: 'Home', href: '/' },
+          { label: 'IDP' }
+        ]}
+      />
+
+      {/* Application Types Section */}
       <IDPSection>
         <Container maxWidth="lg">
-          <Box sx={{ textAlign: 'center', mb: 8 }}>
-            <Heading variant="h1" gutterBottom>
-              International Driving Permit (IDP)
-            </Heading>
-            
-            <Typography variant="h6" color="text.secondary" sx={{ maxWidth: 700, mx: 'auto', mb: 4 }}>
-              Drive legally in over 150 countries worldwide with an official International 
-              Driving Permit from AA Uganda. Get your IDP quickly and efficiently.
-            </Typography>
-
-            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <Box sx={{ textAlign: 'center', mb: 6 }}>
+            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap', mb: 4 }}>
               <Button
                 variant="contained"
                 color="primary"

@@ -3,6 +3,7 @@ import { Box, Container, Typography, Grid, TextField, Paper } from '@mui/materia
 import { Phone, Email, LocationOn, AccessTime } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import { Heading, Button, Card } from '../components/atoms';
+import { PageHeader } from '../components/molecules';
 import { companyInfo } from '../data/companyData';
 
 const ContactSection = styled(Box)(({ theme }) => ({
@@ -84,20 +85,18 @@ const Contact: React.FC = () => {
 
   return (
     <Box>
-      {/* Hero Section */}
+      <PageHeader
+        title="Contact Us"
+        subtitle="Get in touch with AAU for emergency assistance, inquiries, or to learn more about our services."
+        breadcrumbs={[
+          { label: 'Home', href: '/' },
+          { label: 'Contact' }
+        ]}
+      />
+
+      {/* Contact Methods Section */}
       <ContactSection>
         <Container maxWidth="lg">
-          <Box sx={{ textAlign: 'center', mb: 8 }}>
-            <Heading variant="h1" gutterBottom>
-              Contact Us
-            </Heading>
-            
-            <Typography variant="h6" color="text.secondary" sx={{ maxWidth: 600, mx: 'auto' }}>
-              Get in touch with us for any inquiries about our services, 
-              membership, or emergency assistance.
-            </Typography>
-          </Box>
-          
           <Grid container spacing={4}>
             {contactMethods.map((method, index) => (
               <Grid item xs={12} sm={6} md={3} key={index}>

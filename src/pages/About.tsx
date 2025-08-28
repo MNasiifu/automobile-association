@@ -3,6 +3,7 @@ import { Box, Container, Typography, Grid, Avatar } from '@mui/material';
 import { Timeline, People, EmojiEvents, Security } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import { Heading, Card } from '../components/atoms';
+import { PageHeader } from '../components/molecules';
 import { companyInfo } from '../data/companyData';
 
 const AboutSection = styled(Box)(({ theme }) => ({
@@ -57,20 +58,20 @@ const About: React.FC = () => {
 
   return (
     <Box>
-      {/* Hero Section */}
+      <PageHeader
+        title="About AAU"
+        subtitle="Uganda's trusted partner for road safety, insurance, and automotive excellence since establishment."
+        breadcrumbs={[
+          { label: 'Home', href: '/' },
+          { label: 'About' }
+        ]}
+      />
+
+      {/* Main Content Section */}
       <AboutSection>
         <Container maxWidth="lg">
           <Grid container spacing={6} alignItems="center">
             <Grid item xs={12} md={6}>
-              <Heading variant="h1" gutterBottom>
-                About {companyInfo.shortName}
-              </Heading>
-              
-              <Typography variant="h6" color="text.secondary" sx={{ mb: 4, lineHeight: 1.6 }}>
-                Established in {companyInfo.founded}, the Automobile Association of Uganda 
-                has been the trusted partner for motorists across the country for over six decades.
-              </Typography>
-              
               <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.7 }}>
                 {companyInfo.mission}
               </Typography>
