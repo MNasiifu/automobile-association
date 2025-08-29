@@ -43,6 +43,7 @@ import g3 from '../assets/images/car1.jpeg';
 import g4 from '../assets/images/defensive-driving.jpeg';
 import g5 from '../assets/images/driving-school.jpg';
 import g6 from '../assets/images/road.jpg';
+import g7 from '../assets/images/TOWINGANDRECOVERYFRESHCAR.jpeg';
 
 function useInView<T extends Element>(options?: IntersectionObserverInit) {
   const ref = React.useRef<T | null>(null);
@@ -298,7 +299,7 @@ const About: React.FC = () => {
     },
   ];
 
-  const gallery = [g1, g2, g3, g4, g5, g6];
+  const gallery = [g1, g2, g3, g4, g5, g6, g7];
 
   return (
     <Box>
