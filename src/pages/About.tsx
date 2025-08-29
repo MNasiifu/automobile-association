@@ -23,6 +23,7 @@ import {
 } from '@mui/icons-material';
 import { Heading, Card } from '../components/atoms';
 import { PageHeader } from '../components/molecules';
+import { useLocation } from 'react-router-dom';
 import {
   companyInfo,
   affiliates,
@@ -56,6 +57,16 @@ function useInView<T extends Element>(options?: IntersectionObserverInit) {
     return () => obs.disconnect();
   }, [options]);
   return { ref, inView };
+}
+
+function useHashScroll() {
+  const location = useLocation();
+  React.useEffect(() => {
+    const hash = location.hash?.replace('#', '');
+    if (!hash) return;
+    const el = document.getElementById(decodeURIComponent(hash));
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [location.pathname, location.hash]);
 }
 
 const Section = styled('section')(({ theme }) => ({
@@ -250,6 +261,7 @@ const PersonCard: React.FC<{ name: string; role: string }> = ({
 );
 
 const About: React.FC = () => {
+  useHashScroll();
   const [journeyExpanded, setJourneyExpanded] = React.useState(false);
 
   const milestonesDesc = React.useMemo(

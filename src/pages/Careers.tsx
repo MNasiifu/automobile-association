@@ -34,6 +34,7 @@ const Careers: React.FC = () => {
 
               <Button
                 variant="contained"
+                color="secondary"
                 sx={{
                   // Yellow bg + green text (consistent with your brand)
                   bgcolor: 'secondary.main',

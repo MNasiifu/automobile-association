@@ -1,15 +1,30 @@
 import React from 'react';
 import {
-  AppBar, Toolbar, Box, IconButton, Popper, Paper, List, ListItemButton, Typography, useScrollTrigger
+  AppBar,
+  Toolbar,
+  Box,
+  IconButton,
+  Popper,
+  Paper,
+  List,
+  ListItemButton,
+  Typography,
+  useScrollTrigger,
 } from '@mui/material';
 import { Menu as MenuIcon, KeyboardArrowDown } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
-import { Link as RouterLink, type LinkProps as RouterLinkProps, useLocation } from 'react-router-dom';
+import {
+  Link as RouterLink,
+  type LinkProps as RouterLinkProps,
+  useLocation,
+} from 'react-router-dom';
 import { Button } from '../atoms';
 import { navigationItems, companyInfo } from '../../data/companyData';
 import AAULogo from '../../assets/images/aau-logo.png';
 
-interface NavigationProps { onMenuClick?: () => void; }
+interface NavigationProps {
+  onMenuClick?: () => void;
+}
 type NavChild = { label: string; path: string };
 type NavItem = { label: string; path: string; children?: NavChild[] };
 
@@ -51,10 +66,11 @@ const MobileMenuButton = styled(IconButton)(({ theme }) => ({
   [theme.breakpoints.up('md')]: { display: 'none' },
 }));
 
-
-const LinkBehavior = React.forwardRef<HTMLAnchorElement, RouterLinkProps>(function LinkBehavior(props, ref) {
-  return <RouterLink ref={ref} {...props} />;
-});
+const LinkBehavior = React.forwardRef<HTMLAnchorElement, RouterLinkProps>(
+  function LinkBehavior(props, ref) {
+    return <RouterLink ref={ref} {...props} />;
+  }
+);
 
 const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
   const location = useLocation();
@@ -68,7 +84,9 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
   const closeTimer = React.useRef<number | null>(null);
 
   const isActiveRoute = (path: string) =>
-    path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
+    path === '/'
+      ? location.pathname === '/'
+      : location.pathname.startsWith(path);
 
   const cancelClose = () => {
     if (closeTimer.current !== null) {
@@ -87,7 +105,11 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
   };
 
   // Open on hover/focus instantly (re-anchors if switching parents)
-  const handleParentEnter = (key: string, el: HTMLElement, kids?: NavChild[]) => {
+  const handleParentEnter = (
+    key: string,
+    el: HTMLElement,
+    kids?: NavChild[]
+  ) => {
     cancelClose();
     if (kids && kids.length) {
       setActiveKey(key);
@@ -113,7 +135,9 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
 
   return (
     <StyledAppBar position="sticky" elevation={trigger ? 2 : 0}>
-      <Toolbar sx={{ px: { xs: 2, sm: 3, md: 4 }, minHeight: { xs: 64, md: 72 } }}>
+      <Toolbar
+        sx={{ px: { xs: 2, sm: 3, md: 4 }, minHeight: { xs: 64, md: 72 } }}
+      >
         <Logo component={LinkBehavior} to="/" aria-label="AA Uganda Home">
           <img src={AAULogo} alt="AA Uganda Logo" />
           <Box className="logo-text">{companyInfo.phrase}</Box>
@@ -134,14 +158,30 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
             return (
               <Box
                 key={key}
-                onMouseEnter={(e) => handleParentEnter(key, e.currentTarget as HTMLElement, item.children)}
-                onFocus={(e) => handleParentEnter(key, e.currentTarget as HTMLElement, item.children)}
+                onMouseEnter={(e) =>
+                  handleParentEnter(
+                    key,
+                    e.currentTarget as HTMLElement,
+                    item.children
+                  )
+                }
+                onFocus={(e) =>
+                  handleParentEnter(
+                    key,
+                    e.currentTarget as HTMLElement,
+                    item.children
+                  )
+                }
               >
                 <Button
                   variant="text"
                   component={LinkBehavior}
                   to={item.path}
-                  endIcon={hasChildren ? <KeyboardArrowDown sx={{ ml: 0.25 }} /> : undefined}
+                  endIcon={
+                    hasChildren ? (
+                      <KeyboardArrowDown sx={{ ml: 0.25 }} />
+                    ) : undefined
+                  }
                   aria-haspopup={hasChildren ? 'menu' : undefined}
                   aria-expanded={activeKey === key ? 'true' : undefined}
                   aria-controls={activeKey === key ? 'nav-popper' : undefined}
@@ -155,12 +195,18 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
                       ? {
                           content: '""',
                           position: 'absolute',
-                          left: 10, right: 10, bottom: 6,
-                          height: 3, borderRadius: 3,
+                          left: 10,
+                          right: 10,
+                          bottom: 6,
+                          height: 3,
+                          borderRadius: 3,
                           backgroundColor: 'secondary.main',
                         }
                       : {},
-                    '&:hover': { backgroundColor: 'primary.main', color: 'primary.contrastText' },
+                    '&:hover': {
+                      backgroundColor: 'primary.main',
+                      color: 'primary.contrastText',
+                    },
                   }}
                 >
                   {item.label}
@@ -196,8 +242,8 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
             sx={{
               mt: 1,
               borderRadius: 1,
-              bgcolor: 'secondary.main', 
-              color: 'primary.main',    
+              bgcolor: 'secondary.main',
+              color: 'primary.main',
               minWidth: 240,
               boxShadow: '0 8px 20px rgba(0,0,0,0.18)',
             }}
@@ -208,21 +254,46 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
                   key={c.path}
                   component={LinkBehavior}
                   to={c.path}
-                  onClick={() => scheduleClose(0)}
+                  onClick={(e) => {
+                    const isHash = c.path.includes('#');
+                    if (isHash) {
+                      const [base, rawHash] = c.path.split('#');
+                      const hash = decodeURIComponent(rawHash || '');
+                      if (location.pathname === base && hash) {
+                        e.preventDefault(); // stay on the same route
+                        const el = document.getElementById(hash);
+                        if (el)
+                          el.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start',
+                          });
+                      }
+                    }
+                    scheduleClose(0);
+                  }}
                   sx={{
                     fontWeight: 500,
                     letterSpacing: 0.8,
-                    '&:hover': { bgcolor: 'primary.main', color: 'primary.contrastText' },
+                    '&:hover': {
+                      bgcolor: 'primary.main',
+                      color: 'primary.contrastText',
+                    },
                   }}
                 >
-                  <Typography variant="body2" sx={{ fontWeight: 600, py: 0.5 }}>{c.label}</Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 600, py: 0.5 }}>
+                    {c.label}
+                  </Typography>
                 </ListItemButton>
               ))}
             </List>
           </Paper>
         </Popper>
 
-        <MobileMenuButton color="inherit" aria-label="Open menu" onClick={onMenuClick}>
+        <MobileMenuButton
+          color="inherit"
+          aria-label="Open menu"
+          onClick={onMenuClick}
+        >
           <MenuIcon />
         </MobileMenuButton>
       </Toolbar>
