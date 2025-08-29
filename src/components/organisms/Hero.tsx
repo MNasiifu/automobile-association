@@ -3,7 +3,7 @@ import { Box, Container, Typography, Grid } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Button, Heading } from '../atoms';
 import { heroContent } from '../../data/companyData';
-import HeroImage from '../../assets/images/hero-illustration.png';
+import HeroImage from '../../assets/images/defensive-driving.jpeg';
 
 const HeroSection = styled(Box)(({ theme }) => ({
   background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
@@ -157,7 +157,7 @@ const Hero: React.FC = () => {
                 alt="AA Uganda Services"
                 sx={{
                   width: '100%',
-                  maxWidth: 400,
+                  maxWidth: 600,
                   height: 'auto',
                   filter: 'drop-shadow(0 10px 20px rgba(0, 0, 0, 0.2))',
                 }}

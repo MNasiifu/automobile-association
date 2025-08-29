@@ -1,7 +1,9 @@
 // Company information and static data for AA Uganda
-
+import fiaImage from '../assets/images/FIA.jpeg';
 export const companyInfo = {
   name: "Automobile Association of Uganda",
+  phrase: "Inspring Mobility",
+  description: "AA Uganda is a leading motoring organization in Uganda, offering a wide range of services including roadside assistance, driving education, insurance, and travel services.",
   shortName: "AA Uganda",
   founded: "1955",
   address: {
@@ -19,13 +21,13 @@ export const companyInfo = {
     website: "www.aauganda.co.ug",
   },
   social: {
-    facebook: "https://facebook.com/aauganda",
-    twitter: "https://twitter.com/aauganda",
-    linkedin: "https://linkedin.com/company/aauganda",
+    facebook: "https://www.facebook.com/profile.php?id=100054503438804",
+    twitter: "https://x.com/AUTOMOBILEASSO1",
+    linkedin: "https://linkedin.com/company/aa-kenya",
     instagram: "https://instagram.com/aauganda",
   },
   mission: "To provide reliable motoring solutions by responding to members' needs while ensuring organizational growth and excellence in service delivery.",
-  vision: "To be the leading motoring organization in Uganda, providing comprehensive automotive services and promoting road safety across the nation.",
+  vision: "Founded to offer reliable motoring solutions by responding to members' needs while taking into consideration the club's growth.",
   values: [
     "Excellence in Service",
     "Integrity and Trust",
@@ -36,12 +38,71 @@ export const companyInfo = {
 };
 
 export const navigationItems = [
-  { label: "Home", path: "/" },
-  { label: "About", path: "/about" },
-  { label: "Services", path: "/services" },
-  { label: "IDP", path: "/idp" },
-  { label: "Contact Us", path: "/contact" },
+  { label: 'Home', path: '/' },
+
+  {
+    label: 'About Us',
+    path: '/about',
+    children: [
+      { label: 'Mission & Vision', path: '/about#mission-vision' },
+      { label: 'Our Journey', path: '/about#journey' },
+      { label: 'Board of Directors', path: '/about#board' },
+      { label: 'Management', path: '/about#management' },
+      { label: 'Affiliation', path: '/about#affiliation' },
+      { label: 'Gallery', path: '/about#gallery' },
+      { label: 'Careers', path: '/careers' },
+    ],
+  },
+
+  {
+    label: 'AA Membership',
+    path: '/membership',
+    children: [
+      { label: 'Premier', path: '/membership#premier' },
+      { label: 'Prestige', path: '/membership#prestige' },
+      { label: 'Classic', path: '/membership#classic' },
+      { label: 'Corporate', path: '/membership#corporate' },
+    ],
+  },
+
+  {
+    label: 'AA Driving School',
+    path: '/driving-school',
+    children: [
+      { label: 'About the School', path: '/driving-school#about' },
+      { label: 'Defensive Driving', path: '/driving-school#defensive' },
+      { label: 'Refresher Courses', path: '/driving-school#refresher' },
+    ],
+  },
+
+  {
+    label: 'Our Services',
+    path: '/services',
+    children: [
+      { label: 'Vehicle Inspection', path: '/vehicle-inspection' },
+      { label: 'AA Insurance', path: '/insurance' },
+      { label: 'Carnet / Car Passport', path: '/services#carnet' },
+      { label: 'AA Institute', path: '/institute' },
+    ],
+  },
+  {
+    label: 'Contact Us',
+    path: '/contact',
+    children: [
+      { label: 'Contact Us', path: '/contact' },
+      { label: 'Branches', path: '/contact#branches' },
+    ],
+  },
+] as const;
+
+export const affiliates = [
+  {
+    name: 'FIA',
+    img: fiaImage,
+    description: `Internationally, AA Uganda is a member of Federation Internationale de l'Automobile (FIA), the world motoring body which represents over 100 million motorists and their families. FIA brings together 246 international motoring and sports organizations from 145 countries in 5 continents. Through its membership to FIA, AA has over the years been able to learn best practice from other AA clubs from across the globe, and implement some of these solutions in Kenya.AA is also a member of the world Touring Body – Alliance Internationale de Tourisme (AIT). The AA CEO and the Governing Council President hold the positions of Treasurer and Vice President respectively at the African AA Clubs - African Council of Touring and Automobile Clubs (ACTA).`,
+  },
 ];
+
 
 export const heroContent = {
   title: "Your Trusted Partner on Uganda's Roads",
@@ -57,8 +118,39 @@ export const heroContent = {
   ],
 };
 
+type Person = { name: string; role: string };
+
+export const board: Person[] = [
+  { name: 'Jane K.', role: 'Board Chair' },
+  { name: 'Michael O.', role: 'Vice Chair' },
+  { name: 'Grace A.', role: 'Board Member' },
+  { name: 'Peter N.', role: 'Board Member' },
+  { name: 'Ruth S.', role: 'Board Member' },
+  { name: 'Paul T.', role: 'Board Member' },
+];
+
+export const management: Person[] = [
+  { name: 'John M.', role: 'Chief Executive Officer' },
+  { name: 'Sarah N.', role: 'Head of Operations' },
+  { name: 'David B.', role: 'Head of Training' },
+  { name: 'Rita T.', role: 'Head of Finance' },
+  { name: 'Agnes K.', role: 'Head of ICT' },
+  { name: 'Tom W.', role: 'Head of Membership' },
+];
+
+export const milestones = [
+  { year: 2023, text: 'Introduced enhanced inspection & advisory services.' },
+  { year: 2020, text: 'Digitized member services with online applications and support.' },
+  { year: 2005, text: 'Launched modern driving school and safety training programs.' },
+  { year: 1978, text: 'Expanded roadside support coverage across major corridors.' },
+  { year: 1955, text: 'Founded with a mission to support motorists and road safety in Uganda.' },
+];
+
 export default {
   companyInfo,
   navigationItems,
   heroContent,
+  board,
+  management,
+  affiliates,
 };

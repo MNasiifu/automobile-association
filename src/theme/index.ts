@@ -84,6 +84,26 @@ const components = {
           background: `linear-gradient(135deg, ${colors.primary.dark} 0%, ${colors.primary.main} 100%)`,
         },
       },
+       containedSecondary: {
+        backgroundImage: 'none',
+        background: colors.secondary.main,     // yellow bg
+        color: colors.primary.main,            // green text
+        fontWeight: 900,
+        '&:hover': {
+          background: colors.secondary.light,  // lighter yellow
+          color: colors.primary.dark,          // darker green text
+          boxShadow: '0 6px 18px rgba(2,79,49,0.25)',
+        },
+        '&:focus-visible': {
+          outline: 'none',
+          boxShadow: '0 0 0 3px rgba(2,79,49,0.25)',
+        },
+        '&.Mui-disabled': {
+          background: '#00000014', // same feel as MUI disabled bg
+          color: '#00000061',
+          boxShadow: 'none',
+        },
+      },
     },
   },
   MuiCard: {

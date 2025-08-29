@@ -5,3 +5,4 @@ export { default as Membership } from './Idp';
 export { default as InternationalDrivingPermit } from './Idp';
 export { default as Contact } from './Contact';
 export { default as PageHeaderDemo } from './PageHeaderDemo';
+export { default as Careers } from './Careers';

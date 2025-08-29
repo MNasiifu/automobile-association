@@ -5,7 +5,7 @@ import { Close as CloseIcon } from '@mui/icons-material';
 import theme from './theme';
 import { Navigation } from './components/molecules';
 import { Footer } from './components/organisms';
-import { Home, About, Services, Membership, Contact } from './pages';
+import { Home, About, Services, Membership, Contact, Careers } from './pages';
 import { navigationItems } from './data/companyData';
 
 // Mobile Menu Component
@@ -40,6 +40,7 @@ const MobileMenu: React.FC<{ open: boolean; onClose: () => void }> = ({ open, on
               key={item.path} 
               onClick={onClose}
               component={Link}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               {...({ to: item.path } as any)}
               sx={{
                 textDecoration: 'none',
@@ -97,6 +98,7 @@ const App: React.FC = () => {
               <Route path="/services" element={<Services />} />
               <Route path="/idp" element={<Membership />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/careers" element={<Careers />} />
             </Routes>
           </Box>
           
