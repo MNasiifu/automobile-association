@@ -35,8 +35,10 @@ const StyledContentContainer = styled(Container)(({ theme }) => ({
       padding: theme.spacing(4, 4),
     },
     [theme.breakpoints.down('sm')]: {
-      padding: theme.spacing(4, 3),
-      borderRadius: theme.spacing(3),
+      padding: theme.spacing(2.5, 3),
+      borderRadius: theme.spacing(5),
+      border: 'none',
+      background: '#6d6e702e',
     },
     
     // Inner content wrapper for better organization

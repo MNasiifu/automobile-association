@@ -12,7 +12,7 @@ const StyledHeaderContainer = styled(Box)<{ $backgroundImage?: string }>(({ them
   overflow: 'hidden',
   background: $backgroundImage 
     ? `linear-gradient(135deg, rgba(2, 121, 63, 0.9) 0%, rgba(2, 121, 63, 0.7) 100%), url(${$backgroundImage})`
-    : `linear-gradient(135deg, ${theme.palette.secondary.main} 0%, ${theme.palette.secondary.dark} 100%)`,
+    : `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
   backgroundSize: 'cover',
   backgroundPosition: 'center',
   backgroundAttachment: 'fixed',

@@ -35,10 +35,34 @@ export const companyInfo = {
   ],
 };
 
-export const navigationItems = [
+export interface NavigationItem {
+  label: string;
+  path: string;
+  submenu?: NavigationSubItem[];
+}
+
+export interface NavigationSubItem {
+  label: string;
+  path: string;
+  icon?: string;
+}
+
+export const navigationItems: NavigationItem[] = [
   { label: "Home", path: "/" },
   { label: "About", path: "/about" },
-  { label: "Services", path: "/services" },
+  { 
+    label: "Services", 
+    path: "/services",
+    submenu: [
+      { label: "Vehicle Valuation", path: "/services/vehicle-valuation", icon: "Assessment" },
+      { label: "Fleet Management", path: "/services/fleet-management", icon: "FleetManagement" },
+      { label: "Rescue Services", path: "/services/rescue", icon: "BuildCircle" },
+      { label: "Vehicle Inspection", path: "/services/vehicle-inspection", icon: "Search" },
+      { label: "Insurance Services", path: "/services/insurance", icon: "Security" },
+      { label: "Automotive Advisory", path: "/services/automotive-advisory", icon: "SupportAgent" },
+      { label: "Membership", path: "/services/membership", icon: "CardMembership" },
+    ]
+  },
   { label: "IDP", path: "/idp" },
   { label: "Contact Us", path: "/contact" },
 ];

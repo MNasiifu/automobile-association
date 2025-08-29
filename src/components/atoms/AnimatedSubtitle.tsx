@@ -5,7 +5,7 @@ import { slideInUp } from './animations';
 
 const StyledAnimatedSubtitle = styled(Typography)(({ theme }) => ({
   color: 'rgba(255, 255, 255, 0.95)',
-  fontSize: 'clamp(1.1rem, 2vw + 0.5rem, 1.4rem)',
+  fontSize: 'clamp(1.1rem, 2vw + 0.5rem, 1.1rem)',
   fontWeight: 400,
   lineHeight: 1.65,
   textShadow: '0 2px 8px rgba(0,0,0,0.3)',
