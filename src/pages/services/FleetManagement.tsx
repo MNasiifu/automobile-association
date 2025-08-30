@@ -10,7 +10,6 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  Chip,
   Button,
   Paper,
   Stack,
@@ -27,15 +26,13 @@ import {
   Route as RouteIcon,
   Assignment as ReportIcon,
   CheckCircle as CheckIcon,
-  Phone as PhoneIcon,
-  Email as EmailIcon,
   ExpandMore as ExpandMoreIcon,
   Schedule as ScheduleIcon,
   Build as BuildIcon,
   Person as PersonIcon,
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
-import { PageHeader } from '../../components/molecules';
+import { ContactButtons, PageHeader } from '../../components/molecules';
 import { Heading } from '../../components/atoms';
 
 const HeroSection = styled(Box)(({ theme }) => ({
@@ -205,36 +202,9 @@ const FleetManagement: React.FC = () => {
                   <strong>Trusted Heritage:</strong> Built on the Automobile Association legacy with decades of experience serving Ugandan motorists.
                 </Typography>
               </Alert>
-              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                <Button
-                  variant="contained"
-                  size="large"
-                  startIcon={<PhoneIcon />}
-                  sx={{ 
-                    px: 4, 
-                    py: 1.5,
-                    borderRadius: 3,
-                    textTransform: 'none',
-                    fontSize: '1.1rem',
-                  }}
-                >
-                  Get Demo
-                </Button>
-                <Button
-                  variant="outlined"
-                  size="large"
-                  startIcon={<EmailIcon />}
-                  sx={{ 
-                    px: 4, 
-                    py: 1.5,
-                    borderRadius: 3,
-                    textTransform: 'none',
-                    fontSize: '1.1rem',
-                  }}
-                >
-                  Request Quote
-                </Button>
-              </Stack>
+              <ContactButtons 
+                whatsappMessage="Hello! I would like to inquire about your fleet management services."
+              />
             </Grid>
             <Grid item xs={12} md={6}>
               <Grid container spacing={2}>
@@ -335,27 +305,115 @@ const FleetManagement: React.FC = () => {
           <Grid container spacing={4}>
             {managementFeatures.map((feature, index) => (
               <Grid item xs={12} sm={6} md={3} key={index}>
-                <Paper sx={{ p: 3, textAlign: 'center', height: '100%', borderRadius: 2 }}>
-                  <IconWrapper sx={{ mx: 'auto' }}>
+                <Paper 
+                  sx={{ 
+                    p: 3, 
+                    textAlign: 'center', 
+                    height: '100%', 
+                    borderRadius: 3,
+                    transition: 'all 0.3s ease-in-out',
+                    cursor: 'pointer',
+                    border: '1px solid transparent',
+                    '&:hover': {
+                      transform: 'translateY(-8px)',
+                      boxShadow: (theme) => `0 12px 32px ${theme.palette.primary.main}20`,
+                      borderColor: 'primary.main',
+                      '& .feature-icon': {
+                        transform: 'scale(1.1)',
+                      },
+                      '& .feature-list': {
+                        '& .feature-item': {
+                          transform: 'translateX(4px)',
+                        }
+                      }
+                    }
+                  }}
+                >
+                  <IconWrapper 
+                    className="feature-icon"
+                    sx={{ 
+                      mx: 'auto',
+                      transition: 'transform 0.3s ease-in-out',
+                      mb: 3,
+                    }}
+                  >
                     {feature.icon}
                   </IconWrapper>
-                  <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+                  <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
                     {feature.title}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 3, lineHeight: 1.6 }}>
                     {feature.description}
                   </Typography>
-                  <Box>
-                    {feature.features.map((item, idx) => (
-                      <Chip
-                        key={idx}
-                        label={item}
-                        size="small"
-                        sx={{ m: 0.25 }}
-                        variant="outlined"
-                        color="primary"
-                      />
-                    ))}
+                  
+                  {/* Enhanced feature list with better visual hierarchy */}
+                  <Box 
+                    className="feature-list"
+                    sx={{ 
+                      textAlign: 'left',
+                      mt: 3,
+                      pt: 2,
+                      borderTop: '1px solid',
+                      borderColor: 'divider',
+                    }}
+                  >
+                    <Typography 
+                      variant="overline" 
+                      sx={{ 
+                        display: 'block',
+                        textAlign: 'center',
+                        mb: 2,
+                        fontWeight: 600,
+                        color: 'primary.main',
+                        letterSpacing: 1.2,
+                      }}
+                    >
+                      Key Features
+                    </Typography>
+                    <Stack spacing={1}>
+                      {feature.features.map((item, idx) => (
+                        <Box
+                          key={idx}
+                          className="feature-item"
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            transition: 'all 0.2s ease-in-out',
+                            p: 1,
+                            borderRadius: 1,
+                            '&:hover': {
+                              backgroundColor: 'primary.main',
+                              color: 'primary.contrastText',
+                              '& .check-icon': {
+                                color: 'secondary.main',
+                                transform: 'scale(1.2)',
+                              }
+                            }
+                          }}
+                        >
+                          <CheckIcon 
+                            className="check-icon"
+                            sx={{ 
+                              color: 'success.main', 
+                              mr: 1.5, 
+                              fontSize: '1.1rem',
+                              transition: 'all 0.2s ease-in-out',
+                              flexShrink: 0,
+                            }} 
+                          />
+                          <Typography 
+                            variant="body2" 
+                            sx={{ 
+                              fontSize: '0.9rem',
+                              fontWeight: 500,
+                              lineHeight: 1.4,
+                            }}
+                          >
+                            {item}
+                          </Typography>
+                        </Box>
+                      ))}
+                    </Stack>
                   </Box>
                 </Paper>
               </Grid>
@@ -365,48 +423,406 @@ const FleetManagement: React.FC = () => {
       </Box>
 
       {/* How It Works */}
-      <Container maxWidth="lg" sx={{ py: 8 }}>
+      <Container maxWidth="lg" sx={{ py: 8, position: 'relative' }}>
         <Heading variant="h2" align="center" gutterBottom>
           How It Works
         </Heading>
-        <Typography variant="h6" align="center" color="text.secondary" sx={{ mb: 6 }}>
-          Simple 3-step process to get your fleet managed and protected
+        <Typography variant="h6" align="center" color="text.secondary" sx={{ mb: 8, maxWidth: 700, mx: 'auto' }}>
+          Our streamlined 3-step process ensures quick deployment and immediate value for your fleet operations
         </Typography>
 
-        <Grid container spacing={4}>
-          {processSteps.map((step, index) => (
-            <Grid item xs={12} md={4} key={index}>
-              <Paper sx={{ p: 4, textAlign: 'center', borderRadius: 3 }}>
+        {/* Desktop Timeline */}
+        <Box 
+          sx={{ 
+            display: { xs: 'none', md: 'block' },
+            position: 'relative',
+            mb: 4,
+          }}
+        >
+          {/* Timeline line */}
+          <Box
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '16.66%',
+              right: '16.66%',
+              height: 4,
+              background: 'linear-gradient(90deg, transparent 0%, #e0e0e0 20%, #e0e0e0 80%, transparent 100%)',
+              borderRadius: 2,
+              zIndex: 0,
+              transform: 'translateY(-50%)',
+            }}
+          />
+          
+          {/* Animated progress line */}
+          <Box
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '16.66%',
+              width: '66.66%',
+              height: 4,
+              background: (theme) => `linear-gradient(90deg, 
+                transparent 0%, 
+                ${theme.palette.primary.main} 10%, 
+                ${theme.palette.primary.main} 35%, 
+                ${theme.palette.primary.light} 45%, 
+                ${theme.palette.primary.light} 65%, 
+                ${theme.palette.secondary.main} 75%, 
+                ${theme.palette.secondary.main} 90%, 
+                transparent 100%
+              )`,
+              borderRadius: 2,
+              zIndex: 1,
+              transform: 'translateY(-50%)',
+              animation: 'pulse 3s ease-in-out infinite',
+              '@keyframes pulse': {
+                '0%, 100%': { opacity: 0.7 },
+                '50%': { opacity: 1 },
+              },
+            }}
+          />
+
+          <Grid container spacing={0}>
+            {processSteps.map((step, index) => (
+              <Grid item xs={4} key={index} sx={{ position: 'relative' }}>
                 <Box
                   sx={{
-                    width: 60,
-                    height: 60,
-                    borderRadius: '50%',
-                    backgroundColor: 'primary.main',
-                    color: 'white',
                     display: 'flex',
+                    flexDirection: 'column',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '1.5rem',
-                    fontWeight: 'bold',
-                    margin: '0 auto 16px',
+                    position: 'relative',
+                    zIndex: 2,
                   }}
                 >
-                  {index + 1}
+                  {/* Step Number with enhanced design */}
+                  <Box
+                    sx={{
+                      width: 80,
+                      height: 80,
+                      borderRadius: '50%',
+                      background: (theme) => `linear-gradient(135deg, 
+                        ${theme.palette.primary.main} 0%, 
+                        ${theme.palette.primary.dark} 100%
+                      )`,
+                      color: 'white',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '1.8rem',
+                      fontWeight: 'bold',
+                      mb: 3,
+                      cursor: 'pointer',
+                      transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                      border: '4px solid white',
+                      boxShadow: (theme) => `0 8px 32px ${theme.palette.primary.main}30`,
+                      position: 'relative',
+                      overflow: 'hidden',
+                      '&::before': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        background: 'linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%)',
+                        transform: 'translateX(-100%)',
+                        transition: 'transform 0.6s ease',
+                      },
+                      '&:hover': {
+                        transform: 'scale(1.15) rotate(5deg)',
+                        boxShadow: (theme) => `0 16px 48px ${theme.palette.primary.main}40`,
+                        '&::before': {
+                          transform: 'translateX(100%)',
+                        },
+                      },
+                    }}
+                  >
+                    {index + 1}
+                  </Box>
+
+                  {/* Enhanced card design */}
+                  <Paper 
+                    sx={{ 
+                      p: 4, 
+                      textAlign: 'center', 
+                      borderRadius: 4,
+                      width: '100%',
+                      maxWidth: 280,
+                      height: 320,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      cursor: 'pointer',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      border: '2px solid transparent',
+                      background: 'linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%)',
+                      '&::before': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: 4,
+                        background: (theme) => `linear-gradient(90deg, 
+                          ${theme.palette.primary.main} 0%, 
+                          ${theme.palette.secondary.main} 100%
+                        )`,
+                      },
+                      '&:hover': {
+                        transform: 'translateY(-12px)',
+                        boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+                        borderColor: 'primary.main',
+                        '& .step-icon': {
+                          transform: 'scale(1.2) rotate(10deg)',
+                        },
+                        '& .step-title': {
+                          color: 'primary.main',
+                        },
+                      },
+                    }}
+                  >
+                    <Box>
+                      <Box
+                        className="step-icon"
+                        sx={{
+                          width: 72,
+                          height: 72,
+                          borderRadius: '20px',
+                          background: (theme) => `linear-gradient(135deg, 
+                            ${theme.palette.primary.light}30 0%, 
+                            ${theme.palette.primary.light}60 100%
+                          )`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          margin: '0 auto 24px',
+                          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                          '& svg': {
+                            color: 'primary.main',
+                            fontSize: '2rem',
+                          },
+                        }}
+                      >
+                        {step.icon}
+                      </Box>
+                      
+                      <Typography 
+                        variant="h5" 
+                        className="step-title"
+                        gutterBottom 
+                        sx={{ 
+                          fontWeight: 700,
+                          mb: 2,
+                          transition: 'color 0.3s ease',
+                          fontSize: '1.4rem',
+                        }}
+                      >
+                        {step.title}
+                      </Typography>
+                    </Box>
+
+                    <Typography 
+                      variant="body1" 
+                      color="text.secondary" 
+                      sx={{ 
+                        lineHeight: 1.6,
+                        fontSize: '1rem',
+                        fontWeight: 400,
+                      }}
+                    >
+                      {step.description}
+                    </Typography>
+
+                    {/* Progress indicator */}
+                    <Box
+                      sx={{
+                        mt: 2,
+                        pt: 2,
+                        borderTop: '1px solid',
+                        borderColor: 'divider',
+                      }}
+                    >
+                      <Typography 
+                        variant="caption" 
+                        sx={{ 
+                          color: 'primary.main',
+                          fontWeight: 600,
+                          textTransform: 'uppercase',
+                          letterSpacing: 1.2,
+                        }}
+                      >
+                        Step {index + 1} of 3
+                      </Typography>
+                    </Box>
+                  </Paper>
                 </Box>
-                <IconWrapper sx={{ mx: 'auto', mb: 2 }}>
-                  {step.icon}
-                </IconWrapper>
-                <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-                  {step.title}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {step.description}
-                </Typography>
-              </Paper>
-            </Grid>
-          ))}
-        </Grid>
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
+
+        {/* Mobile/Tablet Version */}
+        <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+          <Stack spacing={4}>
+            {processSteps.map((step, index) => (
+              <Box key={index} sx={{ position: 'relative' }}>
+                {/* Connecting line for mobile */}
+                {index < processSteps.length - 1 && (
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      left: 39,
+                      top: 80,
+                      bottom: -32,
+                      width: 2,
+                      background: (theme) => `linear-gradient(180deg, 
+                        ${theme.palette.primary.main} 0%, 
+                        ${theme.palette.primary.light} 50%, 
+                        ${theme.palette.secondary.main} 100%
+                      )`,
+                      zIndex: 0,
+                    }}
+                  />
+                )}
+                
+                <Paper 
+                  sx={{ 
+                    p: 4, 
+                    borderRadius: 4,
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 3,
+                    transition: 'all 0.3s ease',
+                    border: '2px solid transparent',
+                    position: 'relative',
+                    zIndex: 1,
+                    background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
+                    '&:hover': {
+                      transform: 'translateX(8px)',
+                      borderColor: 'primary.main',
+                      boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+                    },
+                  }}
+                >
+                  {/* Step number */}
+                  <Box
+                    sx={{
+                      width: 80,
+                      height: 80,
+                      borderRadius: '50%',
+                      background: (theme) => `linear-gradient(135deg, 
+                        ${theme.palette.primary.main} 0%, 
+                        ${theme.palette.primary.dark} 100%
+                      )`,
+                      color: 'white',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '1.5rem',
+                      fontWeight: 'bold',
+                      flexShrink: 0,
+                      boxShadow: (theme) => `0 4px 16px ${theme.palette.primary.main}30`,
+                    }}
+                  >
+                    {index + 1}
+                  </Box>
+
+                  <Box sx={{ flex: 1 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                      <Box
+                        sx={{
+                          width: 48,
+                          height: 48,
+                          borderRadius: '12px',
+                          background: (theme) => `linear-gradient(135deg, 
+                            ${theme.palette.primary.light}30 0%, 
+                            ${theme.palette.primary.light}60 100%
+                          )`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          mr: 2,
+                          '& svg': {
+                            color: 'primary.main',
+                            fontSize: '1.5rem',
+                          },
+                        }}
+                      >
+                        {step.icon}
+                      </Box>
+                      <Typography 
+                        variant="h6" 
+                        sx={{ 
+                          fontWeight: 700,
+                          color: 'primary.main',
+                        }}
+                      >
+                        {step.title}
+                      </Typography>
+                    </Box>
+                    
+                    <Typography 
+                      variant="body1" 
+                      color="text.secondary" 
+                      sx={{ lineHeight: 1.6 }}
+                    >
+                      {step.description}
+                    </Typography>
+
+                    <Typography 
+                      variant="caption" 
+                      sx={{ 
+                        display: 'block',
+                        mt: 2,
+                        color: 'primary.main',
+                        fontWeight: 600,
+                        textTransform: 'uppercase',
+                        letterSpacing: 1,
+                      }}
+                    >
+                      Step {index + 1} of 3
+                    </Typography>
+                  </Box>
+                </Paper>
+              </Box>
+            ))}
+          </Stack>
+        </Box>
+
+        {/* Call to action for the process */}
+        <Box sx={{ textAlign: 'center', mt: 8 }}>
+          <Typography 
+            variant="h6" 
+            color="text.secondary" 
+            sx={{ mb: 3, maxWidth: 600, mx: 'auto' }}
+          >
+            Ready to get started? Our team can have your fleet operational within 24 hours.
+          </Typography>
+          <Button
+            variant="contained"
+            size="large"
+            sx={{
+              px: 6,
+              py: 2,
+              borderRadius: 3,
+              textTransform: 'none',
+              fontSize: '1.1rem',
+              fontWeight: 600,
+              background: (theme) => `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
+              '&:hover': {
+                background: (theme) => `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
+                transform: 'translateY(-2px)',
+                boxShadow: (theme) => `0 8px 32px ${theme.palette.primary.main}30`,
+              },
+              transition: 'all 0.3s ease',
+            }}
+          >
+            Start Your Fleet Setup Today
+          </Button>
+        </Box>
       </Container>
 
       {/* Benefits Section */}
@@ -524,24 +940,10 @@ const FleetManagement: React.FC = () => {
           <Typography variant="h6" color="text.secondary" sx={{ mb: 4, maxWidth: 600, mx: 'auto' }}>
             Join hundreds of businesses across Uganda who trust AA Uganda for their fleet management needs.
           </Typography>
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} justifyContent="center">
-            <Button
-              variant="contained"
-              size="large"
-              startIcon={<PhoneIcon />}
-              sx={{ px: 4, py: 2, borderRadius: 3, textTransform: 'none', fontSize: '1.1rem' }}
-            >
-              Schedule Demo
-            </Button>
-            <Button
-              variant="outlined"
-              size="large"
-              startIcon={<EmailIcon />}
-              sx={{ px: 4, py: 2, borderRadius: 3, textTransform: 'none', fontSize: '1.1rem' }}
-            >
-              Get Pricing
-            </Button>
-          </Stack>
+          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            <ContactButtons phoneText='Schedule Demo' whatsappMessage="Hello! I would like to inquire about your fleet management services." />
+          </Box>
+         
         </Paper>
       </Container>
     </Box>

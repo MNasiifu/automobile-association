@@ -11,10 +11,8 @@ import {
   ListItemIcon,
   ListItemText,
   Chip,
-  Button,
   Paper,
   Divider,
-  Stack,
 } from '@mui/material';
 import {
   Assessment as AssessmentIcon,
@@ -26,12 +24,10 @@ import {
   LocalShipping as ShippingIcon,
   Business as BusinessIcon,
   Phone as PhoneIcon,
-  WhatsApp as WhatsAppIcon,
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
-import { PageHeader } from '../../components/molecules';
+import { PageHeader, ContactButtons } from '../../components/molecules';
 import { Heading } from '../../components/atoms';
-import { config } from '../../utils/config/config';
 
 const HeroSection = styled(Box)(({ theme }) => ({
   background: `linear-gradient(135deg, ${theme.palette.primary.main}15 0%, ${theme.palette.secondary.main}10 100%)`,
@@ -171,40 +167,6 @@ const StepIconWrapper = styled(Box)(({ theme }) => ({
 }));
 
 const VehicleValuation: React.FC = () => {
-  // Handler for phone call functionality
-  const handleTalkToUs = () => {
-    try {
-      window.location.href = `tel:${config.company.contactNumber}`;
-    } catch (error) {
-      console.error('Error initiating phone call:', error);
-      // Fallback: copy number to clipboard if possible
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(config.company.contactNumber);
-        alert(`Phone number copied to clipboard: ${config.company.contactNumber}`);
-      } else {
-        alert(`Please call us at: ${config.company.contactNumber}`);
-      }
-    }
-  };
-
-  // Handler for WhatsApp functionality
-  const handleChatWithUs = () => {
-    try {
-      const message = encodeURIComponent('Hello! I would like to inquire about your vehicle valuation services.');
-      const whatsappUrl = `https://wa.me/${config.company.whatsAppNumber}?text=${message}`;
-      window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
-    } catch (error) {
-      console.error('Error opening WhatsApp:', error);
-      // Fallback: copy number to clipboard
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(config.company.whatsAppNumber);
-        alert(`WhatsApp number copied to clipboard: ${config.company.whatsAppNumber}`);
-      } else {
-        alert(`Please message us on WhatsApp: ${config.company.whatsAppNumber}`);
-      }
-    }
-  };
-
   const valuationServices = [
     {
       title: 'Pre-Insurance Valuation',
@@ -300,38 +262,9 @@ const VehicleValuation: React.FC = () => {
               <Typography variant="h6" color="text.secondary" sx={{ mb: 4, lineHeight: 1.6 }}>
                 At AA Uganda, we provide independent, market-aware vehicle valuations tailored to Uganda's motoring environment. Our expert valuers deliver professional reports for insurance, sales, finance, fleet management, and legal needs.
               </Typography>
-              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                <Button
-                  variant="contained"
-                  size="large"
-                  startIcon={<PhoneIcon />}
-                  onClick={handleTalkToUs}
-                  sx={{ 
-                    px: 4, 
-                    py: 1.5,
-                    borderRadius: 3,
-                    textTransform: 'none',
-                    fontSize: '1.1rem',
-                  }}
-                >
-                  Talk To Us
-                </Button>
-                <Button
-                  variant="outlined"
-                  size="large"
-                  startIcon={<WhatsAppIcon />}
-                  onClick={handleChatWithUs}
-                  sx={{ 
-                    px: 4, 
-                    py: 1.5,
-                    borderRadius: 3,
-                    textTransform: 'none',
-                    fontSize: '1.1rem',
-                  }}
-                >
-                  Chat with us
-                </Button>
-              </Stack>
+              <ContactButtons 
+                whatsappMessage="Hello! I would like to inquire about your vehicle valuation services."
+              />
             </Grid>
             <Grid item xs={12} md={6}>
               <Box sx={{ textAlign: 'center', display: { xs: 'none', md: 'block' } }}>
@@ -618,26 +551,13 @@ const VehicleValuation: React.FC = () => {
           <Typography variant="h6" color="text.secondary" sx={{ mb: 4, maxWidth: 600, mx: 'auto' }}>
             Get started with AA Uganda's trusted valuation services. Book an inspection or request a quote today.
           </Typography>
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} justifyContent="center">
-            <Button
-              variant="contained"
-              size="large"
-              startIcon={<PhoneIcon />}
-              onClick={handleTalkToUs}
-              sx={{ px: {xs: 1, sm: 4}, py: 2, borderRadius: 3, textTransform: 'none', fontSize: '1.1rem' }}
-            >
-              Schedule Inspection
-            </Button>
-            <Button
-              variant="outlined"
-              size="large"
-              startIcon={<WhatsAppIcon />}
-              onClick={handleChatWithUs}
-              sx={{ px: 4, py: 2, borderRadius: 3, textTransform: 'none', fontSize: '1.1rem' }}
-            >
-              Chat with us
-            </Button>
-          </Stack>
+          <ContactButtons 
+            phoneText="Schedule Inspection"
+            whatsappMessage="Hello! I would like to inquire about your vehicle valuation services."
+            justifyContent="center"
+            spacing={3}
+            buttonSx={{ px: {xs: 1, sm: 4}, py: 2 }}
+          />
         </Paper>
       </Container>
     </Box>
