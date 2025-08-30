@@ -140,7 +140,7 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
       <Toolbar sx={{ px: { xs: 2, sm: 3, md: 4 }, minHeight: { xs: 64, md: 72 } }}>
         <Logo to="/" aria-label="AA Uganda Home">
           <img src={AAULogo} alt="AA Uganda Logo" />
-          <Box className="logo-text">{companyInfo.phrase}</Box>
+          <Typography className="logo-text" sx={{ fontSize: '1rem'}}>{companyInfo.phrase}</Typography>
         </Logo>
 
         <NavLinks
@@ -218,6 +218,7 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
           {/* Apply for IDP — yellow BG + green text */}
           <Button
             variant="contained"
+            color='secondary'
             component={LinkBehavior as any}
             {...({ to: '/idp' } as any)}
             sx={{
