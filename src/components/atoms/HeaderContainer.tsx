@@ -3,15 +3,17 @@ import { Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 // Styled HeaderContainer component
-const StyledHeaderContainer = styled(Box)<{ $backgroundImage?: string }>(({ theme, $backgroundImage }) => ({
+const StyledHeaderContainer = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'bgImage'
+})<{ bgImage?: string }>(({ theme, bgImage }) => ({
   position: 'relative',
   minHeight: '40vh',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   overflow: 'hidden',
-  background: $backgroundImage 
-    ? `linear-gradient(135deg, rgba(2, 121, 63, 0.9) 0%, rgba(2, 121, 63, 0.7) 100%), url(${$backgroundImage})`
+  background: bgImage 
+    ? `linear-gradient(135deg, rgba(2, 121, 63, 0.9) 0%, rgba(2, 121, 63, 0.7) 100%), url(${bgImage})`
     : `linear-gradient(135deg, ${theme.palette.secondary.main} 0%, ${theme.palette.secondary.dark} 100%)`,
   backgroundSize: 'cover',
   backgroundPosition: 'center',
@@ -61,7 +63,7 @@ const HeaderContainer: React.FC<HeaderContainerProps> = ({
 }) => {
   return (
     <StyledHeaderContainer 
-      $backgroundImage={backgroundImage}
+      bgImage={backgroundImage}
       className={className}
     >
       {children}

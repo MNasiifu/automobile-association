@@ -65,7 +65,13 @@ const GalleryCarousel: React.FC<GalleryCarouselProps> = ({
       onMouseLeave={() => setPaused(false)}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
-      sx={{ position: 'relative', overflow: 'hidden', borderRadius: 2 }}
+      sx={{ 
+        position: 'relative',
+        overflow: 'hidden',
+        borderRadius: 2,
+        maxWidth: 'lg',
+        mx: 'auto'
+      }}
     >
       <Box
         sx={{

@@ -16,7 +16,7 @@ export const companyInfo = {
     },
   },
   contact: {
-    phone: "+256 414 250 362",
+    phone: "+256 786 623 001",
     email: "info@aauganda.co.ug",
     website: "www.aauganda.co.ug",
   },
@@ -37,36 +37,21 @@ export const companyInfo = {
   ],
 };
 
-export const navigationItems = [
+import type { MenuIconKey, NavItem } from '../types/navigation';
+
+export const navigationItems: ReadonlyArray<NavItem> = [
   { label: 'Home', path: '/' },
-
   {
-    label: 'About Us',
-    path: '/about',
-    children: [
-      { label: 'Mission & Vision', path: '/about#mission-vision' },
-      { label: 'Our Journey', path: '/about#journey' },
-      { label: 'Board of Directors', path: '/about#board' },
-      { label: 'Management', path: '/about#management' },
-      { label: 'Affiliation', path: '/about#affiliation' },
-      { label: 'Gallery', path: '/about#gallery' },
-      { label: 'Careers', path: '/careers' },
-    ],
+    label: 'IDP',
+    path: '/idp',
   },
-
   {
-    label: 'AA Membership',
+    label: 'Membership',
     path: '/membership',
-    children: [
-      { label: 'Premier', path: '/membership#premier' },
-      { label: 'Prestige', path: '/membership#prestige' },
-      { label: 'Classic', path: '/membership#classic' },
-      { label: 'Corporate', path: '/membership#corporate' },
-    ],
   },
 
   {
-    label: 'AA Driving School',
+    label: 'Driving School',
     path: '/driving-school',
     children: [
       { label: 'About the School', path: '/driving-school#about' },
@@ -85,11 +70,23 @@ export const navigationItems = [
       { label: 'AA Institute', path: '/institute' },
     ],
   },
+    {
+    label: 'About Us',
+    path: '/about',
+    children: [
+      { label: 'Mission & Vision', path: '/about#mission-vision' },
+      { label: 'Our Journey', path: '/about#journey' },
+      { label: 'Board of Directors', path: '/about#board' },
+      { label: 'Management', path: '/about#management' },
+      { label: 'Affiliation', path: '/about#affiliation' },
+      { label: 'Careers', path: '/careers' },
+      { label: 'Gallery', path: '/gallery' },
+    ],
+  },
   {
     label: 'Contact Us',
     path: '/contact',
     children: [
-      { label: 'Contact Us', path: '/contact' },
       { label: 'Branches', path: '/contact#branches' },
     ],
   },

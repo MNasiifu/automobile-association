@@ -103,7 +103,7 @@ src/
 
 - **Founded**: 1955
 - **Location**: Plot 4 Old Port Bell Rd, Kampala, Uganda
-- **Phone**: +256 414 250 362
+- **Phone**: +256 786 623 001
 - **Email**: info@aauganda.co.ug
 - **Services**: 30+ rescue vehicles nationwide
 

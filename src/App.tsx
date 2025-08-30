@@ -5,8 +5,9 @@ import { Close as CloseIcon } from '@mui/icons-material';
 import theme from './theme';
 import { Navigation } from './components/molecules';
 import { Footer } from './components/organisms';
-import { Home, About, Services, Membership, Contact, Careers } from './pages';
+import { Home, About, Services, Membership, Contact, Careers, InternationalDrivingPermit } from './pages';
 import { navigationItems } from './data/companyData';
+import { WhatsAppButton } from './components/atoms';
 
 // Mobile Menu Component
 const MobileMenu: React.FC<{ open: boolean; onClose: () => void }> = ({ open, onClose }) => {
@@ -96,14 +97,17 @@ const App: React.FC = () => {
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<About />} />
               <Route path="/services" element={<Services />} />
-              <Route path="/idp" element={<Membership />} />
+              <Route path="/idp" element={<InternationalDrivingPermit />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/careers" element={<Careers />} />
+              <Route path="/membership" element={<Membership />} />
             </Routes>
           </Box>
           
           {/* Footer */}
           <Footer />
+          {/* WhatsApp Button */}
+          <WhatsAppButton />
         </Box>
       </Router>
     </ThemeProvider>

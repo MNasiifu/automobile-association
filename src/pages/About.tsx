@@ -21,7 +21,7 @@ import {
   Flag,
   Visibility,
 } from '@mui/icons-material';
-import { Heading, Card } from '../components/atoms';
+import { Heading, Card, CountUpAnimation } from '../components/atoms';
 import { PageHeader } from '../components/molecules';
 import { useLocation } from 'react-router-dom';
 import {
@@ -70,10 +70,32 @@ function useHashScroll() {
   }, [location.pathname, location.hash]);
 }
 
+const animationKeyframes = {
+  fadeIn: keyframes`
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  `,
+  slideInRight: keyframes`
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  `,
+  countUp: keyframes`
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  `,
+};
+
 const Section = styled('section')(({ theme }) => ({
   padding: theme.spacing(6, 0),
   scrollMarginTop: theme.spacing(12),
-  [theme.breakpoints.up('md')]: { scrollMarginTop: theme.spacing(14) },
+  opacity: 0,
+  animation: `${animationKeyframes.fadeIn} 0.8s ease-out forwards`,
+  '&:nth-of-type(even)': {
+    animation: `${animationKeyframes.slideInRight} 0.8s ease-out forwards`,
+  },
+  [theme.breakpoints.up('md')]: { 
+    scrollMarginTop: theme.spacing(14),
+  },
 }));
 
 type StripeDividerProps = {
@@ -153,6 +175,13 @@ const StatCard = styled(Card)(({ theme }) => ({
   flexDirection: 'column',
   gap: theme.spacing(1),
   wordBreak: 'break-word',
+  opacity: 0,
+  transform: 'translateY(20px)',
+  animation: `${animationKeyframes.fadeIn} 0.6s ease-out forwards`,
+  '&:nth-of-type(1)': { animationDelay: '0.2s' },
+  '&:nth-of-type(2)': { animationDelay: '0.4s' },
+  '&:nth-of-type(3)': { animationDelay: '0.6s' },
+  '&:nth-of-type(4)': { animationDelay: '0.8s' },
 }));
 
 const IconWrapper = styled(Avatar)(({ theme }) => ({
@@ -371,13 +400,12 @@ const About: React.FC = () => {
                 <Grid key={i} xs={12} sm={6} md={3}>
                   <StatCard>
                     <IconWrapper>{s.icon}</IconWrapper>
-                    <Typography
+                    <CountUpAnimation
+                      value={s.number}
                       variant="h3"
                       color="primary"
                       sx={{ fontWeight: 800, mb: 0.5 }}
-                    >
-                      {s.number}
-                    </Typography>
+                    />
                     <Typography
                       variant="subtitle1"
                       sx={{ fontWeight: 700, mb: 0.5 }}
@@ -562,14 +590,19 @@ const About: React.FC = () => {
 
       <StripeDivider imageSrc={stripeImg} reverse />
 
-      <Section id="gallery" aria-labelledby="gallery-heading">
-        <Container maxWidth="lg">
-          <Heading id="gallery-heading" variant="h3" gutterBottom>
+      <Box component="section" sx={{ width: '100vw', position: 'relative', left: '50%', transform: 'translateX(-50%)', mb: 6 }}>
+        <Container maxWidth={false}>
+          <Heading id="gallery-heading" variant="h3" gutterBottom sx={{ textAlign: 'center', mb: 4 }}>
             Gallery
           </Heading>
-          <GalleryCarousel images={gallery} interval={4200} speed={650} />
+          <GalleryCarousel 
+            images={gallery} 
+            interval={4200} 
+            speed={650}
+            heights={{ xs: 300, sm: 400, md: 500, lg: 600 }}
+          />
         </Container>
-      </Section>
+      </Box>
     </Box>
   );
 };

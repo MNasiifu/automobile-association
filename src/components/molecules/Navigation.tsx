@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import {
   AppBar,
   Toolbar,
@@ -13,40 +13,51 @@ import {
 } from '@mui/material';
 import { Menu as MenuIcon, KeyboardArrowDown } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
-import {
-  Link as RouterLink,
-  type LinkProps as RouterLinkProps,
-  useLocation,
-} from 'react-router-dom';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { Button } from '../atoms';
 import { navigationItems, companyInfo } from '../../data/companyData';
 import AAULogo from '../../assets/images/aau-logo.png';
 
+type NavChild = { label: string; path: string };
+type NavItem = { label: string; path: string; children?: NavChild[] };
+
 interface NavigationProps {
   onMenuClick?: () => void;
 }
-type NavChild = { label: string; path: string };
-type NavItem = { label: string; path: string; children?: NavChild[] };
+
+// Forwarded Link so MUI components accept `to`
+type RouterLinkProps = React.ComponentProps<typeof RouterLink>;
+const LinkBehavior = React.forwardRef<HTMLAnchorElement, RouterLinkProps>(
+  function LinkBehavior(props, ref) {
+    return <RouterLink ref={ref} {...props} />;
+  }
+);
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   backgroundColor: theme.palette.background.default,
   color: theme.palette.text.primary,
-  boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+  boxShadow: '0 2px 12px rgba(0, 0, 0, 0.08)',
   borderBottom: `1px solid ${theme.palette.grey[200]}`,
 }));
 
-const Logo = styled(Box)(({ theme }) => ({
+const Logo = styled(RouterLink)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   textDecoration: 'none',
   cursor: 'pointer',
-  '& img': { height: 56, width: 'auto', marginRight: theme.spacing(1.5) }, // bigger logo
+  '& img': {
+    height: 48, // bigger logo for visibility
+    width: 'auto',
+    marginRight: theme.spacing(1.25),
+  },
   '& .logo-text': {
     fontWeight: 800,
-    fontSize: '1.15rem',
+    fontSize: '1.1rem',
     color: theme.palette.primary.main,
-    letterSpacing: 0.2,
-    [theme.breakpoints.down('sm')]: { display: 'none' },
+    whiteSpace: 'nowrap',
+    [theme.breakpoints.down('sm')]: {
+      display: 'none',
+    },
   },
 }));
 
@@ -55,22 +66,19 @@ const NavLinks = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   gap: theme.spacing(0.5),
   marginLeft: 'auto',
-  flexWrap: 'nowrap',
-  whiteSpace: 'nowrap',
-  overflow: 'hidden',
-  [theme.breakpoints.down('md')]: { display: 'none' },
+  [theme.breakpoints.down('md')]: {
+    display: 'none',
+  },
 }));
 
 const MobileMenuButton = styled(IconButton)(({ theme }) => ({
   marginLeft: 'auto',
-  [theme.breakpoints.up('md')]: { display: 'none' },
+  [theme.breakpoints.up('md')]: {
+    display: 'none',
+  },
 }));
 
-const LinkBehavior = React.forwardRef<HTMLAnchorElement, RouterLinkProps>(
-  function LinkBehavior(props, ref) {
-    return <RouterLink ref={ref} {...props} />;
-  }
-);
+const CLOSE_DELAY = 120;
 
 const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
   const location = useLocation();
@@ -84,9 +92,7 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
   const closeTimer = React.useRef<number | null>(null);
 
   const isActiveRoute = (path: string) =>
-    path === '/'
-      ? location.pathname === '/'
-      : location.pathname.startsWith(path);
+    path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
 
   const cancelClose = () => {
     if (closeTimer.current !== null) {
@@ -95,7 +101,7 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
     }
   };
 
-  const scheduleClose = (delay = 140) => {
+  const scheduleClose = (delay = CLOSE_DELAY) => {
     cancelClose();
     closeTimer.current = window.setTimeout(() => {
       setActiveKey(null);
@@ -104,41 +110,35 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
     }, delay);
   };
 
-  // Open on hover/focus instantly (re-anchors if switching parents)
-  const handleParentEnter = (
-    key: string,
-    el: HTMLElement,
-    kids?: NavChild[]
-  ) => {
+  // Open instantly on hover/focus; close instantly if no submenu
+  const handleParentEnter = (key: string, el: HTMLElement, kids?: NavChild[]) => {
     cancelClose();
-    if (kids && kids.length) {
-      setActiveKey(key);
+    const hasKids = !!kids?.length;
+
+    if (hasKids) {
+      setActiveKey((prev) => (prev === key ? prev : key));
       setAnchorEl(el);
-      setChildrenItems(kids);
+      setChildrenItems(kids!);
     } else {
-      // parent has no submenu -> ensure dropdown is closed
       setActiveKey(null);
       setAnchorEl(null);
       setChildrenItems([]);
     }
   };
 
-  // Close when leaving both nav and the dropdown
+  // Close dropdown if the pointer leaves both the nav and popper
   const handlePopperMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
     const next = e.relatedTarget as Node | null;
-    if (next && navRef.current?.contains(next)) {
-      // heading back to the nav bar; don't close here
-      return;
-    }
+    if (next && navRef.current?.contains(next)) return; // moving back to nav
     scheduleClose(80);
   };
 
+  const openDropdown = Boolean(activeKey && childrenItems.length > 0);
+
   return (
     <StyledAppBar position="sticky" elevation={trigger ? 2 : 0}>
-      <Toolbar
-        sx={{ px: { xs: 2, sm: 3, md: 4 }, minHeight: { xs: 64, md: 72 } }}
-      >
-        <Logo component={LinkBehavior} to="/" aria-label="AA Uganda Home">
+      <Toolbar sx={{ px: { xs: 2, sm: 3, md: 4 }, minHeight: { xs: 64, md: 72 } }}>
+        <Logo to="/" aria-label="AA Uganda Home">
           <img src={AAULogo} alt="AA Uganda Logo" />
           <Box className="logo-text">{companyInfo.phrase}</Box>
         </Logo>
@@ -148,7 +148,7 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
           role="navigation"
           aria-label="Primary"
           onMouseEnter={cancelClose}
-          onMouseLeave={() => scheduleClose(140)}
+          onMouseLeave={() => scheduleClose(CLOSE_DELAY)}
         >
           {(navigationItems as unknown as NavItem[]).map((item) => {
             const active = isActiveRoute(item.path);
@@ -159,29 +159,17 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
               <Box
                 key={key}
                 onMouseEnter={(e) =>
-                  handleParentEnter(
-                    key,
-                    e.currentTarget as HTMLElement,
-                    item.children
-                  )
+                  handleParentEnter(key, e.currentTarget as HTMLElement, item.children)
                 }
                 onFocus={(e) =>
-                  handleParentEnter(
-                    key,
-                    e.currentTarget as HTMLElement,
-                    item.children
-                  )
+                  handleParentEnter(key, e.currentTarget as HTMLElement, item.children)
                 }
               >
                 <Button
                   variant="text"
-                  component={LinkBehavior}
-                  to={item.path}
-                  endIcon={
-                    hasChildren ? (
-                      <KeyboardArrowDown sx={{ ml: 0.25 }} />
-                    ) : undefined
-                  }
+                  component={LinkBehavior as any}
+                  {...({ to: item.path } as any)}
+                  endIcon={hasChildren ? <KeyboardArrowDown sx={{ ml: 0.25 }} /> : undefined}
                   aria-haspopup={hasChildren ? 'menu' : undefined}
                   aria-expanded={activeKey === key ? 'true' : undefined}
                   aria-controls={activeKey === key ? 'nav-popper' : undefined}
@@ -190,22 +178,34 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
                     fontWeight: active ? 800 : 600,
                     position: 'relative',
                     px: 1.15,
+                    whiteSpace: 'nowrap',
                     fontSize: { lg: 14, xl: 15 },
+                    textTransform: 'none',
+                    minWidth: 'unset',
+                    padding: '6px 8px',
+                    '&.MuiButton-root': {
+                      border: 'none',
+                      boxShadow: 'none',
+                    },
                     '&:after': active
                       ? {
                           content: '""',
                           position: 'absolute',
-                          left: 10,
-                          right: 10,
-                          bottom: 6,
-                          height: 3,
-                          borderRadius: 3,
-                          backgroundColor: 'secondary.main',
+                          left: 8,
+                          right: 8,
+                          bottom: 4,
+                          height: 2,
+                          borderRadius: 1,
+                          backgroundColor: 'secondary.main', // Change to yellow
                         }
                       : {},
                     '&:hover': {
-                      backgroundColor: 'primary.main',
-                      color: 'primary.contrastText',
+                      backgroundColor: 'transparent',
+                      color: 'primary.main',
+                      boxShadow: 'none',
+                    },
+                    '&:active': {
+                      boxShadow: 'none',
                     },
                   }}
                 >
@@ -215,13 +215,22 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
             );
           })}
 
-          {/* Apply for IDP — yellow bg + green text (uses your containedSecondary override) */}
+          {/* Apply for IDP — yellow BG + green text */}
           <Button
             variant="contained"
-            color="secondary"
-            component={LinkBehavior}
-            to="/idp"
-            sx={{ ml: 1.5, fontWeight: 900 }}
+            component={LinkBehavior as any}
+            {...({ to: '/idp' } as any)}
+            sx={{
+              ml: 1.5,
+              fontWeight: 900,
+              bgcolor: 'secondary.main',
+              color: 'primary.main',
+              '&:hover': {
+                bgcolor: 'secondary.light',
+                color: 'primary.dark',
+                boxShadow: '0 6px 18px rgba(2,79,49,0.25)',
+              },
+            }}
           >
             Apply for IDP
           </Button>
@@ -229,9 +238,10 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
 
         <Popper
           id="nav-popper"
-          open={Boolean(activeKey)}
+          open={openDropdown}
           anchorEl={anchorEl}
           placement="bottom-start"
+          disablePortal
           sx={{ zIndex: (t) => t.zIndex.modal + 1 }}
           onMouseEnter={cancelClose}
           onMouseLeave={handlePopperMouseLeave}
@@ -242,45 +252,62 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
             sx={{
               mt: 1,
               borderRadius: 1,
-              bgcolor: 'secondary.main',
-              color: 'primary.main',
+              color: 'text.primary',
               minWidth: 240,
               boxShadow: '0 8px 20px rgba(0,0,0,0.18)',
+              backgroundColor: '#ffffff',
             }}
           >
             <List dense disablePadding sx={{ py: 0.5 }}>
               {childrenItems.map((c) => (
                 <ListItemButton
                   key={c.path}
-                  component={LinkBehavior}
-                  to={c.path}
+                  component={LinkBehavior as any}
+                  {...({ to: c.path } as any)}
                   onClick={(e) => {
+                    // Smooth-scroll if this is a same-page hash link
                     const isHash = c.path.includes('#');
                     if (isHash) {
                       const [base, rawHash] = c.path.split('#');
                       const hash = decodeURIComponent(rawHash || '');
                       if (location.pathname === base && hash) {
-                        e.preventDefault(); // stay on the same route
+                        e.preventDefault();
                         const el = document.getElementById(hash);
-                        if (el)
-                          el.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start',
-                          });
+                        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
                       }
                     }
                     scheduleClose(0);
                   }}
                   sx={{
-                    fontWeight: 500,
-                    letterSpacing: 0.8,
+                    fontWeight: 600,
+                    letterSpacing: 0.2,
+                    py: 0.5,
+                    px: 2,
+                    gap: 1.5,
+                    display: 'flex',
+                    alignItems: 'center',
                     '&:hover': {
                       bgcolor: 'primary.main',
                       color: 'primary.contrastText',
+                      '& .menu-icon': {
+                        color: 'secondary.main'
+                      }
                     },
                   }}
                 >
-                  <Typography variant="body2" sx={{ fontWeight: 600, py: 0.5 }}>
+                  <Box 
+                    className="menu-icon"
+                    sx={{ 
+                      width: 20, 
+                      height: 20, 
+                      display: 'flex', 
+                      alignItems: 'center',
+                      color: 'secondary.main'
+                    }}
+                  >
+                    •
+                  </Box>
+                  <Typography variant="body2" sx={{ fontWeight: 600, whiteSpace: 'nowrap' }}>
                     {c.label}
                   </Typography>
                 </ListItemButton>
@@ -289,11 +316,7 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
           </Paper>
         </Popper>
 
-        <MobileMenuButton
-          color="inherit"
-          aria-label="Open menu"
-          onClick={onMenuClick}
-        >
+        <MobileMenuButton color="inherit" aria-label="Open menu" onClick={onMenuClick}>
           <MenuIcon />
         </MobileMenuButton>
       </Toolbar>
