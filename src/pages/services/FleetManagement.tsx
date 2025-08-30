@@ -34,6 +34,7 @@ import {
 import { styled } from '@mui/material/styles';
 import { ContactButtons, PageHeader } from '../../components/molecules';
 import { Heading } from '../../components/atoms';
+import { config } from '../../utils/config/config';
 
 const HeroSection = styled(Box)(({ theme }) => ({
   background: `linear-gradient(135deg, ${theme.palette.primary.main}15 0%, ${theme.palette.secondary.main}10 100%)`,
@@ -77,6 +78,22 @@ const StatsCard = styled(Paper)(({ theme }) => ({
 }));
 
 const FleetManagement: React.FC = () => {
+  // Handler for fleet setup button - benchmarked from handleTalkToUs in ContactButtons.tsx
+  const handleFleetSetup = () => {
+    try {
+      window.location.href = `tel:${config.company.contactNumber}`;
+    } catch (error) {
+      console.error('Error initiating phone call for fleet setup:', error);
+      // Fallback: copy number to clipboard if possible
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(config.company.contactNumber);
+        alert(`Phone number copied to clipboard: ${config.company.contactNumber}`);
+      } else {
+        alert(`Please call us at: ${config.company.contactNumber}`);
+      }
+    }
+  };
+
   const trackingFeatures = [
     {
       title: 'Real-time GPS Tracking',
@@ -804,6 +821,7 @@ const FleetManagement: React.FC = () => {
           <Button
             variant="contained"
             size="large"
+            onClick={handleFleetSetup}
             sx={{
               px: 6,
               py: 2,

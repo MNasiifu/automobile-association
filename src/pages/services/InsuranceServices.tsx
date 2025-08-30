@@ -12,7 +12,6 @@ import {
   ListItemText,
   Button,
   Paper,
-  Stack,
   Chip,
   Alert,
   Accordion,
@@ -26,11 +25,8 @@ import {
 import {
   Security as InsuranceIcon,
   DirectionsCar as CarIcon,
-  LocalPhone as PhoneIcon,
-  Email as EmailIcon,
   CheckCircle as CheckIcon,
   AccountBalance as BankIcon,
-  Assignment as ClaimIcon,
   Speed as FastIcon,
   Support as SupportIcon,
   ExpandMore as ExpandMoreIcon,
@@ -39,6 +35,7 @@ import {
 import { styled } from "@mui/material/styles";
 import { ContactButtons, PageHeader } from "../../components/molecules";
 import { Heading } from "../../components/atoms";
+import { config } from "../../utils/config/config";
 
 const HeroSection = styled(Box)(({ theme }) => ({
   background: `linear-gradient(135deg, ${theme.palette.primary.main}15 0%, ${theme.palette.secondary.main}10 100%)`,
@@ -98,6 +95,22 @@ const ProcessStep = styled(Paper)(({ theme }) => ({
 }));
 
 const InsuranceServices: React.FC = () => {
+  // Handler for getting insurance quote - benchmarked from handleTalkToUs in ContactButtons.tsx
+  const handleGetQuote = () => {
+    try {
+      window.location.href = `tel:${config.company.contactNumber}`;
+    } catch (error) {
+      console.error('Error initiating phone call for insurance quote:', error);
+      // Fallback: copy number to clipboard
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(config.company.contactNumber);
+        alert(`Phone number copied to clipboard: ${config.company.contactNumber}`);
+      } else {
+        alert(`Please call us at: ${config.company.contactNumber}`);
+      }
+    }
+  };
+
   const insurancePlans = [
     {
       title: "Third Party",
@@ -362,6 +375,7 @@ const InsuranceServices: React.FC = () => {
                       variant={plan.popular ? "contained" : "outlined"}
                       fullWidth
                       size="large"
+                      onClick={handleGetQuote}
                       sx={{ mt: 3 }}
                     >
                       Get Quote

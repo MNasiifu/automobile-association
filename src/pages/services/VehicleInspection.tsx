@@ -24,7 +24,6 @@ import {
   CheckCircle as CheckIcon,
   Assignment as ReportIcon,
   Schedule as ScheduleIcon,
-  Email as EmailIcon,
   Build as MechanicalIcon,
   ElectricBolt as ElectricalIcon,
   Security as SecurityIcon,
@@ -93,6 +92,22 @@ const VehicleInspection: React.FC = () => {
         alert(
           `Phone number copied to clipboard: ${config.company.contactNumber}`
         );
+      } else {
+        alert(`Please call us at: ${config.company.contactNumber}`);
+      }
+    }
+  };
+
+  // Handler for membership inquiry - benchmarked from handleTalkToUs in ContactButtons.tsx
+  const handleNavigateToMembershipPage = () => {
+    try {
+      window.location.href = `tel:${config.company.contactNumber}`;
+    } catch (error) {
+      console.error('Error initiating phone call for membership inquiry:', error);
+      // Fallback: copy number to clipboard
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(config.company.contactNumber);
+        alert(`Phone number copied to clipboard: ${config.company.contactNumber}`);
       } else {
         alert(`Please call us at: ${config.company.contactNumber}`);
       }
@@ -536,6 +551,7 @@ const VehicleInspection: React.FC = () => {
               <Button
                 size="large"
                 startIcon={<PremiumIcon />}
+                onClick={handleNavigateToMembershipPage}
                 sx={{
                   backgroundColor: "secondary.main",
                   color: "secondary.contrastText",
