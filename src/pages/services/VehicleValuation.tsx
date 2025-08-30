@@ -26,11 +26,12 @@ import {
   LocalShipping as ShippingIcon,
   Business as BusinessIcon,
   Phone as PhoneIcon,
-  Email as EmailIcon,
+  WhatsApp as WhatsAppIcon,
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import { PageHeader } from '../../components/molecules';
 import { Heading } from '../../components/atoms';
+import { config } from '../../utils/config/config';
 
 const HeroSection = styled(Box)(({ theme }) => ({
   background: `linear-gradient(135deg, ${theme.palette.primary.main}15 0%, ${theme.palette.secondary.main}10 100%)`,
@@ -105,6 +106,40 @@ const StepNumber = styled(Box)(({ theme }) => ({
 }));
 
 const VehicleValuation: React.FC = () => {
+  // Handler for phone call functionality
+  const handleTalkToUs = () => {
+    try {
+      window.location.href = `tel:${config.company.contactNumber}`;
+    } catch (error) {
+      console.error('Error initiating phone call:', error);
+      // Fallback: copy number to clipboard if possible
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(config.company.contactNumber);
+        alert(`Phone number copied to clipboard: ${config.company.contactNumber}`);
+      } else {
+        alert(`Please call us at: ${config.company.contactNumber}`);
+      }
+    }
+  };
+
+  // Handler for WhatsApp functionality
+  const handleChatWithUs = () => {
+    try {
+      const message = encodeURIComponent('Hello! I would like to inquire about your vehicle valuation services.');
+      const whatsappUrl = `https://wa.me/${config.company.whatsAppNumber}?text=${message}`;
+      window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+    } catch (error) {
+      console.error('Error opening WhatsApp:', error);
+      // Fallback: copy number to clipboard
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(config.company.whatsAppNumber);
+        alert(`WhatsApp number copied to clipboard: ${config.company.whatsAppNumber}`);
+      } else {
+        alert(`Please message us on WhatsApp: ${config.company.whatsAppNumber}`);
+      }
+    }
+  };
+
   const valuationServices = [
     {
       title: 'Pre-Insurance Valuation',
@@ -205,6 +240,7 @@ const VehicleValuation: React.FC = () => {
                   variant="contained"
                   size="large"
                   startIcon={<PhoneIcon />}
+                  onClick={handleTalkToUs}
                   sx={{ 
                     px: 4, 
                     py: 1.5,
@@ -213,12 +249,13 @@ const VehicleValuation: React.FC = () => {
                     fontSize: '1.1rem',
                   }}
                 >
-                  Book Inspection
+                  Talk To Us
                 </Button>
                 <Button
                   variant="outlined"
                   size="large"
-                  startIcon={<EmailIcon />}
+                  startIcon={<WhatsAppIcon />}
+                  onClick={handleChatWithUs}
                   sx={{ 
                     px: 4, 
                     py: 1.5,
@@ -227,7 +264,7 @@ const VehicleValuation: React.FC = () => {
                     fontSize: '1.1rem',
                   }}
                 >
-                  Get Quote
+                  Chat with us
                 </Button>
               </Stack>
             </Grid>
@@ -423,6 +460,7 @@ const VehicleValuation: React.FC = () => {
               variant="contained"
               size="large"
               startIcon={<PhoneIcon />}
+              onClick={handleTalkToUs}
               sx={{ px: 4, py: 2, borderRadius: 3, textTransform: 'none', fontSize: '1.1rem' }}
             >
               Schedule Inspection
@@ -430,10 +468,11 @@ const VehicleValuation: React.FC = () => {
             <Button
               variant="outlined"
               size="large"
-              startIcon={<EmailIcon />}
+              startIcon={<WhatsAppIcon />}
+              onClick={handleChatWithUs}
               sx={{ px: 4, py: 2, borderRadius: 3, textTransform: 'none', fontSize: '1.1rem' }}
             >
-              Request Quote
+              Chat with us
             </Button>
           </Stack>
         </Paper>

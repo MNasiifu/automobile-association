@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AppBar, Toolbar, Box, IconButton, Menu, MenuItem, Typography } from '@mui/material';
 import { Menu as MenuIcon, ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
@@ -73,10 +73,11 @@ const DropdownButton = styled(Button)(({ theme }) => ({
 
 const StyledMenu = styled(Menu)(({ theme }) => ({
   '& .MuiPaper-root': {
-    marginTop: theme.spacing(1),
+    marginTop: theme.spacing(0.25), // Further reduced gap for seamless hover transition
     minWidth: 220,
     borderRadius: theme.spacing(1),
     boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+    border: `1px solid ${theme.palette.grey[200]}`,
     '& .MuiMenuItem-root': {
       padding: theme.spacing(1.5, 2),
       '&:hover': {
@@ -98,6 +99,17 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
   const location = useLocation();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [hoverTimeout, setHoverTimeout] = useState<number | null>(null);
+  const [isMenuHovered, setIsMenuHovered] = useState(false);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (hoverTimeout) {
+        clearTimeout(hoverTimeout);
+      }
+    };
+  }, [hoverTimeout]);
 
   // Helper function to determine if a navigation item is active
   const isActiveRoute = (path: string) => {
@@ -108,13 +120,65 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
   };
 
   const handleDropdownOpen = (event: React.MouseEvent<HTMLElement>, itemLabel: string) => {
+    // Clear any existing timeout
+    if (hoverTimeout) {
+      clearTimeout(hoverTimeout);
+      setHoverTimeout(null);
+    }
+    
     setAnchorEl(event.currentTarget);
     setActiveDropdown(itemLabel);
   };
 
   const handleDropdownClose = () => {
-    setAnchorEl(null);
-    setActiveDropdown(null);
+    // Only close if the menu is not being hovered
+    if (!isMenuHovered) {
+      setAnchorEl(null);
+      setActiveDropdown(null);
+    }
+  };
+
+  const handleMouseEnter = (event: React.MouseEvent<HTMLElement>, itemLabel: string) => {
+    // Clear any existing timeout
+    if (hoverTimeout) {
+      clearTimeout(hoverTimeout);
+      setHoverTimeout(null);
+    }
+    
+    setAnchorEl(event.currentTarget);
+    setActiveDropdown(itemLabel);
+  };
+
+  const handleMouseLeave = () => {
+    // Only set timeout if menu is not being hovered
+    if (!isMenuHovered) {
+      const timeout = setTimeout(() => {
+        setAnchorEl(null);
+        setActiveDropdown(null);
+      }, 200); // Increased delay for better UX
+      
+      setHoverTimeout(timeout);
+    }
+  };
+
+  const handleMenuMouseEnter = () => {
+    // Clear the timeout and set menu as hovered
+    if (hoverTimeout) {
+      clearTimeout(hoverTimeout);
+      setHoverTimeout(null);
+    }
+    setIsMenuHovered(true);
+  };
+
+  const handleMenuMouseLeave = () => {
+    // Reset menu hover state and close the dropdown with a slight delay
+    setIsMenuHovered(false);
+    const timeout = setTimeout(() => {
+      setAnchorEl(null);
+      setActiveDropdown(null);
+    }, 100);
+    
+    setHoverTimeout(timeout);
   };
 
   const renderIcon = (iconName?: string) => {
@@ -144,7 +208,12 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
             
             if (item.submenu && item.submenu.length > 0) {
               return (
-                <React.Fragment key={item.path}>
+                <Box
+                  key={item.path}
+                  sx={{ position: 'relative' }}
+                  onMouseEnter={(e) => handleMouseEnter(e, item.label)}
+                  onMouseLeave={handleMouseLeave}
+                >
                   <DropdownButton
                     variant="text"
                     endIcon={<ExpandMoreIcon />}
@@ -153,9 +222,11 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
                     sx={{
                       color: isActive ? 'primary.dark' : 'text.primary',
                       fontWeight: isActive ? 600 : 400,
+                      cursor: 'pointer',
                       '&:hover': {
                         backgroundColor: 'primary.main',
                         color: 'primary.contrastText',
+                        cursor: 'pointer',
                       },
                     }}
                   >
@@ -168,6 +239,20 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
                     onClose={handleDropdownClose}
                     MenuListProps={{
                       'aria-labelledby': 'basic-button',
+                      onMouseEnter: handleMenuMouseEnter,
+                      onMouseLeave: handleMenuMouseLeave,
+                    }}
+                    PaperProps={{
+                      onMouseEnter: handleMenuMouseEnter,
+                      onMouseLeave: handleMenuMouseLeave,
+                    }}
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'left',
+                    }}
+                    transformOrigin={{
+                      vertical: 'top',
+                      horizontal: 'left',
                     }}
                   >
                     {item.submenu.map((subItem) => (
@@ -188,7 +273,7 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
                       </MenuItem>
                     ))}
                   </StyledMenu>
-                </React.Fragment>
+                </Box>
               );
             }
 
