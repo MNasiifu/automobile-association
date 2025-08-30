@@ -2,7 +2,16 @@ import React from 'react';
 import { Box, Typography, Chip } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Card, Button } from '../atoms';
-import type { MembershipPlan } from '../../data/membershipData';
+interface MembershipPlan {
+  id: string;
+  name: string;
+  price: number;
+  duration: string;
+  description: string;
+  features: string[];
+  popular?: boolean;
+  color: 'primary' | 'secondary' | 'info';
+}
 
 interface MembershipCardProps {
   plan: MembershipPlan;

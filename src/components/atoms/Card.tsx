@@ -9,7 +9,9 @@ interface CardProps extends MuiCardProps {
   padding?: number;
 }
 
-const StyledCard = styled(MuiCard)<{ hover?: boolean }>(({ theme, hover }) => ({
+const StyledCard = styled(MuiCard, {
+  shouldForwardProp: (prop) => prop !== 'hover'
+})<{ hover?: boolean }>(({ theme, hover }) => ({
   borderRadius: 12,
   boxShadow: '0 2px 12px rgba(0, 0, 0, 0.08)',
   border: `1px solid ${theme.palette.grey[200]}`,
