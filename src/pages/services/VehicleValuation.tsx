@@ -79,30 +79,95 @@ const IconWrapper = styled(Box)(({ theme }) => ({
 }));
 
 const ProcessStep = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(3),
+  padding: theme.spacing(4),
   textAlign: 'center',
   height: '100%',
-  borderRadius: theme.spacing(2),
-  border: `2px solid ${theme.palette.primary.light}`,
-  transition: 'all 0.3s ease-in-out',
+  borderRadius: theme.spacing(3),
+  border: `1px solid ${theme.palette.divider}`,
+  background: 'linear-gradient(145deg, #ffffff 0%, #fafafa 100%)',
+  transition: 'all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+  position: 'relative',
+  overflow: 'hidden',
+  cursor: 'pointer',
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: '-100%',
+    width: '100%',
+    height: '100%',
+    background: `linear-gradient(90deg, transparent, ${theme.palette.primary.main}20, transparent)`,
+    transition: 'left 0.6s ease-in-out',
+  },
   '&:hover': {
+    transform: 'translateY(-8px) scale(1.02)',
+    boxShadow: `0 20px 40px ${theme.palette.primary.main}15`,
     borderColor: theme.palette.primary.main,
-    transform: 'translateY(-2px)',
+    '&::before': {
+      left: '100%',
+    },
+    '& .step-number': {
+      transform: 'scale(1.1) rotate(360deg)',
+      background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+    },
+    '& .step-icon': {
+      transform: 'scale(1.1)',
+      color: theme.palette.primary.main,
+    },
   },
 }));
 
 const StepNumber = styled(Box)(({ theme }) => ({
-  width: 40,
-  height: 40,
+  width: 56,
+  height: 56,
   borderRadius: '50%',
-  backgroundColor: theme.palette.primary.main,
+  background: `linear-gradient(135deg, ${theme.palette.primary.main}90, ${theme.palette.primary.dark})`,
   color: 'white',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  fontSize: '1.25rem',
-  fontWeight: 'bold',
+  fontSize: '1.5rem',
+  fontWeight: 700,
+  margin: '0 auto 24px',
+  boxShadow: `0 8px 24px ${theme.palette.primary.main}30`,
+  transition: 'all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+  position: 'relative',
+  zIndex: 2,
+  border: `3px solid white`,
+}));
+
+const ProcessContainer = styled(Box)(({ theme }) => ({
+  position: 'relative',
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: '120px',
+    left: '12.5%',
+    right: '12.5%',
+    height: '2px',
+    background: `linear-gradient(90deg, ${theme.palette.primary.main}30, ${theme.palette.secondary.main}30)`,
+    zIndex: 0,
+    [theme.breakpoints.down('md')]: {
+      display: 'none',
+    },
+  },
+}));
+
+const StepIconWrapper = styled(Box)(({ theme }) => ({
+  width: 48,
+  height: 48,
+  borderRadius: '12px',
+  background: `linear-gradient(135deg, ${theme.palette.primary.light}20, ${theme.palette.secondary.light}20)`,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
   margin: '0 auto 16px',
+  transition: 'all 0.3s ease-in-out',
+  '& svg': {
+    fontSize: '1.75rem',
+    color: theme.palette.primary.main,
+    transition: 'all 0.3s ease-in-out',
+  },
 }));
 
 const VehicleValuation: React.FC = () => {
@@ -201,7 +266,7 @@ const VehicleValuation: React.FC = () => {
     {
       number: 4,
       title: 'Expert Support',
-      description: 'Follow-up guidance for insurers, repairers, or buyers',
+      description: 'Follow-up guidance for insurers, banks, financial institutions, repairers, or buyers',
       icon: <PhoneIcon />,
     },
   ];
@@ -269,7 +334,7 @@ const VehicleValuation: React.FC = () => {
               </Stack>
             </Grid>
             <Grid item xs={12} md={6}>
-              <Box sx={{ textAlign: 'center' }}>
+              <Box sx={{ textAlign: 'center', display: { xs: 'none', md: 'block' } }}>
                 <AssessmentIcon sx={{ fontSize: 200, color: 'primary.main', opacity: 0.1 }} />
               </Box>
             </Grid>
@@ -293,16 +358,27 @@ const VehicleValuation: React.FC = () => {
             { icon: <AssessmentIcon />, title: 'Financial Requirements', desc: 'Supports finance, lease and probate requirements' },
             { icon: <CheckIcon />, title: 'Claims Evidence', desc: 'Provides evidence in claims, disputes and investigations' },
             { icon: <BusinessIcon />, title: 'Fleet Management', desc: 'Helps fleet owners manage depreciation and budgeting' },
+            { icon: <MoneyIcon />, title: 'Car Logbook Loans', desc: 'Banks and financial institutions use professional valuations to determine loan amounts for car logbook financing' },
           ].map((item, index) => (
             <Grid item xs={12} sm={6} md={4} key={index}>
-              <Paper sx={{ p: 3, textAlign: 'center', height: '100%', borderRadius: 2 }}>
-                <IconWrapper sx={{ mx: 'auto' }}>
-                  {item.icon}
-                </IconWrapper>
-                <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-                  {item.title}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
+              <Paper sx={{ 
+                p: 3, 
+                textAlign: 'center', 
+                height: '100%', 
+                borderRadius: 2,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between'
+              }}>
+                <Box>
+                  <IconWrapper sx={{ mx: 'auto' }}>
+                    {item.icon}
+                  </IconWrapper>
+                  <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, minHeight: '2.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {item.title}
+                  </Typography>
+                </Box>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 'auto' }}>
                   {item.desc}
                 </Typography>
               </Paper>
@@ -360,28 +436,115 @@ const VehicleValuation: React.FC = () => {
         <Heading variant="h2" align="center" gutterBottom>
           How It Works
         </Heading>
-        <Typography variant="h6" align="center" color="text.secondary" sx={{ mb: 6 }}>
+        <Typography variant="h6" align="center" color="text.secondary" sx={{ mb: 2 }}>
           Fast, transparent process from booking to final report
         </Typography>
+        <Typography variant="body1" align="center" color="text.secondary" sx={{ mb: 8, maxWidth: 600, mx: 'auto', opacity: 0.8 }}>
+          Our streamlined 4-step process ensures you get professional vehicle valuation with minimal hassle and maximum reliability.
+        </Typography>
 
-        <Grid container spacing={4}>
-          {processSteps.map((step, index) => (
-            <Grid item xs={12} sm={6} md={3} key={index}>
-              <ProcessStep>
-                <StepNumber>{step.number}</StepNumber>
-                <IconWrapper sx={{ mx: 'auto', mb: 2 }}>
-                  {step.icon}
-                </IconWrapper>
-                <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-                  {step.title}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {step.description}
-                </Typography>
-              </ProcessStep>
+        <ProcessContainer>
+          <Grid container spacing={4}>
+            {processSteps.map((step, index) => (
+              <Grid item xs={12} sm={6} md={3} key={index}>
+                <ProcessStep elevation={0}>
+                  <StepNumber className="step-number">{step.number}</StepNumber>
+                  <StepIconWrapper className="step-icon">
+                    {step.icon}
+                  </StepIconWrapper>
+                  <Typography 
+                    variant="h6" 
+                    gutterBottom 
+                    sx={{ 
+                      fontWeight: 700, 
+                      color: 'text.primary',
+                      mb: 2,
+                      fontSize: { xs: '1.1rem', sm: '1.25rem' }
+                    }}
+                  >
+                    {step.title}
+                  </Typography>
+                  <Typography 
+                    variant="body2" 
+                    color="text.secondary"
+                    sx={{ 
+                      lineHeight: 1.6,
+                      fontSize: { xs: '0.875rem', sm: '0.95rem' }
+                    }}
+                  >
+                    {step.description}
+                  </Typography>
+                  
+                  {/* Progress indicator for mobile */}
+                  {index < processSteps.length - 1 && (
+                    <Box
+                      sx={{
+                        display: { xs: 'block', md: 'none' },
+                        mt: 3,
+                        mx: 'auto',
+                        width: 2,
+                        height: 40,
+                        background: (theme) => `linear-gradient(180deg, ${theme.palette.primary.main}60, ${theme.palette.primary.light}30)`,
+                        borderRadius: 1,
+                      }}
+                    />
+                  )}
+                </ProcessStep>
+              </Grid>
+            ))}
+          </Grid>
+        </ProcessContainer>
+
+        {/* Additional Process Benefits */}
+        <Box sx={{ mt: 8, textAlign: 'center' }}>
+          <Paper 
+            sx={{ 
+              p: 4, 
+              borderRadius: 3,
+              background: (theme) => `linear-gradient(135deg, ${theme.palette.primary.main}08, ${theme.palette.secondary.main}05)`,
+              border: (theme) => `1px solid ${theme.palette.primary.main}20`,
+            }}
+          >
+            <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, color: 'primary.main' }}>
+              Why Our Process Works
+            </Typography>
+            <Grid container spacing={3} sx={{ mt: 2 }}>
+              {[
+                { icon: <ScheduleIcon />, title: 'Quick Turnaround', desc: 'Most reports delivered within 24-48 hours' },
+                { icon: <SecurityIcon />, title: 'Guaranteed Accuracy', desc: 'Professional valuers with local market expertise' },
+                { icon: <CheckIcon />, title: 'Comprehensive Coverage', desc: 'Every aspect of your vehicle thoroughly assessed' },
+                { icon: <PhoneIcon />, title: 'Ongoing Support', desc: 'Expert guidance throughout the entire process' },
+              ].map((benefit, index) => (
+                <Grid item xs={12} sm={6} md={3} key={index}>
+                  <Box sx={{ textAlign: 'center' }}>
+                    <Box
+                      sx={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: 2,
+                        backgroundColor: 'primary.main',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        mx: 'auto',
+                        mb: 1,
+                        '& svg': { color: 'white', fontSize: '1.25rem' }
+                      }}
+                    >
+                      {benefit.icon}
+                    </Box>
+                    <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
+                      {benefit.title}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {benefit.desc}
+                    </Typography>
+                  </Box>
+                </Grid>
+              ))}
             </Grid>
-          ))}
-        </Grid>
+          </Paper>
+        </Box>
       </Container>
 
       {/* Report Includes */}
@@ -445,7 +608,7 @@ const VehicleValuation: React.FC = () => {
             p: 6, 
             textAlign: 'center',
             borderRadius: 4,
-            backgroundColor: 'primary.light',
+            backgroundColor: 'grey.100',
             backgroundImage: (theme) => `linear-gradient(135deg, ${theme.palette.primary.light}20 0%, ${theme.palette.secondary.light}20 100%)`,
           }}
         >
@@ -461,7 +624,7 @@ const VehicleValuation: React.FC = () => {
               size="large"
               startIcon={<PhoneIcon />}
               onClick={handleTalkToUs}
-              sx={{ px: 4, py: 2, borderRadius: 3, textTransform: 'none', fontSize: '1.1rem' }}
+              sx={{ px: {xs: 1, sm: 4}, py: 2, borderRadius: 3, textTransform: 'none', fontSize: '1.1rem' }}
             >
               Schedule Inspection
             </Button>
