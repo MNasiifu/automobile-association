@@ -58,7 +58,7 @@ export const navigationItems: NavigationItem[] = [
       { label: "Fleet Management", path: "/services/fleet-management", icon: "DirectionsCar" },
       { label: "Rescue Services", path: "/services/rescue-services", icon: "BuildCircle" },
       { label: "Vehicle Inspection", path: "/services/vehicle-inspection", icon: "Search" },
-      { label: "Insurance Services", path: "/services/insurance", icon: "Security" },
+      { label: "Insurance Services", path: "/services/insurance-services", icon: "Security" },
       { label: "Automotive Advisory", path: "/services/automotive-advisory", icon: "SupportAgent" },
       { label: "Membership", path: "/services/membership", icon: "CardMembership" },
     ]

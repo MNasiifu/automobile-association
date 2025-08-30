@@ -29,7 +29,6 @@ import {
   LocalGasStation as FuelIcon,
   CheckCircle as CheckIcon,
   SupportAgent as SupportIcon,
-  LocationOn as LocationIcon,
   Speed as SpeedIcon,
   AccessTime as ClockIcon,
   Engineering as TechnicianIcon,
