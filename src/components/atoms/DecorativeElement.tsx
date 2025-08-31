@@ -20,7 +20,7 @@ const StyledDecorativeElement = styled(Box)<{
   height: `${$size}px`,
   left: `${$left}%`,
   top: `${$top}%`,
-  background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+  background: `linear-gradient(191deg, ${theme.palette.primary.dark}, ${theme.palette.primary.light})`,
   borderRadius: '50%',
   opacity: $opacity,
   animation: `${subtleFloat} 6s ease-in-out infinite`,

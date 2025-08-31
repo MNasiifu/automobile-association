@@ -31,7 +31,7 @@ const StyledAnimatedTitle = styled(Heading)(({ theme }) => ({
     transform: 'translateX(-50%)',
     width: '60px',
     height: '3px',
-    background: `linear-gradient(90deg, transparent, ${theme.palette.primary.main}, transparent)`,
+    background: `linear-gradient(90deg, transparent, ${theme.palette.secondary.light}, transparent)`,
     borderRadius: '2px',
     opacity: 0.8,
   },

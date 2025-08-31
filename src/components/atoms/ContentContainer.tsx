@@ -9,7 +9,7 @@ const StyledContentContainer = styled(Container)(({ theme }) => ({
   marginBottom: theme.spacing(1),
   
   '& .page-header-content': {
-    background: 'rgba(255, 255, 255, 0.15)',
+    background: theme.palette.primary.main,
     backdropFilter: 'blur(20px)',
     borderTopLeftRadius: theme.spacing(12),
     borderBottomRightRadius: theme.spacing(12),
