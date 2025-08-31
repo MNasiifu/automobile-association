@@ -1,21 +1,20 @@
-// AA Uganda Brand Colors and Design System
 export const colors = {
-  // Primary brand colors inspired by automotive industry and Uganda
   primary: {
-    main: '#024f31', // Dark green - professional and trustworthy branding
+    main: '#024f31',
     light: '#679583',
     dark: '#013722',
     contrastText: '#ffffff',
   },
+
   secondary: {
-    main: '#f1c50e', // Golden yellow - vibrant and attention-grabbing accent
-    light: '#f7dc6e',
-    dark: '#a98a0a',
+    main: '#f4d616',
+    light: '#f8e877',
+    dark: '#a89b0e',
     contrastText: '#000000',
   },
-  // Neutral colors
+
   neutral: {
-    50: '#FAFAFA',
+    50:  '#FAFAFA',
     100: '#F5F5F5',
     200: '#EEEEEE',
     300: '#E0E0E0',
@@ -26,39 +25,58 @@ export const colors = {
     800: '#424242',
     900: '#212121',
   },
-  // Functional colors
+
   success: {
     main: '#4CAF50',
     light: '#81C784',
     dark: '#388E3C',
+    contrastText: '#ffffff',
   },
   warning: {
     main: '#FF9800',
     light: '#FFB74D',
     dark: '#F57C00',
+    contrastText: '#000000',
   },
   error: {
-    main: '#F44336',
-    light: '#E57373',
-    dark: '#D32F2F',
+    main: '#D32F2F',
+    light: '#EF5350',
+    dark: '#C62828',
+    contrastText: '#ffffff',
   },
   info: {
     main: '#2196F3',
     light: '#64B5F6',
     dark: '#1976D2',
+    contrastText: '#ffffff',
   },
-  // Background colors
+
   background: {
     default: '#FFFFFF',
     paper: '#FAFAFA',
     section: '#F8F9FA',
   },
-  // Text colors
+
   text: {
     primary: '#212121',
-    secondary: '#757575',
+    secondary: '#013722',
     disabled: '#BDBDBD',
+    inverse: '#ffffff',
   },
+
+  overlays: {
+    green4:  'rgba(2, 79, 49, 0.04)',
+    green8:  'rgba(2, 79, 49, 0.08)',
+    green12: 'rgba(2, 79, 49, 0.12)',
+    green16: 'rgba(2, 79, 49, 0.16)',
+    yellow8: 'rgba(244, 214, 22, 0.08)',
+    yellow12:'rgba(244, 214, 22, 0.12)',
+    yellow16:'rgba(244, 214, 22, 0.16)',
+    black12: 'rgba(0, 0, 0, 0.12)',
+    white12: 'rgba(255, 255, 255, 0.12)',
+  },
+
+  divider: 'rgba(0, 0, 0, 0.08)',
 } as const;
 
 export type ColorPalette = typeof colors;
