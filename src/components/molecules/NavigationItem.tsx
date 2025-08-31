@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Button, Box, ButtonBase } from '@mui/material';
+import React from 'react';
+import { Button, Box } from '@mui/material';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { Link as RouterLink } from 'react-router-dom';
 import { SubMenu } from './SubMenu';
@@ -12,7 +12,6 @@ interface NavigationItemProps {
   children?: ReadonlyArray<{ readonly label: MenuIconKey; readonly path: string }>;
   open?: boolean;
   anchorEl?: HTMLElement | null;
-  childrenItems?: ReadonlyArray<{ readonly label: MenuIconKey; readonly path: string }>;
   onMouseEnter?: (event: React.MouseEvent<HTMLElement>) => void;
   onMouseLeave?: () => void;
 }
@@ -24,7 +23,6 @@ export const NavigationItem: React.FC<NavigationItemProps> = ({
   children,
   open,
   anchorEl,
-  childrenItems,
   onMouseEnter,
   onMouseLeave
 }) => {
@@ -47,15 +45,16 @@ export const NavigationItem: React.FC<NavigationItemProps> = ({
       >
         <Button
           variant="text"
-          className={active ? 'active' : ''}
+          className={`nav-link ${active ? 'active' : ''}`}
           endIcon={children && <KeyboardArrowDown />}
           sx={{
             color: active ? 'primary.main' : 'text.primary',
             fontWeight: active ? 700 : 500,
-            px: 1.15,
-            fontSize: { lg: 14, xl: 15 },
             transition: 'all 0.2s ease-in-out',
             backgroundColor: 'transparent',
+            py: { xs: 0.5, sm: 0.75, md: 1 },
+            px: { xs: 1, sm: 1.5, md: 2 },
+            minWidth: 0,
             '&:hover': {
               backgroundColor: 'transparent',
               color: 'primary.main',
@@ -89,7 +88,7 @@ export const NavigationItem: React.FC<NavigationItemProps> = ({
 
       {children && (
         <SubMenu
-          items={childrenItems || children}
+          items={children}
           open={Boolean(open)}
           anchorEl={anchorEl || null}
           onClose={() => onMouseLeave?.()}

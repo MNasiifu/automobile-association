@@ -38,6 +38,9 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
   color: theme.palette.text.primary,
   boxShadow: '0 2px 12px rgba(0, 0, 0, 0.08)',
   borderBottom: `1px solid ${theme.palette.grey[200]}`,
+  '& .MuiToolbar-root': {
+    justifyContent: 'space-between',
+  }
 }));
 
 const Logo = styled(RouterLink)(({ theme }) => ({
@@ -45,8 +48,10 @@ const Logo = styled(RouterLink)(({ theme }) => ({
   alignItems: 'center',
   textDecoration: 'none',
   cursor: 'pointer',
+  flexShrink: 0,
+  marginRight: theme.spacing(2),
   '& img': {
-    height: 48, // bigger logo for visibility
+    height: 48,
     width: 'auto',
     marginRight: theme.spacing(1.25),
   },
@@ -55,7 +60,7 @@ const Logo = styled(RouterLink)(({ theme }) => ({
     fontSize: '1.1rem',
     color: theme.palette.primary.main,
     whiteSpace: 'nowrap',
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       display: 'none',
     },
   },
@@ -65,14 +70,32 @@ const NavLinks = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   gap: theme.spacing(0.5),
-  marginLeft: 'auto',
-  [theme.breakpoints.down('md')]: {
-    display: 'none',
+  flex: 1,
+  justifyContent: 'flex-end',
+  '& .nav-items': {
+    display: 'flex',
+    alignItems: 'center',
+    gap: theme.spacing(1),
+    flexWrap: 'wrap',
+    [theme.breakpoints.down('md')]: {
+      display: 'none'
+    }
+  },
+  '& .apply-button': {
+    marginLeft: theme.spacing(2),
+    whiteSpace: 'nowrap',
+    [theme.breakpoints.down('md')]: {
+      display: 'none'
+    },
+    [theme.breakpoints.between('md', 'lg')]: {
+      marginLeft: theme.spacing(1),
+      padding: theme.spacing(1, 2),
+    },
   },
 }));
 
 const MobileMenuButton = styled(IconButton)(({ theme }) => ({
-  marginLeft: 'auto',
+  marginLeft: theme.spacing(2),
   [theme.breakpoints.up('md')]: {
     display: 'none',
   },
@@ -150,82 +173,84 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
           onMouseEnter={cancelClose}
           onMouseLeave={() => scheduleClose(CLOSE_DELAY)}
         >
-          {(navigationItems as unknown as NavItem[]).map((item) => {
-            const active = isActiveRoute(item.path);
-            const hasChildren = !!item.children?.length;
-            const key = item.label;
+          <Box className="nav-items">
+            {(navigationItems as unknown as NavItem[]).map((item) => {
+              const active = isActiveRoute(item.path);
+              const hasChildren = !!item.children?.length;
+              const key = item.label;
 
-            return (
-              <Box
-                key={key}
-                onMouseEnter={(e) =>
-                  handleParentEnter(key, e.currentTarget as HTMLElement, item.children)
-                }
-                onFocus={(e) =>
-                  handleParentEnter(key, e.currentTarget as HTMLElement, item.children)
-                }
-              >
-                <Button
-                  variant="text"
-                  component={LinkBehavior as any}
-                  {...({ to: item.path } as any)}
-                  endIcon={hasChildren ? <KeyboardArrowDown sx={{ ml: 0.25 }} /> : undefined}
-                  aria-haspopup={hasChildren ? 'menu' : undefined}
-                  aria-expanded={activeKey === key ? 'true' : undefined}
-                  aria-controls={activeKey === key ? 'nav-popper' : undefined}
-                  sx={{
-                    color: active ? 'primary.dark' : 'text.primary',
-                    fontWeight: active ? 800 : 600,
-                    position: 'relative',
-                    px: 1.15,
-                    whiteSpace: 'nowrap',
-                    fontSize: { lg: 14, xl: 15 },
-                    textTransform: 'none',
-                    minWidth: 'unset',
-                    padding: '6px 8px',
-                    '&.MuiButton-root': {
-                      border: 'none',
-                      boxShadow: 'none',
-                    },
-                    '&:after': active
-                      ? {
-                          content: '""',
-                          position: 'absolute',
-                          left: 8,
-                          right: 8,
-                          bottom: 4,
-                          height: 2,
-                          borderRadius: 1,
-                          backgroundColor: 'secondary.main', // Change to yellow
-                        }
-                      : {},
-                    '&:hover': {
-                      backgroundColor: 'transparent',
-                      color: 'primary.main',
-                      boxShadow: 'none',
-                    },
-                    '&:active': {
-                      boxShadow: 'none',
-                    },
-                  }}
+              return (
+                <Box
+                  key={key}
+                  onMouseEnter={(e) =>
+                    handleParentEnter(key, e.currentTarget as HTMLElement, item.children)
+                  }
+                  onFocus={(e) =>
+                    handleParentEnter(key, e.currentTarget as HTMLElement, item.children)
+                  }
+                  sx={{ flexShrink: 0 }}
                 >
-                  {item.label}
-                </Button>
-              </Box>
-            );
-          })}
+                  <Button
+                    variant="text"
+                    component={LinkBehavior as any}
+                    {...({ to: item.path } as any)}
+                    endIcon={hasChildren ? <KeyboardArrowDown sx={{ ml: 0.25 }} /> : undefined}
+                    aria-haspopup={hasChildren ? 'menu' : undefined}
+                    aria-expanded={activeKey === key ? 'true' : undefined}
+                    aria-controls={activeKey === key ? 'nav-popper' : undefined}
+                    sx={{
+                      color: active ? 'primary.dark' : 'text.primary',
+                      fontWeight: active ? 800 : 600,
+                      position: 'relative',
+                      whiteSpace: 'nowrap',
+                      fontSize: { xs: '0.875rem', md: '0.9375rem' },
+                      textTransform: 'none',
+                      minWidth: 'unset',
+                      padding: { xs: '4px 8px', md: '6px 12px' },
+                      '&.MuiButton-root': {
+                        border: 'none',
+                        boxShadow: 'none',
+                      },
+                      '&:after': active
+                        ? {
+                            content: '""',
+                            position: 'absolute',
+                            left: 8,
+                            right: 8,
+                            bottom: 4,
+                            height: 2,
+                            borderRadius: 1,
+                            backgroundColor: 'secondary.main',
+                          }
+                        : {},
+                      '&:hover': {
+                        backgroundColor: 'transparent',
+                        color: 'primary.main',
+                        boxShadow: 'none',
+                      },
+                      '&:active': {
+                        boxShadow: 'none',
+                      },
+                    }}
+                  >
+                    {item.label}
+                  </Button>
+                </Box>
+              );
+            })}
+          </Box>
 
-          {/* Apply for IDP — yellow BG + green text */}
           <Button
+            className="apply-button"
             variant="contained"
-            color='secondary'
+            color="secondary"
             component={LinkBehavior as any}
             {...({ to: '/idp' } as any)}
             sx={{
-              ml: 1.5,
               fontWeight: 900,
               bgcolor: 'secondary.main',
               color: 'primary.main',
+              flexShrink: 0,
               '&:hover': {
                 bgcolor: 'secondary.light',
                 color: 'primary.dark',

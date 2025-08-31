@@ -31,8 +31,13 @@ const StripeDivider: React.FC<StripeDividerProps> = ({
   const rightAnim = reverse ? slideInLeft : slideInRight;
 
   return (
-    <Box ref={ref} aria-hidden sx={{ py: 1.5, bgcolor: 'background.default', overflow: 'hidden' }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap, px: 0 }}>
+    <Box ref={ref} aria-hidden sx={{ py: 1, bgcolor: 'background.default', overflow: 'hidden' }}>
+      <Box sx={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: { xs: gap / 3, sm: gap / 2, md: gap, lg: gap * 1.25 }, 
+        px: 0 
+      }}>
         <Box
           sx={{
               flex: 1,

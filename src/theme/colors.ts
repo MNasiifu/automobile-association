@@ -39,9 +39,9 @@ export const colors = {
     contrastText: '#000000',
   },
   error: {
-    main: '#F44336',
-    light: '#E57373',
-    dark: '#D32F2F',
+    main: '#D32F2F',
+    light: '#EF5350',
+    dark: '#C62828',
     contrastText: '#ffffff',
   },
   info: {

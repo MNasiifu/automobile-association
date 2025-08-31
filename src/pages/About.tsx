@@ -21,7 +21,7 @@ import {
   Flag,
   Visibility,
 } from '@mui/icons-material';
-import { Heading, Card, CountUpAnimation } from '../components/atoms';
+import { Heading, Card, CountUpAnimation, StripeDivider } from '../components/atoms';
 import { PageHeader } from '../components/molecules';
 import { useLocation } from 'react-router-dom';
 import {
@@ -44,21 +44,6 @@ import g4 from '../assets/images/defensive-driving.jpeg';
 import g5 from '../assets/images/driving-school.jpg';
 import g6 from '../assets/images/road.jpg';
 import g7 from '../assets/images/TOWINGANDRECOVERYFRESHCAR.jpeg';
-
-function useInView<T extends Element>(options?: IntersectionObserverInit) {
-  const ref = React.useRef<T | null>(null);
-  const [inView, setInView] = React.useState(false);
-  React.useEffect(() => {
-    if (!ref.current) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => setInView(entry.isIntersecting),
-      { rootMargin: '0px 0px -10% 0px', threshold: 0.15, ...(options || {}) }
-    );
-    obs.observe(ref.current);
-    return () => obs.disconnect();
-  }, [options]);
-  return { ref, inView };
-}
 
 function useHashScroll() {
   const location = useLocation();
@@ -97,70 +82,6 @@ const Section = styled('section')(({ theme }) => ({
     scrollMarginTop: theme.spacing(14),
   },
 }));
-
-type StripeDividerProps = {
-  imageSrc?: string;
-  height?: number | string;
-  gap?: number;
-  reverse?: boolean;
-};
-
-const slideInLeft = keyframes`
-  0% { transform: translateX(-120%); opacity: .25; }
-  100% { transform: translateX(0); opacity: 1; }
-`;
-const slideInRight = keyframes`
-  0% { transform: translateX(120%); opacity: .25; }
-  100% { transform: translateX(0); opacity: 1; }
-`;
-
-const StripeDivider: React.FC<StripeDividerProps> = ({
-  imageSrc = stripeImg,
-  height = 40,
-  gap = 40,
-  reverse = false,
-}) => {
-  const { ref, inView } = useInView<HTMLDivElement>();
-  const leftAnim = reverse ? slideInRight : slideInLeft;
-  const rightAnim = reverse ? slideInLeft : slideInRight;
-
-  return (
-    <Box ref={ref} aria-hidden sx={{ py: 1.5, bgcolor: 'background.default' }}>
-      <Container maxWidth="lg">
-        <Box sx={{ display: 'flex', alignItems: 'center', gap }}>
-          <Box
-            sx={{
-              flex: 1,
-              height,
-              backgroundImage: `url(${imageSrc})`,
-              backgroundRepeat: 'repeat-x',
-              backgroundSize: 'auto 100%',
-              backgroundPosition: 'left center',
-              animation: inView
-                ? `${leftAnim} 600ms cubic-bezier(.2,.8,.2,1) both`
-                : 'none',
-              opacity: inView ? 1 : 0.25,
-            }}
-          />
-          <Box
-            sx={{
-              flex: 1,
-              height,
-              backgroundImage: `url(${imageSrc})`,
-              backgroundRepeat: 'repeat-x',
-              backgroundSize: 'auto 100%',
-              backgroundPosition: 'right center',
-              animation: inView
-                ? `${rightAnim} 640ms cubic-bezier(.2,.8,.2,1) both`
-                : 'none',
-              opacity: inView ? 1 : 0.25,
-            }}
-          />
-        </Box>
-      </Container>
-    </Box>
-  );
-};
 
 const StatsSectionRoot = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.grey[50],

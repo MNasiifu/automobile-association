@@ -92,8 +92,8 @@ const Contact: React.FC = () => {
 
       {/* Contact Methods Section */}
       <ContactSection>
-        <Container maxWidth="lg">
-          <Grid container spacing={4}>
+        <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 3, md: 4 } }}>
+          <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
             {contactMethods.map((method, index) => (
               <Grid item xs={12} sm={6} md={3} key={index}>
                 <ContactCard>

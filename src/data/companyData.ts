@@ -37,7 +37,7 @@ export const companyInfo = {
   ],
 };
 
-import type { MenuIconKey, NavItem } from '../types/navigation';
+import type {  NavItem } from '../types/navigation';
 
 export const navigationItems: ReadonlyArray<NavItem> = [
   { label: 'Home', path: '/' },
