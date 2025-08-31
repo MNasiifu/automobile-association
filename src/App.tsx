@@ -124,7 +124,17 @@ const MobileMenu: React.FC<{ open: boolean; onClose: () => void }> = ({ open, on
                         }}
                       >
                         <ListItemIcon sx={{ minWidth: 36 }}>
-                          {renderIcon(subItem.icon)}
+                          {subItem.icon ? renderIcon(subItem.icon) : (
+                            <Box
+                              sx={{
+                                width: 8,
+                                height: 8,
+                                borderRadius: '50%',
+                                backgroundColor: theme.palette.primary.main,
+                                margin: '0 8px',
+                              }}
+                            />
+                          )}
                         </ListItemIcon>
                         <ListItemText 
                           primary={subItem.label}

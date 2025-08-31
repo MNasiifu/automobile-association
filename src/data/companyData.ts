@@ -54,9 +54,9 @@ export const navigationItems: ReadonlyArray<NavItem> = [
     label: 'Driving School',
     path: '/driving-school',
     children: [
-      { label: 'About the School', path: '/driving-school#about' },
-      { label: 'Defensive Driving', path: '/driving-school#defensive' },
-      { label: 'Refresher Courses', path: '/driving-school#refresher' },
+      { label: 'About the School', path: '/driving-school#about', icon: 'School' },
+      { label: 'Defensive Driving', path: '/driving-school#defensive', icon: 'SecurityUpdateGood' },
+      { label: 'Refresher Courses', path: '/driving-school#refresher', icon: 'Replay' },
     ],
   },
 
@@ -76,20 +76,20 @@ export const navigationItems: ReadonlyArray<NavItem> = [
     label: 'About Us',
     path: '/about',
     children: [
-      { label: 'Mission & Vision', path: '/about#mission-vision' },
-      { label: 'Our Journey', path: '/about#journey' },
-      { label: 'Board of Directors', path: '/about#board' },
-      { label: 'Management', path: '/about#management' },
-      { label: 'Affiliation', path: '/about#affiliation' },
-      { label: 'Careers', path: '/careers' },
-      { label: 'Gallery', path: '/gallery' },
+      { label: 'Mission & Vision', path: '/about#mission-vision', icon: 'Flag' },
+      { label: 'Our Journey', path: '/about#journey', icon: 'Timeline' },
+      { label: 'Board of Directors', path: '/about#board', icon: 'Groups' },
+      { label: 'Management', path: '/about#management', icon: 'Business' },
+      { label: 'Affiliation', path: '/about#affiliation', icon: 'Handshake' },
+      { label: 'Careers', path: '/careers', icon: 'Work' },
+      { label: 'Gallery', path: '/gallery', icon: 'PhotoLibrary' },
     ],
   },
   {
     label: 'Contact Us',
     path: '/contact',
     children: [
-      { label: 'Branches', path: '/contact#branches' },
+      { label: 'Branches', path: '/contact#branches', icon: 'LocationOn' },
     ],
   },
 ] as const;
