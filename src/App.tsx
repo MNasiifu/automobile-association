@@ -32,8 +32,9 @@ import {
   AutomotiveAdvisory,
   MembershipPage
 } from './pages';
-import { navigationItems, type NavigationItem } from './data/companyData';
+import { navigationItems } from './data/companyData';
 import * as Icons from '@mui/icons-material';
+import type { NavItem } from './types/navigation';
 
 // Mobile Menu Component
 const MobileMenu: React.FC<{ open: boolean; onClose: () => void }> = ({ open, onClose }) => {
@@ -77,11 +78,11 @@ const MobileMenu: React.FC<{ open: boolean; onClose: () => void }> = ({ open, on
       </Box>
       
       <List>
-        {navigationItems.map((item: NavigationItem) => {
+        {navigationItems.map((item: NavItem) => {
           const isActive = isActiveRoute(item.path);
           const isExpanded = expandedItems.has(item.label);
           
-          if (item.submenu && item.submenu.length > 0) {
+          if (item.children && item.children.length > 0) {
             return (
               <React.Fragment key={item.path}>
                 <ListItem 
@@ -107,7 +108,7 @@ const MobileMenu: React.FC<{ open: boolean; onClose: () => void }> = ({ open, on
                 
                 <Collapse in={isExpanded} timeout="auto" unmountOnExit>
                   <List component="div" disablePadding>
-                    {item.submenu.map((subItem) => (
+                    {item.children.map((subItem) => (
                       <ListItem 
                         key={subItem.path}
                         onClick={onClose}
@@ -219,7 +220,7 @@ const App: React.FC = () => {
               <Route path="/services/vehicle-inspection" element={<VehicleInspection />} />
               <Route path="/services/insurance-services" element={<InsuranceServices />} />
               <Route path="/services/automotive-advisory" element={<AutomotiveAdvisory />} />
-              <Route path="/services/membership" element={<MembershipPage />} />
+              <Route path="/membership" element={<MembershipPage />} />
               <Route path="/idp" element={<InternationalDrivingPermit />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/careers" element={<Careers />} />

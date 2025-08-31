@@ -70,7 +70,6 @@ export const navigationItems: ReadonlyArray<NavItem> = [
       { label: "Vehicle Inspection", path: "/services/vehicle-inspection", icon: "Search" },
       { label: "Insurance Services", path: "/services/insurance-services", icon: "Security" },
       { label: "Automotive Advisory", path: "/services/automotive-advisory", icon: "SupportAgent" },
-      { label: "Membership", path: "/services/membership", icon: "CardMembership" },
     ],
   },
     {
