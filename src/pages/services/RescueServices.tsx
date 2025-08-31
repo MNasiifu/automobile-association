@@ -483,7 +483,7 @@ const RescueServices: React.FC = () => {
             🚨 24/7 Emergency Hotline
           </Typography>
           <Typography variant="h2" gutterBottom sx={{ fontWeight: 'bold', fontSize: {xs: '1.5rem', sm: '2.0rem'} }}>
-            +256 414 250 362
+            {config.company.contactNumber}
           </Typography>
           <Typography variant="body1" sx={{ mb: 3, opacity: 0.9 }}>
             Available 24 hours a day, 7 days a week for all emergency assistance

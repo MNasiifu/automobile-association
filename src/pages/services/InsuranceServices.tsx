@@ -378,7 +378,7 @@ const InsuranceServices: React.FC = () => {
                       onClick={handleGetQuote}
                       sx={{ mt: 3 }}
                     >
-                      Get Quote
+                      Contact Support
                     </Button>
                   </CardContent>
                 </CardComponent>
@@ -473,7 +473,7 @@ const InsuranceServices: React.FC = () => {
         <Box sx={{ textAlign: "center", mt: 6 }}>
           <Alert severity="success" sx={{ mb: 3, maxWidth: 600, mx: "auto" }}>
             <Typography variant="body1">
-              <strong>Emergency Hotline:</strong> 0800-100-100 (Available 24/7)
+              <strong>Emergency Hotline:</strong> {config.company.emergencyHotline} (Available 24/7)
             </Typography>
           </Alert>
           <ContactButtons 

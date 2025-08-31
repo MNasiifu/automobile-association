@@ -457,7 +457,7 @@ const VehicleInspection: React.FC = () => {
                         <ListItemIcon sx={{ minWidth: 20 }}>
                           <CheckIcon
                             sx={{
-                              fontSize: { xs: "1rem", sm: "1.0rem" },
+                              fontSize: "1rem",
                               color: "primary.main",
                             }}
                           />
