@@ -1,42 +1,66 @@
-import React, { useState, useEffect } from 'react';
-import { AppBar, Toolbar, Box, IconButton, Menu, MenuItem, Typography } from '@mui/material';
-import { Menu as MenuIcon, ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
+import * as React from 'react';
+import {
+  AppBar,
+  Toolbar,
+  Box,
+  IconButton,
+  Popper,
+  Paper,
+  List,
+  ListItemButton,
+  Typography,
+  useScrollTrigger,
+} from '@mui/material';
+import { Menu as MenuIcon, KeyboardArrowDown } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
-import { useLocation, Link } from 'react-router-dom';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { Button } from '../atoms';
-import { navigationItems, companyInfo, type NavigationItem } from '../../data/companyData';
+import { navigationItems, companyInfo } from '../../data/companyData';
 import AAULogo from '../../assets/images/aau-logo.png';
-import * as Icons from '@mui/icons-material';
+
+type NavChild = { label: string; path: string };
+type NavItem = { label: string; path: string; children?: NavChild[] };
 
 interface NavigationProps {
   onMenuClick?: () => void;
 }
+
+// Forwarded Link so MUI components accept `to`
+type RouterLinkProps = React.ComponentProps<typeof RouterLink>;
+const LinkBehavior = React.forwardRef<HTMLAnchorElement, RouterLinkProps>(
+  function LinkBehavior(props, ref) {
+    return <RouterLink ref={ref} {...props} />;
+  }
+);
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   backgroundColor: theme.palette.background.default,
   color: theme.palette.text.primary,
   boxShadow: '0 2px 12px rgba(0, 0, 0, 0.08)',
   borderBottom: `1px solid ${theme.palette.grey[200]}`,
+  '& .MuiToolbar-root': {
+    justifyContent: 'space-between',
+  }
 }));
 
-const Logo = styled(Box)(({ theme }) => ({
+const Logo = styled(RouterLink)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   textDecoration: 'none',
   cursor: 'pointer',
-  
+  flexShrink: 0,
+  marginRight: theme.spacing(2),
   '& img': {
-    height: 40,
+    height: 48,
     width: 'auto',
-    marginRight: theme.spacing(1),
+    marginRight: theme.spacing(1.25),
   },
-  
   '& .logo-text': {
-    fontWeight: 700,
-    fontSize: '1.2rem',
+    fontWeight: 800,
+    fontSize: '1.1rem',
     color: theme.palette.primary.main,
-    
-    [theme.breakpoints.down('sm')]: {
+    whiteSpace: 'nowrap',
+    [theme.breakpoints.down('md')]: {
       display: 'none',
     },
   },
@@ -45,280 +69,280 @@ const Logo = styled(Box)(({ theme }) => ({
 const NavLinks = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  gap: theme.spacing(1),
-  marginLeft: 'auto',
-  
-  [theme.breakpoints.down('md')]: {
-    display: 'none',
+  gap: theme.spacing(0.5),
+  flex: 1,
+  justifyContent: 'flex-end',
+  '& .nav-items': {
+    display: 'flex',
+    alignItems: 'center',
+    gap: theme.spacing(1),
+    flexWrap: 'wrap',
+    [theme.breakpoints.down('md')]: {
+      display: 'none'
+    }
+  },
+  '& .apply-button': {
+    marginLeft: theme.spacing(2),
+    whiteSpace: 'nowrap',
+    [theme.breakpoints.down('md')]: {
+      display: 'none'
+    },
+    [theme.breakpoints.between('md', 'lg')]: {
+      marginLeft: theme.spacing(1),
+      padding: theme.spacing(1, 2),
+    },
   },
 }));
 
 const MobileMenuButton = styled(IconButton)(({ theme }) => ({
-  marginLeft: 'auto',
-  
+  marginLeft: theme.spacing(2),
   [theme.breakpoints.up('md')]: {
     display: 'none',
   },
 }));
 
-const DropdownButton = styled(Button)(({ theme }) => ({
-  '& .MuiButton-endIcon': {
-    marginLeft: theme.spacing(0.5),
-    transition: 'transform 0.2s ease-in-out',
-  },
-  '&[aria-expanded="true"] .MuiButton-endIcon': {
-    transform: 'rotate(180deg)',
-  },
-}));
-
-const StyledMenu = styled(Menu)(({ theme }) => ({
-  '& .MuiPaper-root': {
-    marginTop: theme.spacing(0.25), // Further reduced gap for seamless hover transition
-    minWidth: 220,
-    borderRadius: theme.spacing(1),
-    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
-    border: `1px solid ${theme.palette.grey[200]}`,
-    '& .MuiMenuItem-root': {
-      padding: theme.spacing(1.5, 2),
-      '&:hover': {
-        backgroundColor: theme.palette.primary.light,
-        color: theme.palette.primary.contrastText,
-      },
-    },
-  },
-}));
-
-const MenuItemContent = styled(Box)(() => ({
-  display: 'flex',
-  alignItems: 'center',
-  gap: 8,
-  width: '100%',
-}));
+const CLOSE_DELAY = 120;
 
 const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
   const location = useLocation();
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-  const [hoverTimeout, setHoverTimeout] = useState<number | null>(null);
-  const [isMenuHovered, setIsMenuHovered] = useState(false);
+  const trigger = useScrollTrigger({ threshold: 6 });
 
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (hoverTimeout) {
-        clearTimeout(hoverTimeout);
-      }
-    };
-  }, [hoverTimeout]);
+  const [activeKey, setActiveKey] = React.useState<string | null>(null);
+  const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
+  const [childrenItems, setChildrenItems] = React.useState<NavChild[]>([]);
+  const navRef = React.useRef<HTMLDivElement | null>(null);
+  const popperRef = React.useRef<HTMLDivElement | null>(null);
+  const closeTimer = React.useRef<number | null>(null);
 
-  // Helper function to determine if a navigation item is active
-  const isActiveRoute = (path: string) => {
-    if (path === '/') {
-      return location.pathname === '/';
+  const isActiveRoute = (path: string) =>
+    path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
+
+  const cancelClose = () => {
+    if (closeTimer.current !== null) {
+      window.clearTimeout(closeTimer.current);
+      closeTimer.current = null;
     }
-    return location.pathname.startsWith(path);
   };
 
-  const handleDropdownOpen = (event: React.MouseEvent<HTMLElement>, itemLabel: string) => {
-    // Clear any existing timeout
-    if (hoverTimeout) {
-      clearTimeout(hoverTimeout);
-      setHoverTimeout(null);
-    }
-    
-    setAnchorEl(event.currentTarget);
-    setActiveDropdown(itemLabel);
-  };
-
-  const handleDropdownClose = () => {
-    // Only close if the menu is not being hovered
-    if (!isMenuHovered) {
+  const scheduleClose = (delay = CLOSE_DELAY) => {
+    cancelClose();
+    closeTimer.current = window.setTimeout(() => {
+      setActiveKey(null);
       setAnchorEl(null);
-      setActiveDropdown(null);
-    }
+      setChildrenItems([]);
+    }, delay);
   };
 
-  const handleMouseEnter = (event: React.MouseEvent<HTMLElement>, itemLabel: string) => {
-    // Clear any existing timeout
-    if (hoverTimeout) {
-      clearTimeout(hoverTimeout);
-      setHoverTimeout(null);
-    }
-    
-    setAnchorEl(event.currentTarget);
-    setActiveDropdown(itemLabel);
-  };
+  // Open instantly on hover/focus; close instantly if no submenu
+  const handleParentEnter = (key: string, el: HTMLElement, kids?: NavChild[]) => {
+    cancelClose();
+    const hasKids = !!kids?.length;
 
-  const handleMouseLeave = () => {
-    // Only set timeout if menu is not being hovered
-    if (!isMenuHovered) {
-      const timeout = setTimeout(() => {
-        setAnchorEl(null);
-        setActiveDropdown(null);
-      }, 200); // Increased delay for better UX
-      
-      setHoverTimeout(timeout);
-    }
-  };
-
-  const handleMenuMouseEnter = () => {
-    // Clear the timeout and set menu as hovered
-    if (hoverTimeout) {
-      clearTimeout(hoverTimeout);
-      setHoverTimeout(null);
-    }
-    setIsMenuHovered(true);
-  };
-
-  const handleMenuMouseLeave = () => {
-    // Reset menu hover state and close the dropdown with a slight delay
-    setIsMenuHovered(false);
-    const timeout = setTimeout(() => {
+    if (hasKids) {
+      setActiveKey((prev) => (prev === key ? prev : key));
+      setAnchorEl(el);
+      setChildrenItems(kids!);
+    } else {
+      setActiveKey(null);
       setAnchorEl(null);
-      setActiveDropdown(null);
-    }, 100);
-    
-    setHoverTimeout(timeout);
+      setChildrenItems([]);
+    }
   };
 
-  const renderIcon = (iconName?: string) => {
-    if (!iconName) return null;
-    const IconComponent = (Icons as any)[iconName];
-    return IconComponent ? <IconComponent fontSize="small" /> : null;
+  // Close dropdown if the pointer leaves both the nav and popper
+  const handlePopperMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
+    const next = e.relatedTarget as Node | null;
+    if (next && navRef.current?.contains(next)) return; // moving back to nav
+    scheduleClose(80);
   };
+
+  const openDropdown = Boolean(activeKey && childrenItems.length > 0);
 
   return (
-    <StyledAppBar position="sticky" elevation={0}>
-      <Toolbar sx={{ px: { xs: 2, sm: 3, md: 4 } }}>
-        <Logo 
-          component={Link}
-          {...({ to: '/' } as any)}
-          sx={{ 
-            textDecoration: 'none',
-            cursor: 'pointer'
-          }}
-        >
+    <StyledAppBar position="sticky" elevation={trigger ? 2 : 0}>
+      <Toolbar sx={{ px: { xs: 2, sm: 3, md: 4 }, minHeight: { xs: 64, md: 72 } }}>
+        <Logo to="/" aria-label="AA Uganda Home">
           <img src={AAULogo} alt="AA Uganda Logo" />
-          <Box className="logo-text">{companyInfo.shortName}</Box>
+          <Typography className="logo-text" sx={{ fontSize: '1rem'}}>{companyInfo.phrase}</Typography>
         </Logo>
-        
-        <NavLinks>
-          {navigationItems.map((item: NavigationItem) => {
-            const isActive = isActiveRoute(item.path);
-            
-            if (item.submenu && item.submenu.length > 0) {
+
+        <NavLinks
+          ref={navRef}
+          role="navigation"
+          aria-label="Primary"
+          onMouseEnter={cancelClose}
+          onMouseLeave={() => scheduleClose(CLOSE_DELAY)}
+        >
+          <Box className="nav-items">
+            {(navigationItems as unknown as NavItem[]).map((item) => {
+              const active = isActiveRoute(item.path);
+              const hasChildren = !!item.children?.length;
+              const key = item.label;
+
               return (
                 <Box
-                  key={item.path}
-                  sx={{ position: 'relative' }}
-                  onMouseEnter={(e) => handleMouseEnter(e, item.label)}
-                  onMouseLeave={handleMouseLeave}
+                  key={key}
+                  onMouseEnter={(e) =>
+                    handleParentEnter(key, e.currentTarget as HTMLElement, item.children)
+                  }
+                  onFocus={(e) =>
+                    handleParentEnter(key, e.currentTarget as HTMLElement, item.children)
+                  }
+                  sx={{ flexShrink: 0 }}
                 >
-                  <DropdownButton
+                  <Button
                     variant="text"
-                    endIcon={<ExpandMoreIcon />}
-                    onClick={(e) => handleDropdownOpen(e, item.label)}
-                    aria-expanded={activeDropdown === item.label}
+                    component={LinkBehavior as any}
+                    {...({ to: item.path } as any)}
+                    endIcon={hasChildren ? <KeyboardArrowDown sx={{ ml: 0.25 }} /> : undefined}
+                    aria-haspopup={hasChildren ? 'menu' : undefined}
+                    aria-expanded={activeKey === key ? 'true' : undefined}
+                    aria-controls={activeKey === key ? 'nav-popper' : undefined}
                     sx={{
-                      color: isActive ? 'primary.dark' : 'text.primary',
-                      fontWeight: isActive ? 600 : 400,
-                      cursor: 'pointer',
+                      color: active ? 'primary.dark' : 'text.primary',
+                      fontWeight: active ? 800 : 600,
+                      position: 'relative',
+                      whiteSpace: 'nowrap',
+                      fontSize: { xs: '0.875rem', md: '0.9375rem' },
+                      textTransform: 'none',
+                      minWidth: 'unset',
+                      padding: { xs: '4px 8px', md: '6px 12px' },
+                      '&.MuiButton-root': {
+                        border: 'none',
+                        boxShadow: 'none',
+                      },
+                      '&:after': active
+                        ? {
+                            content: '""',
+                            position: 'absolute',
+                            left: 8,
+                            right: 8,
+                            bottom: 4,
+                            height: 2,
+                            borderRadius: 1,
+                            backgroundColor: 'secondary.main',
+                          }
+                        : {},
                       '&:hover': {
-                        backgroundColor: 'primary.main',
-                        color: 'primary.contrastText',
-                        cursor: 'pointer',
+                        backgroundColor: 'transparent',
+                        color: 'primary.main',
+                        boxShadow: 'none',
+                      },
+                      '&:active': {
+                        boxShadow: 'none',
                       },
                     }}
                   >
                     {item.label}
-                  </DropdownButton>
-                  
-                  <StyledMenu
-                    anchorEl={anchorEl}
-                    open={activeDropdown === item.label}
-                    onClose={handleDropdownClose}
-                    MenuListProps={{
-                      'aria-labelledby': 'basic-button',
-                      onMouseEnter: handleMenuMouseEnter,
-                      onMouseLeave: handleMenuMouseLeave,
-                    }}
-                    PaperProps={{
-                      onMouseEnter: handleMenuMouseEnter,
-                      onMouseLeave: handleMenuMouseLeave,
-                    }}
-                    anchorOrigin={{
-                      vertical: 'bottom',
-                      horizontal: 'left',
-                    }}
-                    transformOrigin={{
-                      vertical: 'top',
-                      horizontal: 'left',
-                    }}
-                  >
-                    {item.submenu.map((subItem) => (
-                      <MenuItem
-                        key={subItem.path}
-                        component={Link}
-                        to={subItem.path}
-                        onClick={handleDropdownClose}
-                        sx={{
-                          color: isActiveRoute(subItem.path) ? 'primary.main' : 'text.primary',
-                          fontWeight: isActiveRoute(subItem.path) ? 600 : 400,
-                        }}
-                      >
-                        <MenuItemContent>
-                          {renderIcon(subItem.icon)}
-                          <Typography variant="body2">{subItem.label}</Typography>
-                        </MenuItemContent>
-                      </MenuItem>
-                    ))}
-                  </StyledMenu>
+                  </Button>
                 </Box>
               );
-            }
+            })}
+          </Box>
 
-            return (
-              <Button
-                key={item.path}
-                variant="text"
-                component={Link}
-                {...({ to: item.path } as any)}
-                sx={{
-                  color: isActive ? 'primary.dark' : 'text.primary',
-                  fontWeight: isActive ? 600 : 400,
-                  '&:hover': {
-                    backgroundColor: 'primary.main',
-                    color: 'primary.contrastText',
-                  },
-                }}
-              >
-                {item.label}
-              </Button>
-            );
-          })}
-          
           <Button
+            className="apply-button"
             variant="contained"
-            color="primary"
-            component={Link}
+            color="secondary"
+            component={LinkBehavior as any}
             {...({ to: '/idp' } as any)}
-            sx={{ 
-              ml: 2,
+            sx={{
+              fontWeight: 900,
+              bgcolor: 'secondary.main',
+              color: 'primary.main',
+              flexShrink: 0,
               '&:hover': {
-                color: 'secondary.main',
-                fontWeight: 600
-              }
+                bgcolor: 'secondary.light',
+                color: 'primary.dark',
+                boxShadow: '0 6px 18px rgba(2,79,49,0.25)',
+              },
             }}
           >
             Apply for IDP
           </Button>
         </NavLinks>
-        
-        <MobileMenuButton
-          color="inherit"
-          aria-label="menu"
-          onClick={onMenuClick}
+
+        <Popper
+          id="nav-popper"
+          open={openDropdown}
+          anchorEl={anchorEl}
+          placement="bottom-start"
+          disablePortal
+          sx={{ zIndex: (t) => t.zIndex.modal + 1 }}
+          onMouseEnter={cancelClose}
+          onMouseLeave={handlePopperMouseLeave}
         >
+          <Paper
+            ref={popperRef}
+            elevation={6}
+            sx={{
+              mt: 1,
+              borderRadius: 1,
+              color: 'text.primary',
+              minWidth: 240,
+              boxShadow: '0 8px 20px rgba(0,0,0,0.18)',
+              backgroundColor: '#ffffff',
+            }}
+          >
+            <List dense disablePadding sx={{ py: 0.5 }}>
+              {childrenItems.map((c) => (
+                <ListItemButton
+                  key={c.path}
+                  component={LinkBehavior as any}
+                  {...({ to: c.path } as any)}
+                  onClick={(e) => {
+                    // Smooth-scroll if this is a same-page hash link
+                    const isHash = c.path.includes('#');
+                    if (isHash) {
+                      const [base, rawHash] = c.path.split('#');
+                      const hash = decodeURIComponent(rawHash || '');
+                      if (location.pathname === base && hash) {
+                        e.preventDefault();
+                        const el = document.getElementById(hash);
+                        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }
+                    }
+                    scheduleClose(0);
+                  }}
+                  sx={{
+                    fontWeight: 600,
+                    letterSpacing: 0.2,
+                    py: 0.5,
+                    px: 2,
+                    gap: 1.5,
+                    display: 'flex',
+                    alignItems: 'center',
+                    '&:hover': {
+                      bgcolor: 'primary.main',
+                      color: 'primary.contrastText',
+                      '& .menu-icon': {
+                        color: 'secondary.main'
+                      }
+                    },
+                  }}
+                >
+                  <Box 
+                    className="menu-icon"
+                    sx={{ 
+                      width: 20, 
+                      height: 20, 
+                      display: 'flex', 
+                      alignItems: 'center',
+                      color: 'secondary.main'
+                    }}
+                  >
+                    •
+                  </Box>
+                  <Typography variant="body2" sx={{ fontWeight: 600, whiteSpace: 'nowrap' }}>
+                    {c.label}
+                  </Typography>
+                </ListItemButton>
+              ))}
+            </List>
+          </Paper>
+        </Popper>
+
+        <MobileMenuButton color="inherit" aria-label="Open menu" onClick={onMenuClick}>
           <MenuIcon />
         </MobileMenuButton>
       </Toolbar>

@@ -16,12 +16,14 @@ import { Close as CloseIcon, ExpandLess, ExpandMore } from '@mui/icons-material'
 import theme from './theme';
 import { Navigation } from './components/molecules';
 import { Footer } from './components/organisms';
+import { WhatsAppButton } from './components/atoms';
 import { 
   Home, 
   About, 
-  Services, 
-  Membership, 
+  Services,
   Contact,
+  Careers,
+  InternationalDrivingPermit,
   VehicleValuation,
   FleetManagement,
   RescueServices,
@@ -188,7 +190,13 @@ const App: React.FC = () => {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Router>
-        <Box sx={{ minHeight: '100vh', width: '100vw', display: 'flex', flexDirection: 'column' }}>
+        <Box sx={{ 
+            minHeight: '100vh', 
+            width: '100%',
+            display: 'flex', 
+            flexDirection: 'column',
+            overflow: 'hidden'
+          }}>
           {/* Navigation */}
           <Navigation onMenuClick={handleMobileMenuToggle} />
           
@@ -196,7 +204,11 @@ const App: React.FC = () => {
           <MobileMenu open={mobileMenuOpen} onClose={handleMobileMenuClose} />
           
           {/* Main Content */}
-          <Box sx={{ flexGrow: 1 }}>
+          <Box sx={{ 
+            flexGrow: 1,
+            width: '100%',
+            overflowX: 'hidden'
+          }}>
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<About />} />
@@ -208,13 +220,16 @@ const App: React.FC = () => {
               <Route path="/services/insurance-services" element={<InsuranceServices />} />
               <Route path="/services/automotive-advisory" element={<AutomotiveAdvisory />} />
               <Route path="/services/membership" element={<MembershipPage />} />
-              <Route path="/idp" element={<Membership />} />
+              <Route path="/idp" element={<InternationalDrivingPermit />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/careers" element={<Careers />} />
             </Routes>
           </Box>
           
           {/* Footer */}
           <Footer />
+          {/* WhatsApp Button */}
+          <WhatsAppButton />
         </Box>
       </Router>
     </ThemeProvider>

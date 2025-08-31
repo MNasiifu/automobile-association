@@ -9,3 +9,11 @@ export { default as ContactButtons } from './ContactButtons';
 // PageHeader subcomponents
 export { default as DecorativeBackground } from './DecorativeBackground';
 export { default as PageHeaderContent } from './PageHeaderContent';
+
+// About page components
+export { default as MissionVisionCard } from './MissionVisionCard';
+export { default as PersonCard } from './PersonCard';
+export { default as JourneyItem } from './JourneyItem';
+
+// Navigation components
+export { default as MobileMenu } from './MobileMenu';

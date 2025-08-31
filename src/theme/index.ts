@@ -70,10 +70,19 @@ const components = {
       root: {
         borderRadius: 8,
         padding: '12px 24px',
-        fontSize: '0.875rem',
         fontWeight: 500,
         textTransform: 'none' as const,
         boxShadow: 'none',
+        whiteSpace: 'nowrap',
+        minWidth: 'auto',
+        '@media (max-width: 600px)': {
+          padding: '8px 16px',
+          fontSize: '0.8125rem',
+        },
+        '@media (min-width: 601px) and (max-width: 900px)': {
+          padding: '10px 20px',
+          fontSize: '0.85rem',
+        },
         '&:hover': {
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
         },
@@ -82,6 +91,26 @@ const components = {
         background: `linear-gradient(135deg, ${colors.primary.main} 0%, ${colors.primary.dark} 100%)`,
         '&:hover': {
           background: `linear-gradient(135deg, ${colors.primary.dark} 0%, ${colors.primary.main} 100%)`,
+        },
+      },
+       containedSecondary: {
+        backgroundImage: 'none',
+        background: colors.secondary.main,     // yellow bg
+        color: colors.primary.main,            // green text
+        fontWeight: 900,
+        '&:hover': {
+          background: colors.secondary.light,  // lighter yellow
+          color: colors.primary.dark,          // darker green text
+          boxShadow: '0 6px 18px rgba(2,79,49,0.25)',
+        },
+        '&:focus-visible': {
+          outline: 'none',
+          boxShadow: '0 0 0 3px rgba(2,79,49,0.25)',
+        },
+        '&.Mui-disabled': {
+          background: '#00000014', // same feel as MUI disabled bg
+          color: '#00000061',
+          boxShadow: 'none',
         },
       },
     },
@@ -111,6 +140,52 @@ const components = {
         backgroundColor: colors.background.default,
         color: colors.text.primary,
         boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+        '& .MuiToolbar-root': {
+          minHeight: { xs: 56, sm: 64, md: 70 },
+          padding: {
+            xs: '0 16px',
+            sm: '0 24px',
+            md: '0 32px'
+          },
+        },
+        '& .nav-link': {
+          fontSize: {
+            xs: '0.875rem',
+            sm: '0.9375rem',
+            md: '1rem'
+          },
+          padding: {
+            xs: '4px 8px',
+            sm: '6px 12px',
+            md: '8px 16px'
+          },
+        },
+        '& .slogan-text': {
+          fontSize: {
+            xs: '0.75rem',
+            sm: '0.875rem',
+            md: '1rem'
+          },
+          fontStyle: 'italic',
+          fontFamily: '"Playfair Display", serif',
+          background: `linear-gradient(135deg, ${colors.primary.main} 0%, ${colors.secondary.main} 100%)`,
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          animation: 'fadeIn 1.5s ease-in-out',
+          '@keyframes fadeIn': {
+            '0%': {
+              opacity: 0,
+              transform: 'translateY(10px)'
+            },
+            '100%': {
+              opacity: 1,
+              transform: 'translateY(0)'
+            }
+          },
+          '@media (max-width: 900px)': {
+            display: 'none'
+          }
+        }
       },
     },
   },

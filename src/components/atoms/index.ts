@@ -15,3 +15,11 @@ export { default as SectionDivider } from './SectionDivider';
 
 // Animations
 export * from './animations';
+
+// Statistics and Visual Elements
+export { default as StripeDivider } from './StripeDivider';
+export { default as CounterSection } from './CounterSection';
+export { default as CountUpAnimation } from './CountUpAnimation';
+
+// Social Media
+export { default as WhatsAppButton } from './WhatsAppButton';

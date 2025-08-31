@@ -1,352 +1,101 @@
-import React, { useState } from 'react';
-import { 
-  Box, 
-  Container, 
-  Typography, 
-  Grid, 
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Paper,
-  Alert,
-  Snackbar,
-} from '@mui/material';
-import { 
-  ExpandMore as ExpandMoreIcon, 
-  Verified as VerifiedIcon,
-} from '@mui/icons-material';
-import { styled } from '@mui/material/styles';
-import { Heading, Button } from '../components/atoms';
-import { IDPCard, VerificationModal } from '../components/molecules';
-import { 
-  idpApplicationTypes, 
-  idpBenefits, 
-  idpRequirements, 
-  idpFAQs, 
-  verificationInfo 
-} from '../data/idpData';
+import React from 'react';
+import { Box, Container, Typography, Grid } from '@mui/material';
+import { PageHeader } from '../components/molecules';
+import rescueImage from '../assets/images/AA-rescue.jpg';
 
-const IDPSection = styled(Box)(({ theme }) => ({
-  padding: theme.spacing(8, 0),
-}));
 
-const BenefitsSection = styled(Box)(({ theme }) => ({
-  backgroundColor: theme.palette.grey[50],
-  padding: theme.spacing(8, 0),
-}));
-
-const RequirementsSection = styled(Box)(({ theme }) => ({
-  padding: theme.spacing(8, 0),
-}));
-
-const VerificationSection = styled(Box)(({ theme }) => ({
-  backgroundColor: theme.palette.primary.main,
-  color: theme.palette.primary.contrastText,
-  padding: theme.spacing(8, 0),
-}));
-
-const FAQSection = styled(Box)(({ theme }) => ({
-  padding: theme.spacing(8, 0),
-  backgroundColor: theme.palette.grey[50],
-}));
-
-const BenefitCard = styled(Box)(({ theme }) => ({
-  textAlign: 'center',
-  padding: theme.spacing(3),
-}));
-
-const RequirementCard = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(3),
-  height: '100%',
-  backgroundColor: theme.palette.background.paper,
-}));
-
-const VerificationCard = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(4),
-  backgroundColor: theme.palette.background.paper,
-  borderRadius: theme.spacing(2),
-}));
-
-const InternationalDrivingPermit: React.FC = () => {
-  const [verificationResult, setVerificationResult] = useState<string>('');
-  const [showAlert, setShowAlert] = useState<boolean>(false);
-  const [verificationModalOpen, setVerificationModalOpen] = useState<boolean>(false);
-
-  const handleApplicationSelect = (applicationId: string) => {
-    console.log('Selected application:', applicationId);
-    // In a real app, this would redirect to application form
-    setVerificationResult('Redirecting to application form...');
-    setShowAlert(true);
-  };
-
-  const handleVerificationModalOpen = () => {
-    setVerificationModalOpen(true);
-  };
-
-  const handleVerificationModalClose = () => {
-    setVerificationModalOpen(false);
-  };
-
+const MembershipPage: React.FC = () => {
   return (
     <Box>
-      {/* Hero Section */}
-      <IDPSection>
-        <Container maxWidth="lg">
-          <Box sx={{ textAlign: 'center', mb: 8 }}>
-            <Heading variant="h1" gutterBottom>
-              International Driving Permit (IDP)
-            </Heading>
-            
-            <Typography variant="h6" color="text.secondary" sx={{ maxWidth: 700, mx: 'auto', mb: 4 }}>
-              Drive legally in over 150 countries worldwide with an official International 
-              Driving Permit from AA Uganda. Get your IDP quickly and efficiently.
-            </Typography>
-
-            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Button
-                variant="contained"
-                color="primary"
-                size="large"
-                onClick={() => document.getElementById('applications')?.scrollIntoView({ behavior: 'smooth' })}
-              >
-                Apply for IDP
-              </Button>
-              
-              <Button
-                variant="outlined"
-                color="primary"
-                size="large"
-                startIcon={<VerifiedIcon />}
-                onClick={handleVerificationModalOpen}
-              >
-                Verify IDP
-              </Button>
-            </Box>
-          </Box>
-          
-          <Grid container spacing={4} justifyContent="center" id="applications">
-            {idpApplicationTypes.map((application) => (
-              <Grid item xs={12} sm={6} lg={4} key={application.id}>
-                <IDPCard 
-                  application={application} 
-                  onSelect={handleApplicationSelect}
-                />
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
-      </IDPSection>
-
-      {/* Benefits Section */}
-      <BenefitsSection>
-        <Container maxWidth="lg">
-          <Box sx={{ textAlign: 'center', mb: 6 }}>
-            <Heading variant="h2" gutterBottom>
-              Why Get an International Driving Permit?
-            </Heading>
-            
-            <Typography variant="h6" color="text.secondary">
-              Essential for international travel and driving abroad
-            </Typography>
-          </Box>
-          
-          <Grid container spacing={4}>
-            {idpBenefits.map((benefit, index) => (
-              <Grid item xs={12} sm={6} md={3} key={index}>
-                <BenefitCard>
-                  <Box
-                    sx={{
-                      width: 80,
-                      height: 80,
-                      backgroundColor: 'primary.main',
-                      borderRadius: '50%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      margin: '0 auto 24px auto',
-                      color: 'primary.contrastText',
-                    }}
-                  >
-                    <Typography variant="h4">🌍</Typography>
-                  </Box>
-                  
-                  <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-                    {benefit.title}
-                  </Typography>
-                  
-                  <Typography variant="body2" color="text.secondary">
-                    {benefit.description}
-                  </Typography>
-                </BenefitCard>
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
-      </BenefitsSection>
-
-      {/* Requirements Section */}
-      <RequirementsSection>
-        <Container maxWidth="lg">
-          <Box sx={{ textAlign: 'center', mb: 6 }}>
-            <Heading variant="h2" gutterBottom>
-              Application Requirements
-            </Heading>
-            
-            <Typography variant="h6" color="text.secondary">
-              Everything you need to know to apply for your IDP
-            </Typography>
-          </Box>
-          
-          <Grid container spacing={4}>
-            <Grid item xs={12} md={4}>
-              <RequirementCard>
-                <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: 'primary.main' }}>
-                  Eligibility Criteria
-                </Typography>
-                <Box component="ul" sx={{ pl: 2, m: 0 }}>
-                  {idpRequirements.eligibility.map((requirement, index) => (
-                    <Typography component="li" variant="body2" key={index} sx={{ mb: 1 }}>
-                      {requirement}
-                    </Typography>
-                  ))}
-                </Box>
-              </RequirementCard>
-            </Grid>
-            
-            <Grid item xs={12} md={4}>
-              <RequirementCard>
-                <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: 'primary.main' }}>
-                  Required Documents
-                </Typography>
-                <Box component="ul" sx={{ pl: 2, m: 0 }}>
-                  {idpRequirements.documentation.map((doc, index) => (
-                    <Typography component="li" variant="body2" key={index} sx={{ mb: 1 }}>
-                      {doc}
-                    </Typography>
-                  ))}
-                </Box>
-              </RequirementCard>
-            </Grid>
-            
-            <Grid item xs={12} md={4}>
-              <RequirementCard>
-                <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: 'primary.main' }}>
-                  Application Process
-                </Typography>
-                <Box component="ol" sx={{ pl: 2, m: 0 }}>
-                  {idpRequirements.process.map((step, index) => (
-                    <Typography component="li" variant="body2" key={index} sx={{ mb: 1 }}>
-                      {step}
-                    </Typography>
-                  ))}
-                </Box>
-              </RequirementCard>
-            </Grid>
-          </Grid>
-        </Container>
-      </RequirementsSection>
-
-      {/* IDP Verification Section */}
-      <VerificationSection id="verification">
-        <Container maxWidth="md">
-          <Box sx={{ textAlign: 'center', mb: 6 }}>
-            <Heading variant="h2" gutterBottom sx={{ color: 'inherit' }}>
-              {verificationInfo.title}
-            </Heading>
-            
-            <Typography variant="h6" sx={{ color: 'inherit', opacity: 0.9 }}>
-              {verificationInfo.description}
-            </Typography>
-          </Box>
-          
-          <VerificationCard>
-            <Box sx={{ textAlign: 'center', mb: 4 }}>
-              <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-                Verify IDP Online
-              </Typography>
-              
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                Enter your IDP number below to verify its authenticity
-              </Typography>
-              
-              <Alert severity="info" sx={{ mb: 2 }}>
-                Click the "Verify" button above to open the verification modal
-              </Alert>
-            </Box>
-            
-            <Grid container spacing={3}>
-              {verificationInfo.features.map((feature, index) => (
-                <Grid item xs={12} sm={6} key={index}>
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <VerifiedIcon sx={{ mr: 1, color: 'success.main' }} />
-                    <Typography variant="body2">{feature}</Typography>
-                  </Box>
-                </Grid>
-              ))}
-            </Grid>
-          </VerificationCard>
-        </Container>
-      </VerificationSection>
-
-      {/* FAQ Section */}
-      <FAQSection>
-        <Container maxWidth="md">
-          <Box sx={{ textAlign: 'center', mb: 6 }}>
-            <Heading variant="h2" gutterBottom>
-              Frequently Asked Questions
-            </Heading>
-            
-            <Typography variant="h6" color="text.secondary">
-              Get answers to common questions about International Driving Permits
-            </Typography>
-          </Box>
-          
-          <Box>
-            {idpFAQs.map((faq, index) => (
-              <Accordion key={index} sx={{ mb: 2 }}>
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  aria-controls={`panel${index}a-content`}
-                  id={`panel${index}a-header`}
-                >
-                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                    {faq.question}
-                  </Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Typography variant="body1" sx={{ lineHeight: 1.7 }}>
-                    {faq.answer}
-                  </Typography>
-                </AccordionDetails>
-              </Accordion>
-            ))}
-          </Box>
-        </Container>
-      </FAQSection>
-
-      {/* Alert Snackbar */}
-      <Snackbar
-        open={showAlert}
-        autoHideDuration={4000}
-        onClose={() => setShowAlert(false)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert 
-          onClose={() => setShowAlert(false)} 
-          severity={verificationResult.includes('✅') ? 'success' : verificationResult.includes('❌') ? 'error' : 'info'}
-          sx={{ width: '100%' }}
-        >
-          {verificationResult}
-        </Alert>
-      </Snackbar>
-
-      {/* Verification Modal */}
-      <VerificationModal
-        open={verificationModalOpen}
-        onClose={handleVerificationModalClose}
+      <PageHeader 
+        title="AA Uganda Membership"
+        subtitle="Join Us Today"
+        description="Experience exclusive benefits and premium services with AA Uganda membership."
       />
+      
+      {/* Main Content */}
+      <Container maxWidth="lg" sx={{ py: { xs: 4, md: 8 } }}>
+        {/* Services Section */}
+        <Grid container spacing={4} alignItems="center" sx={{ mb: 8 }}>
+          <Grid item xs={12} md={6}>
+            <Box sx={{ mb: 4 }}>
+              <Typography variant="h4" gutterBottom>
+                Why Join AA Uganda?
+              </Typography>
+              <Typography color="text.secondary" sx={{ mb: 2 }}>
+                As a member of AA Uganda, you'll enjoy:
+              </Typography>
+              <Box component="ul" sx={{ pl: 2 }}>
+                {[
+                  '24/7 Emergency Rescue Services',
+                  'Exclusive Discounts on Driving School',
+                  'Free Vehicle Inspection',
+                  'Technical Assistance and Advice',
+                  'Travel and Tourism Services',
+                  'Access to International Driving Permits'
+                ].map((benefit) => (
+                  <Typography 
+                    key={benefit} 
+                    component="li" 
+                    sx={{ mb: 1 }}
+                  >
+                    {benefit}
+                  </Typography>
+                ))}
+              </Box>
+            </Box>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Box
+              component="img"
+              src={rescueImage}
+              alt="AA Uganda Rescue Services"
+              sx={{
+                width: '100%',
+                height: 'auto',
+                borderRadius: 2,
+                boxShadow: 3
+              }}
+            />
+          </Grid>
+        </Grid>
+
+        {/* Coming Soon Banner */}
+        <Box 
+          sx={{ 
+            bgcolor: 'primary.main',
+            color: 'primary.contrastText',
+            py: 6,
+            px: 4,
+            borderRadius: 2,
+            textAlign: 'center',
+            mb: 8
+          }}
+        >
+          <Typography variant="h3" sx={{ mb: 2 }}>
+            New Membership Portal Coming Soon
+          </Typography>
+          <Typography>
+            We're revamping our membership system to serve you better. 
+            Stay tuned for enhanced features and an improved user experience.
+          </Typography>
+        </Box>
+
+        {/* Contact Information */}
+        <Box sx={{ textAlign: 'center' }}>
+          <Typography variant="h5" gutterBottom>
+            Want to Know More?
+          </Typography>
+          <Typography color="text.secondary">
+            Visit our office or call us at +256 786 623 001
+          </Typography>
+          <Typography color="text.secondary">
+            Email: membership@aauganda.org
+          </Typography>
+        </Box>
+      </Container>
     </Box>
   );
 };
 
-export default InternationalDrivingPermit;
+export default MembershipPage;
