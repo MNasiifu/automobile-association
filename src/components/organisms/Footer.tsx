@@ -160,7 +160,7 @@ const Footer: React.FC = () => {
                       borderRadius: '50%',
                       padding: 1,
                       background: (theme) => `linear-gradient(45deg, transparent 30%, ${theme.palette.secondary.main})`,
-                      WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                      mask: 'linear-gradient(#fff 0 0) content-box',
                       WebkitMaskComposite: 'xor',
                       maskComposite: 'exclude',
                       opacity: 0,

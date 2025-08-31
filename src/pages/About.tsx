@@ -44,6 +44,7 @@ import g4 from '../assets/images/defensive-driving.jpeg';
 import g5 from '../assets/images/driving-school.jpg';
 import g6 from '../assets/images/road.jpg';
 import g7 from '../assets/images/TOWINGANDRECOVERYFRESHCAR.jpeg';
+import fiaLogo from '../assets/images/FIA.jpeg';
 
 function useHashScroll() {
   const location = useLocation();
@@ -473,7 +474,7 @@ const About: React.FC = () => {
               >
                 <Box
                   component="img"
-                  src={affiliates?.[0]?.img ?? '../assets/images/FIA.jpeg'}
+                  src={affiliates?.[0]?.img ?? fiaLogo}
                   alt={affiliates?.[0]?.name ?? 'FIA'}
                   sx={{
                     width: '100%',
