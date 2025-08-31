@@ -17,8 +17,9 @@ import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { Button } from '../atoms';
 import { navigationItems, companyInfo } from '../../data/companyData';
 import AAULogo from '../../assets/images/aau-logo.png';
+import * as Icons from '@mui/icons-material';
 
-type NavChild = { label: string; path: string };
+type NavChild = { label: string; path: string; icon?: string };
 type NavItem = { label: string; path: string; children?: NavChild[] };
 
 interface NavigationProps {
@@ -116,6 +117,12 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
 
   const isActiveRoute = (path: string) =>
     path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
+
+  const renderIcon = (iconName?: string) => {
+    if (!iconName) return null;
+    const IconComponent = (Icons as any)[iconName];
+    return IconComponent ? <IconComponent fontSize="small" /> : null;
+  };
 
   const cancelClose = () => {
     if (closeTimer.current !== null) {
@@ -307,7 +314,7 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
                   sx={{
                     fontWeight: 600,
                     letterSpacing: 0.2,
-                    py: 0.5,
+                    py: 1.5,
                     px: 2,
                     gap: 1.5,
                     display: 'flex',
@@ -328,10 +335,20 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
                       height: 20, 
                       display: 'flex', 
                       alignItems: 'center',
-                      color: 'secondary.main'
+                      justifyContent: 'center',
+                      color: 'secondary.dark'
                     }}
                   >
-                    •
+                    {c.icon ? renderIcon(c.icon) : (
+                      <Box
+                        sx={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: '50%',
+                          backgroundColor: 'secondary.dark',
+                        }}
+                      />
+                    )}
                   </Box>
                   <Typography variant="body2" sx={{ fontWeight: 600, whiteSpace: 'nowrap' }}>
                     {c.label}

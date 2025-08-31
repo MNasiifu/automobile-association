@@ -26,7 +26,7 @@ const StyledDecorativeElement = styled(Box, {
   height: `${elementSize}px`,
   left: `${elementLeft}%`,
   top: `${elementTop}%`,
-  background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+  background: `linear-gradient(191deg, ${theme.palette.primary.dark}, ${theme.palette.primary.light})`,
   borderRadius: '50%',
   opacity: elementOpacity,
   animation: `${subtleFloat} 6s ease-in-out infinite`,

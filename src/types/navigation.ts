@@ -6,7 +6,8 @@ export interface NavItem {
   readonly label: string;
   readonly path: string;
   readonly children?: ReadonlyArray<{
-    readonly label: MenuIconKey;
+    readonly label: string;
     readonly path: string;
+    readonly icon?: string;
   }>;
 }

@@ -13,11 +13,11 @@ interface DecorativeBackgroundProps {
 
 const DecorativeBackground: React.FC<DecorativeBackgroundProps> = ({
   elements = [
-    { size: 80, left: 5, top: 15, opacity: 0.08 },
-    { size: 120, left: 90, top: 10, opacity: 0.06 },
-    { size: 60, left: 85, top: 80, opacity: 0.1 },
-    { size: 100, left: 10, top: 85, opacity: 0.07 },
-    { size: 90, left: 50, top: 5, opacity: 0.05 },
+    { size: 80, left: 5, top: 15, opacity: 0.15 },
+    { size: 120, left: 90, top: 10, opacity: 0.15 },
+    { size: 60, left: 85, top: 80, opacity: 0.15 },
+    { size: 100, left: 10, top: 85, opacity: 0.15 },
+    { size: 90, left: 50, top: 5, opacity: 0.25 },
   ]
 }) => {
   const theme = useTheme();

@@ -43,4 +43,10 @@ export const menuIcons = {
   'AA Institute': InstituteIcon,
   'News & Events': MediaIcon,
   'Branches': BranchesIcon,
+  'Vehicle Valuation': RefresherIcon,
+  'Fleet Management': InspectionIcon,
+  'Rescue Services': InsuranceIcon,
+  'Insurance Services': CarnetIcon,
+  'Automotive Advisory': InstituteIcon,
+  'Membership': MediaIcon,
 } as const;
