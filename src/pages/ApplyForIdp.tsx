@@ -16,10 +16,6 @@ import {
   Card,
   CardContent,
   Chip,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
   FormHelperText,
   Radio,
   RadioGroup,
@@ -31,18 +27,14 @@ import {
   List,
   ListItem,
   ListItemIcon,
-  ListItemText,
-  Divider,
-  Avatar,
+  ListItemText
 } from '@mui/material';
 import {
   DriveEta,
   Public as PublicIcon,
   Security as SecurityIcon,
   Speed as SpeedIcon,
-  Upload as UploadIcon,
   CheckCircle as CheckCircleIcon,
-  Schedule as ScheduleIcon,
   AccountCircle,
   Description,
   Verified,
@@ -52,7 +44,8 @@ import {
   CardMembership,
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
-import { Button, Heading } from '../components/atoms';
+import { Button, Heading, HeaderContainer, ContentContainer, AnimatedTitle, AnimatedSubtitle, AnimatedDescription, SectionDivider } from '../components/atoms';
+import { DecorativeBackground } from '../components/molecules';
 
 // Validation schema based on idp.md requirements
 const validationSchema = yup.object({
@@ -125,25 +118,6 @@ interface IDPFormData {
   termsAccepted: boolean;
   declarationAccepted: boolean;
 }
-
-const HeroSection = styled(Box)(({ theme }) => ({
-  background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-  color: theme.palette.primary.contrastText,
-  padding: theme.spacing(8, 0),
-  position: 'relative',
-  overflow: 'hidden',
-  '&::before': {
-    content: '""',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    background: 'url("/images/hero-illustration.png") no-repeat center center',
-    backgroundSize: 'cover',
-    opacity: 0.1,
-  },
-}));
 
 const FeatureCard = styled(Card)(({ theme }) => ({
   height: '100%',
@@ -304,59 +278,41 @@ const ApplyForIdp: React.FC = () => {
 
   return (
     <Box>
-      {/* Hero Section */}
-      <HeroSection>
-        <Container maxWidth="lg">
-          <Box sx={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 3 }}>
-              <DriveEta sx={{ fontSize: { xs: 40, md: 60 }, mr: 2 }} />
-              <Heading 
-                variant="h1" 
-                sx={{ 
-                  color: 'inherit',
-                  fontSize: { xs: '2rem', md: '3rem' },
-                  fontWeight: 700,
-                }}
-              >
-                International Driving Permit
-              </Heading>
-            </Box>
-            
-            <Typography 
-              variant="h5" 
-              sx={{ 
-                color: 'inherit', 
-                opacity: 0.9,
-                maxWidth: 700,
-                mx: 'auto',
-                mb: 4,
-                lineHeight: 1.6,
-                fontSize: { xs: '1.1rem', md: '1.5rem' }
-              }}
-            >
-              Apply for your International Driving Permit through the Automobile Association of Uganda
-            </Typography>
+      {/* Page Header */}
+      <HeaderContainer>
+        <DecorativeBackground />
+        
+        <ContentContainer maxWidth="md">
+          <Box className="page-header-content">
+            <Box className="content-inner">
+              <Box className="main-content">
+                <AnimatedTitle variant="h1" component="h1">
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
+                    <DriveEta sx={{ fontSize: { xs: 40, md: 60 }, color: 'inherit' }} />
+                    <Box component="span">International Driving Permit</Box>
+                  </Box>
+                </AnimatedTitle>
 
-            <Typography 
-              variant="body1" 
-              sx={{ 
-                color: 'inherit', 
-                opacity: 0.8,
-                fontStyle: 'italic',
-                mb: 4
-              }}
-            >
-              Plot 4 Old Portbell Road Suite 8, P.O. Box 1459 Kampala-Uganda
-            </Typography>
+                <AnimatedSubtitle>
+                  Apply for your International Driving Permit through the Automobile Association of Uganda
+                </AnimatedSubtitle>
+
+                <AnimatedDescription>
+                  Plot 4 Old Portbell Road Suite 8, P.O. Box 1459 Kampala-Uganda
+                </AnimatedDescription>
+
+                <SectionDivider />
+              </Box>
+            </Box>
           </Box>
-        </Container>
-      </HeroSection>
+        </ContentContainer>
+      </HeaderContainer>
 
       {/* Membership Benefits Section */}
       <Box sx={{ py: 6, backgroundColor: 'grey.50' }}>
         <Container maxWidth="lg">
           <Box sx={{ textAlign: 'center', mb: 4 }}>
-            <Heading variant="h3" gutterBottom>
+            <Heading variant="h3" align="center" gutterBottom>
               Why Join AA Uganda?
             </Heading>
             <Typography variant="h6" color="text.secondary">
@@ -396,7 +352,7 @@ const ApplyForIdp: React.FC = () => {
       <Box sx={{ py: 8 }}>
         <Container maxWidth="lg">
           <Box sx={{ textAlign: 'center', mb: 6 }}>
-            <Heading variant="h2" gutterBottom>
+            <Heading variant="h2" align="center" gutterBottom>
               IDP Application Form
             </Heading>
             <Typography variant="h6" color="text.secondary">
