@@ -14,9 +14,6 @@ import {
   Paper,
   Stack,
   Chip,
-  Avatar,
-  Rating,
-  Divider,
 } from "@mui/material";
 import {
   SupportAgent as AdvisoryIcon,
@@ -75,22 +72,6 @@ const IconWrapper = styled(Box)(({ theme }) => ({
   "& svg": {
     color: "white",
     fontSize: "2rem",
-  },
-}));
-
-const TestimonialCard = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(3),
-  borderRadius: theme.spacing(2),
-  height: "100%",
-  position: "relative",
-  "&::before": {
-    content: '"""',
-    position: "absolute",
-    top: 10,
-    left: 20,
-    fontSize: "3rem",
-    color: theme.palette.primary.light,
-    fontFamily: "serif",
   },
 }));
 
@@ -452,36 +433,6 @@ const AutomotiveAdvisory: React.FC = () => {
         { text: "Informed decisions", icon: <TrendingIcon /> },
         { text: "Ongoing support", icon: <ContactIcon /> },
       ],
-    },
-  ];
-
-  const testimonials = [
-    {
-      name: "James Mukasa",
-      role: "Fleet Manager",
-      company: "Kampala Transport Ltd",
-      avatar: "/images/testimonial-1.jpg",
-      rating: 5,
-      comment:
-        "AA Uganda's advisory services saved our company over 30% on maintenance costs. Their local expertise is invaluable.",
-    },
-    {
-      name: "Sarah Namugga",
-      role: "Private Car Owner",
-      company: "Entebbe",
-      avatar: "/images/testimonial-2.jpg",
-      rating: 5,
-      comment:
-        "They helped me avoid buying a problematic used car and found me a reliable vehicle within my budget. Excellent service!",
-    },
-    {
-      name: "Robert Ochieng",
-      role: "Taxi Operator",
-      company: "Boda Boda Association",
-      avatar: "/images/testimonial-3.jpg",
-      rating: 5,
-      comment:
-        "The maintenance advice I received has kept my vehicles running smoothly and reduced my repair expenses significantly.",
     },
   ];
 
