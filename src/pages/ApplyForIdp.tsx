@@ -27,8 +27,14 @@ import {
   List,
   ListItem,
   ListItemIcon,
-  ListItemText
+  ListItemText,
+  IconButton,
+  Tooltip
 } from '@mui/material';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import {
   DriveEta,
   Public as PublicIcon,
@@ -42,10 +48,32 @@ import {
   Phone,
   Email,
   CardMembership,
+  Delete as DeleteIcon,
+  PhotoCamera,
+  PictureAsPdf,
+  Image as ImageIcon,
+  CalendarToday as CalendarIcon,
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import { Button, Heading, HeaderContainer, ContentContainer, AnimatedTitle, AnimatedSubtitle, AnimatedDescription, SectionDivider } from '../components/atoms';
 import { DecorativeBackground } from '../components/molecules';
+
+// File validation helpers
+const validateFile = (file: File | null, allowedTypes: string[], maxSizeMB: number) => {
+  if (!file) return false;
+  
+  const allowedMimeTypes = allowedTypes.map(type => {
+    if (type === 'pdf') return 'application/pdf';
+    if (type === 'jpg' || type === 'jpeg') return 'image/jpeg';
+    if (type === 'png') return 'image/png';
+    return type;
+  });
+  
+  if (!allowedMimeTypes.includes(file.type)) return false;
+  if (file.size > maxSizeMB * 1024 * 1024) return false;
+  
+  return true;
+};
 
 // Validation schema based on idp.md requirements
 const validationSchema = yup.object({
@@ -74,6 +102,28 @@ const validationSchema = yup.object({
   // Passport and visa information
   passportNumber: yup.string().required('Passport number is required'),
   countryOfAcquiredVisa: yup.string().required('Country of acquired visa is required'),
+  
+  // File uploads
+  passportBioDataPage: yup.mixed<File>()
+    .required('Passport bio-data page is required')
+    .test('fileType', 'Only PDF files are allowed', (value) => {
+      if (!value) return false;
+      return validateFile(value as File, ['pdf'], 5);
+    }),
+  
+  visaCopy: yup.mixed<File>()
+    .required('Visa copy is required')
+    .test('fileType', 'Only PDF files are allowed', (value) => {
+      if (!value) return false;
+      return validateFile(value as File, ['pdf'], 5);
+    }),
+  
+  passportPhoto: yup.mixed<File>()
+    .required('Passport photo is required')
+    .test('fileType', 'Only PNG, JPG, or JPEG images are allowed', (value) => {
+      if (!value) return false;
+      return validateFile(value as File, ['png', 'jpg', 'jpeg'], 2);
+    }),
   
   // Driving license information
   ugandaDrivingPermitNumber: yup.string().required('Uganda driving permit number is required'),
@@ -120,6 +170,49 @@ const InfoCard = styled(Card)(({ theme }) => ({
   marginBottom: theme.spacing(3),
 }));
 
+const FileUploadBox = styled(Box)(({ theme }) => ({
+  border: `2px dashed ${theme.palette.grey[300]}`,
+  borderRadius: theme.spacing(1),
+  padding: theme.spacing(3),
+  textAlign: 'center',
+  cursor: 'pointer',
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    borderColor: theme.palette.primary.main,
+    backgroundColor: theme.palette.primary.light + '10',
+  },
+  '&.dragover': {
+    borderColor: theme.palette.primary.main,
+    backgroundColor: theme.palette.primary.light + '20',
+  },
+}));
+
+const FilePreviewCard = styled(Card)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  padding: theme.spacing(2),
+  marginTop: theme.spacing(2),
+  border: `1px solid ${theme.palette.success.main}30`,
+  backgroundColor: theme.palette.success.light + '10',
+}));
+
+const PhotoPreview = styled(Box)(({ theme }) => ({
+  width: 120,
+  height: 150,
+  border: `2px solid ${theme.palette.grey[300]}`,
+  borderRadius: theme.spacing(1),
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  overflow: 'hidden',
+  backgroundColor: theme.palette.grey[50],
+  '& img': {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+  },
+}));
+
 const drivingPermitClasses = [
   { value: 'A', label: 'Class A - Motorcycles' },
   { value: 'B', label: 'Class B - Light Motor Vehicles' },
@@ -160,6 +253,7 @@ const ApplyForIdp: React.FC = () => {
     watch,
     formState: { errors, isSubmitting },
     trigger,
+    setValue,
   } = useForm<IDPFormData>({
     resolver: yupResolver(validationSchema) as any,
     defaultValues: {
@@ -177,6 +271,9 @@ const ApplyForIdp: React.FC = () => {
       streetRoadPlot: '',
       passportNumber: '',
       countryOfAcquiredVisa: '',
+      passportBioDataPage: undefined,
+      visaCopy: undefined,
+      passportPhoto: undefined,
       ugandaDrivingPermitNumber: '',
       expiryDateOfDrivingPermit: undefined,
       classesOfDrivingPermit: [],
@@ -193,6 +290,7 @@ const ApplyForIdp: React.FC = () => {
     'Membership & Personal Info',
     'Contact Details',
     'Passport & Visa Info',
+    'Document Upload',
     'Driving License Details',
     'Declaration & Submit',
   ];
@@ -218,9 +316,12 @@ const ApplyForIdp: React.FC = () => {
         fieldsToValidate = ['passportNumber', 'countryOfAcquiredVisa'];
         break;
       case 3:
-        fieldsToValidate = ['ugandaDrivingPermitNumber', 'expiryDateOfDrivingPermit', 'classesOfDrivingPermit'];
+        fieldsToValidate = ['passportBioDataPage', 'visaCopy', 'passportPhoto'];
         break;
       case 4:
+        fieldsToValidate = ['ugandaDrivingPermitNumber', 'expiryDateOfDrivingPermit', 'classesOfDrivingPermit'];
+        break;
+      case 5:
         fieldsToValidate = ['termsAccepted', 'declarationAccepted'];
         break;
     }
@@ -259,8 +360,140 @@ const ApplyForIdp: React.FC = () => {
 
   const applicationFee = watchedIsMember ? 250000 : 350000;
 
+  // File handling functions
+  const handleFileUpload = (fieldName: keyof IDPFormData, file: File) => {
+    setValue(fieldName, file, { shouldValidate: true });
+  };
+
+  const handleFileRemove = (fieldName: keyof IDPFormData) => {
+    setValue(fieldName, undefined, { shouldValidate: true });
+  };
+
+  const createImagePreviewUrl = (file: File): string => {
+    return URL.createObjectURL(file);
+  };
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  // File Upload Component
+  const FileUploadField: React.FC<{
+    fieldName: keyof IDPFormData;
+    label: string;
+    acceptedTypes: string;
+    icon: React.ReactNode;
+    maxSizeMB: number;
+    description: string;
+    showPreview?: boolean;
+  }> = ({ fieldName, label, acceptedTypes, icon, maxSizeMB, description, showPreview = false }) => {
+    const fieldValue = watch(fieldName) as File | undefined;
+    const fieldError = errors[fieldName];
+
+    const handleDrop = (e: React.DragEvent) => {
+      e.preventDefault();
+      const files = Array.from(e.dataTransfer.files);
+      if (files.length > 0) {
+        handleFileUpload(fieldName, files[0]);
+      }
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const files = e.target.files;
+      if (files && files.length > 0) {
+        handleFileUpload(fieldName, files[0]);
+      }
+      e.target.value = ''; // Reset input
+    };
+
+    return (
+      <Box>
+        <FormLabel sx={{ fontWeight: 600, mb: 1, display: 'block' }}>
+          {label} *
+        </FormLabel>
+        <Typography variant="caption" color="text.secondary" sx={{ mb: 2, display: 'block' }}>
+          {description}
+        </Typography>
+
+        {!fieldValue ? (
+          <FileUploadBox
+            onDrop={handleDrop}
+            onDragOver={(e) => e.preventDefault()}
+            onClick={() => document.getElementById(`file-input-${fieldName}`)?.click()}
+          >
+            <input
+              id={`file-input-${fieldName}`}
+              type="file"
+              accept={acceptedTypes}
+              onChange={handleFileChange}
+              style={{ display: 'none' }}
+            />
+            {icon}
+            <Typography variant="h6" sx={{ mt: 2, mb: 1 }}>
+              Click to upload or drag and drop
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {acceptedTypes.toUpperCase()} files up to {maxSizeMB}MB
+            </Typography>
+          </FileUploadBox>
+        ) : (
+          <FilePreviewCard>
+            <Box sx={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+              {showPreview && fieldValue.type.startsWith('image/') ? (
+                <PhotoPreview sx={{ mr: 2, flexShrink: 0 }}>
+                  <img 
+                    src={createImagePreviewUrl(fieldValue)} 
+                    alt="Passport preview"
+                    onLoad={() => {
+                      // Clean up object URL when image loads
+                      setTimeout(() => URL.revokeObjectURL(createImagePreviewUrl(fieldValue)), 1000);
+                    }}
+                  />
+                </PhotoPreview>
+              ) : (
+                <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}>
+                  {fieldValue.type === 'application/pdf' ? <PictureAsPdf color="error" /> : <ImageIcon color="primary" />}
+                </Box>
+              )}
+              
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                  {fieldValue.name}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {formatFileSize(fieldValue.size)}
+                </Typography>
+              </Box>
+              
+              <Tooltip title="Remove file">
+                <IconButton 
+                  onClick={() => handleFileRemove(fieldName)}
+                  color="error"
+                  size="small"
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          </FilePreviewCard>
+        )}
+        
+        {fieldError && (
+          <FormHelperText error sx={{ mt: 1 }}>
+            {fieldError.message}
+          </FormHelperText>
+        )}
+      </Box>
+    );
+  };
+
   return (
-    <Box>
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <Box>
       {/* Page Header */}
       <HeaderContainer>
         <DecorativeBackground />
@@ -394,8 +627,9 @@ const ApplyForIdp: React.FC = () => {
                             {index === 0 && "Enter membership status and personal information"}
                             {index === 1 && "Provide your contact and address details"}
                             {index === 2 && "Enter passport and visa information"}
-                            {index === 3 && "Provide your Uganda driving license details"}
-                            {index === 4 && "Review and confirm your application"}
+                            {index === 3 && "Upload required documents (passport, visa, photo)"}
+                            {index === 4 && "Provide your Uganda driving license details"}
+                            {index === 5 && "Review and confirm your application"}
                           </Typography>
                         </StepContent>
                       )}
@@ -512,16 +746,25 @@ const ApplyForIdp: React.FC = () => {
                             name="dateOfBirth"
                             control={control}
                             render={({ field, fieldState: { error } }) => (
-                              <TextField
-                                {...field}
-                                fullWidth
+                              <DatePicker
                                 label="Date of Birth *"
-                                type="date"
-                                error={!!error}
-                                helperText={error?.message}
-                                InputLabelProps={{ shrink: true }}
-                                value={field.value ? field.value.toISOString().split('T')[0] : ''}
-                                onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
+                                value={field.value ? dayjs(field.value) : null}
+                                onChange={(newValue: Dayjs | null) => {
+                                  field.onChange(newValue ? newValue.toDate() : null);
+                                }}
+                                maxDate={dayjs()}
+                                format="DD/MM/YYYY"
+                                slotProps={{
+                                  textField: {
+                                    fullWidth: true,
+                                    error: !!error,
+                                    helperText: error?.message,
+                                    InputProps: {
+                                      startAdornment: <CalendarIcon sx={{ mr: 1, color: 'text.secondary' }} />
+                                    }
+                                  }
+                                }}
+                                sx={{ width: '100%' }}
                               />
                             )}
                           />
@@ -725,17 +968,75 @@ const ApplyForIdp: React.FC = () => {
 
                       <Alert severity="info" sx={{ mt: 3 }}>
                         <Typography variant="body2">
-                          <strong>Required Documents:</strong><br />
-                          • Copy of passport bio-data page<br />
-                          • Copy of visa for the country intended to travel to<br />
-                          • 2 passport-size photos
+                          <strong>Next Step:</strong> Upload your required documents including passport bio-data page, visa copy, and passport photo in the following step.
                         </Typography>
                       </Alert>
                     </Box>
                   )}
 
-                  {/* Step 4: Driving License Details */}
+                  {/* Step 4: Document Upload */}
                   {activeStep === 3 && (
+                    <Box>
+                      <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
+                        Document Upload
+                      </Typography>
+                      
+                      <Alert severity="info" sx={{ mb: 4 }}>
+                        <Typography variant="body2">
+                          <strong>Important:</strong> Please upload clear, legible copies of your documents. All files must be in the specified formats and within size limits.
+                        </Typography>
+                      </Alert>
+
+                      <Grid container spacing={4}>
+                        <Grid item xs={12} md={6}>
+                          <FileUploadField
+                            fieldName="passportBioDataPage"
+                            label="Passport Bio-Data Page"
+                            acceptedTypes=".pdf"
+                            icon={<PictureAsPdf sx={{ fontSize: 48, color: 'error.main', mb: 1 }} />}
+                            maxSizeMB={5}
+                            description="Upload a clear copy of your passport's bio-data page containing your photo and personal information"
+                          />
+                        </Grid>
+
+                        <Grid item xs={12} md={6}>
+                          <FileUploadField
+                            fieldName="visaCopy"
+                            label="Visa Copy"
+                            acceptedTypes=".pdf"
+                            icon={<PictureAsPdf sx={{ fontSize: 48, color: 'error.main', mb: 1 }} />}
+                            maxSizeMB={5}
+                            description="Upload a copy of your visa for the country you intend to travel to"
+                          />
+                        </Grid>
+
+                        <Grid item xs={12} md={6}>
+                          <FileUploadField
+                            fieldName="passportPhoto"
+                            label="Passport Photo"
+                            acceptedTypes=".png,.jpg,.jpeg"
+                            icon={<PhotoCamera sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />}
+                            maxSizeMB={2}
+                            description="Upload a recent passport-size photograph (white background preferred)"
+                            showPreview={true}
+                          />
+                        </Grid>
+                      </Grid>
+
+                      <Alert severity="warning" sx={{ mt: 4 }}>
+                        <Typography variant="body2">
+                          <strong>File Requirements:</strong><br />
+                          • Passport documents: PDF format only, max 5MB each<br />
+                          • Passport photo: PNG, JPG, or JPEG format, max 2MB<br />
+                          • All documents must be clear and legible<br />
+                          • Only one file per requirement is allowed
+                        </Typography>
+                      </Alert>
+                    </Box>
+                  )}
+
+                  {/* Step 5: Driving License Details */}
+                  {activeStep === 4 && (
                     <Box>
                       <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
                         Uganda Driving License Details
@@ -766,16 +1067,25 @@ const ApplyForIdp: React.FC = () => {
                             name="expiryDateOfDrivingPermit"
                             control={control}
                             render={({ field, fieldState: { error } }) => (
-                              <TextField
-                                {...field}
-                                fullWidth
+                              <DatePicker
                                 label="Expiry Date of Driving Permit *"
-                                type="date"
-                                error={!!error}
-                                helperText={error?.message}
-                                InputLabelProps={{ shrink: true }}
-                                value={field.value ? field.value.toISOString().split('T')[0] : ''}
-                                onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
+                                value={field.value ? dayjs(field.value) : null}
+                                onChange={(newValue: Dayjs | null) => {
+                                  field.onChange(newValue ? newValue.toDate() : null);
+                                }}
+                                minDate={dayjs()}
+                                format="DD/MM/YYYY"
+                                slotProps={{
+                                  textField: {
+                                    fullWidth: true,
+                                    error: !!error,
+                                    helperText: error?.message,
+                                    InputProps: {
+                                      startAdornment: <CalendarIcon sx={{ mr: 1, color: 'text.secondary' }} />
+                                    }
+                                  }
+                                }}
+                                sx={{ width: '100%' }}
                               />
                             )}
                           />
@@ -828,8 +1138,8 @@ const ApplyForIdp: React.FC = () => {
                     </Box>
                   )}
 
-                  {/* Step 5: Declaration & Submit */}
-                  {activeStep === 4 && (
+                  {/* Step 6: Declaration & Submit */}
+                  {activeStep === 5 && (
                     <Box>
                       <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
                         Declaration & Submit
@@ -871,32 +1181,41 @@ const ApplyForIdp: React.FC = () => {
                       {/* Required Documents Checklist */}
                       <Card sx={{ mb: 3, p: 3 }}>
                         <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-                          Required Documents Checklist
+                          Uploaded Documents
                         </Typography>
                         <List>
                           <ListItem>
                             <ListItemIcon>
-                              <CheckCircleIcon color="success" />
+                              <CheckCircleIcon color={watch('passportBioDataPage') ? "success" : "disabled"} />
                             </ListItemIcon>
-                            <ListItemText primary="Copy of Passport bio-data page" />
+                            <ListItemText 
+                              primary="Passport Bio-Data Page" 
+                              secondary={watch('passportBioDataPage') ? (watch('passportBioDataPage') as File).name : "Not uploaded"}
+                            />
+                          </ListItem>
+                          <ListItem>
+                            <ListItemIcon>
+                              <CheckCircleIcon color={watch('visaCopy') ? "success" : "disabled"} />
+                            </ListItemIcon>
+                            <ListItemText 
+                              primary="Visa Copy" 
+                              secondary={watch('visaCopy') ? (watch('visaCopy') as File).name : "Not uploaded"}
+                            />
+                          </ListItem>
+                          <ListItem>
+                            <ListItemIcon>
+                              <CheckCircleIcon color={watch('passportPhoto') ? "success" : "disabled"} />
+                            </ListItemIcon>
+                            <ListItemText 
+                              primary="Passport Photo" 
+                              secondary={watch('passportPhoto') ? (watch('passportPhoto') as File).name : "Not uploaded"}
+                            />
                           </ListItem>
                           <ListItem>
                             <ListItemIcon>
                               <CheckCircleIcon color="success" />
                             </ListItemIcon>
-                            <ListItemText primary="Copy of Visa for intended travel country" />
-                          </ListItem>
-                          <ListItem>
-                            <ListItemIcon>
-                              <CheckCircleIcon color="success" />
-                            </ListItemIcon>
-                            <ListItemText primary="2 Passport-size Photos" />
-                          </ListItem>
-                          <ListItem>
-                            <ListItemIcon>
-                              <CheckCircleIcon color="success" />
-                            </ListItemIcon>
-                            <ListItemText primary="Copy of Valid Uganda Driving Permit" />
+                            <ListItemText primary="Valid Uganda Driving Permit" secondary="Verified in previous step" />
                           </ListItem>
                           {!watchedIsMember && (
                             <ListItem>
@@ -1028,6 +1347,7 @@ const ApplyForIdp: React.FC = () => {
         </Alert>
       </Snackbar>
     </Box>
+    </LocalizationProvider>
   );
 };
 
