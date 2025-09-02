@@ -60,7 +60,7 @@ const validationSchema = yup.object({
   // Personal information
   surname: yup.string().required('Surname is required'),
   otherNames: yup.string().required('Other names are required'),
-  dateOfBirth: yup.date().required('Date of birth is required').max(new Date(), 'Date of birth cannot be in the future'),
+  dateOfBirth: yup.date().nullable().required('Date of birth is required').max(new Date(), 'Date of birth cannot be in the future'),
   placeOfBirth: yup.string().required('Place of birth is required'),
   
   // Contact information
@@ -77,47 +77,16 @@ const validationSchema = yup.object({
   
   // Driving license information
   ugandaDrivingPermitNumber: yup.string().required('Uganda driving permit number is required'),
-  expiryDateOfDrivingPermit: yup.date().required('Expiry date of driving permit is required')
+  expiryDateOfDrivingPermit: yup.date().nullable().required('Expiry date of driving permit is required')
     .min(new Date(), 'Driving permit must be valid'),
-  classesOfDrivingPermit: yup.array().min(1, 'At least one driving permit class is required'),
+  classesOfDrivingPermit: yup.array().of(yup.string().required()).min(1, 'At least one driving permit class is required'),
   
   // Terms and declaration
   termsAccepted: yup.boolean().oneOf([true], 'You must accept the terms and conditions'),
   declarationAccepted: yup.boolean().oneOf([true], 'You must confirm the declaration'),
 });
 
-interface IDPFormData {
-  // Membership
-  isMember: boolean;
-  membershipNumber?: string;
-  
-  // Personal information
-  surname: string;
-  otherNames: string;
-  dateOfBirth: Date | null;
-  placeOfBirth: string;
-  
-  // Contact information
-  postalAddress: string;
-  emailAddress: string;
-  telephoneNumber: string;
-  mobileNumber: string;
-  residentialAddress: string;
-  streetRoadPlot: string;
-  
-  // Passport and visa
-  passportNumber: string;
-  countryOfAcquiredVisa: string;
-  
-  // Driving license
-  ugandaDrivingPermitNumber: string;
-  expiryDateOfDrivingPermit: Date | null;
-  classesOfDrivingPermit: string[];
-  
-  // Terms
-  termsAccepted: boolean;
-  declarationAccepted: boolean;
-}
+type IDPFormData = yup.InferType<typeof validationSchema>;
 
 const FeatureCard = styled(Card)(({ theme }) => ({
   height: '100%',
@@ -189,13 +158,27 @@ const ApplyForIdp: React.FC = () => {
     control,
     handleSubmit,
     watch,
-    formState: { errors, isValid, isSubmitting },
-    setValue,
+    formState: { errors, isSubmitting },
     trigger,
   } = useForm<IDPFormData>({
-    resolver: yupResolver(validationSchema),
+    resolver: yupResolver(validationSchema) as any,
     defaultValues: {
       isMember: false,
+      membershipNumber: '',
+      surname: '',
+      otherNames: '',
+      dateOfBirth: undefined,
+      placeOfBirth: '',
+      postalAddress: '',
+      emailAddress: '',
+      telephoneNumber: '',
+      mobileNumber: '',
+      residentialAddress: '',
+      streetRoadPlot: '',
+      passportNumber: '',
+      countryOfAcquiredVisa: '',
+      ugandaDrivingPermitNumber: '',
+      expiryDateOfDrivingPermit: undefined,
       classesOfDrivingPermit: [],
       termsAccepted: false,
       declarationAccepted: false,
@@ -424,7 +407,7 @@ const ApplyForIdp: React.FC = () => {
 
             {/* Form Content */}
             <Grid item xs={12} md={8}>
-              <form onSubmit={handleSubmit(handleFormSubmit)}>
+              <form onSubmit={handleSubmit(handleFormSubmit as any)}>
                 <FormPaper>
                   {/* Step 1: Membership & Personal Info */}
                   {activeStep === 0 && (
@@ -813,11 +796,12 @@ const ApplyForIdp: React.FC = () => {
                                       <FormControlLabel
                                         control={
                                           <Checkbox
-                                            checked={field.value.includes(permitClass.value)}
+                                            checked={field.value?.includes(permitClass.value) || false}
                                             onChange={(e) => {
+                                              const currentValue = field.value || [];
                                               const newValue = e.target.checked
-                                                ? [...field.value, permitClass.value]
-                                                : field.value.filter(v => v !== permitClass.value);
+                                                ? [...currentValue, permitClass.value]
+                                                : currentValue.filter(v => v !== permitClass.value);
                                               field.onChange(newValue);
                                             }}
                                           />
@@ -937,7 +921,7 @@ const ApplyForIdp: React.FC = () => {
                         <Controller
                           name="declarationAccepted"
                           control={control}
-                          render={({ field, fieldState: { error } }) => (
+                          render={({ field }) => (
                             <FormControlLabel
                               control={
                                 <Checkbox 
@@ -958,7 +942,7 @@ const ApplyForIdp: React.FC = () => {
                         <Controller
                           name="termsAccepted"
                           control={control}
-                          render={({ field, fieldState: { error } }) => (
+                          render={({ field }) => (
                             <FormControlLabel
                               control={
                                 <Checkbox 
