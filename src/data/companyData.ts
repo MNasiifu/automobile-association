@@ -5,26 +5,29 @@ export const companyInfo = {
   phrase: "Inspring Mobility",
   description: "AA Uganda is a leading motoring organization in Uganda, offering a wide range of services including roadside assistance, driving education, insurance, and travel services.",
   shortName: "AA Uganda",
-  founded: "1955",
+  founded: 1986,
   address: {
-    street: "Plot 4 Old Port Bell Rd",
+    street: "Plot 4 Old Portbell Road Suite 8",
     city: "Kampala",
     country: "Uganda",
+    postalCode: "P.O. Box 1459",
     coordinates: {
       lat: 0.3476,
       lng: 32.6204,
     },
   },
   contact: {
-    phone: "+256 786 623 001",
-    email: "info@aauganda.co.ug",
+    phone: "+256752760252 | +256776760252",
+    emergency: {
+      phone: "+256772366004",
+      name: "Mr. Richard"
+    },
+    email: "odongkara@aau.co.ug",
     website: "www.aauganda.co.ug",
   },
   social: {
     facebook: "https://www.facebook.com/profile.php?id=100054503438804",
     twitter: "https://x.com/AUTOMOBILEASSO1",
-    linkedin: "https://linkedin.com/company/aa-kenya",
-    instagram: "https://instagram.com/aauganda",
   },
   mission: "To provide reliable motoring solutions by responding to members' needs while ensuring organizational growth and excellence in service delivery.",
   vision: "Founded to offer reliable motoring solutions by responding to members' needs while taking into consideration the club's growth.",
@@ -58,9 +61,8 @@ export const navigationItems: ReadonlyArray<NavItem> = [
     label: 'Driving School',
     path: '/driving-school',
     children: [
-      { label: 'About the School', path: '/driving-school#about', icon: 'School' },
-      { label: 'Defensive Driving', path: '/driving-school#defensive', icon: 'SecurityUpdateGood' },
-      { label: 'Refresher Courses', path: '/driving-school#refresher', icon: 'Replay' },
+      { label: 'About the School', path: '/driving-school/about', icon: 'School' },
+      { label: 'Refresher Courses', path: '/driving-school/refresher', icon: 'Replay' },
     ],
   },
 
@@ -80,21 +82,16 @@ export const navigationItems: ReadonlyArray<NavItem> = [
     label: 'About Us',
     path: '/about',
     children: [
-      { label: 'Mission & Vision', path: '/about#mission-vision', icon: 'Flag' },
-      { label: 'Our Journey', path: '/about#journey', icon: 'Timeline' },
-      { label: 'Board of Directors', path: '/about#board', icon: 'Groups' },
-      { label: 'Management', path: '/about#management', icon: 'Business' },
-      { label: 'Affiliation', path: '/about#affiliation', icon: 'Handshake' },
-      { label: 'Careers', path: '/careers', icon: 'Work' },
-      { label: 'Gallery', path: '/gallery', icon: 'PhotoLibrary' },
+      { label: 'Who We Are', path: '/about/who-we-are', icon: 'Flag' },
+      { label: 'Our Team', path: '/about/team', icon: 'Groups' },
+      { label: 'Affiliation', path: '/about/affiliation', icon: 'Handshake' },
+      { label: 'Careers', path: '/about/careers', icon: 'Work' },
+      { label: 'Gallery', path: '/about/gallery', icon: 'PhotoLibrary' },
     ],
   },
   {
     label: 'Contact Us',
     path: '/contact',
-    children: [
-      { label: 'Branches', path: '/contact#branches', icon: 'LocationOn' },
-    ],
   },
 ] as const;
 
@@ -109,7 +106,7 @@ export const affiliates = [
 
 export const heroContent = {
   title: "Your Trusted Partner on Uganda's Roads",
-  subtitle: "For over 65 years, AA Uganda has been providing reliable motoring solutions, driving education, and rescue services across Uganda.",
+  subtitle: `For over ${new Date().getFullYear() - 1986} years, AA Uganda has been providing reliable motoring solutions, driving education, and rescue services across Uganda.`,
   ctaText: "Apply for IDP",
   ctaLink: "/membership",
   backgroundImage: "/images/hero-bg.jpg",
@@ -146,7 +143,7 @@ export const milestones = [
   { year: 2020, text: 'Digitized member services with online applications and support.' },
   { year: 2005, text: 'Launched modern driving school and safety training programs.' },
   { year: 1978, text: 'Expanded roadside support coverage across major corridors.' },
-  { year: 1955, text: 'Founded with a mission to support motorists and road safety in Uganda.' },
+  { year: 1986, text: 'Founded with a mission to support motorists and road safety in Uganda.' },
 ];
 
 export default {
