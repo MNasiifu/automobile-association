@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Container, Typography, Grid } from '@mui/material';
-import { Facebook, Twitter, LinkedIn, Instagram, Phone, Email, LocationOn } from '@mui/icons-material';
+import { Facebook, Twitter, Phone, Email, LocationOn } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import { keyframes } from '@mui/system';
 import { companyInfo, navigationItems } from '../../data/companyData';
