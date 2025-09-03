@@ -30,6 +30,8 @@ import {
   ListItemText,
   IconButton,
   Tooltip,
+  CircularProgress,
+  Collapse,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -53,6 +55,9 @@ import {
   PictureAsPdf,
   Image as ImageIcon,
   CalendarToday as CalendarIcon,
+  Info as InfoIcon,
+  ExpandMore as ExpandMoreIcon,
+  ExpandLess as ExpandLessIcon,
 } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
 import {
@@ -62,10 +67,12 @@ import {
   ContentContainer,
   AnimatedTitle,
   AnimatedSubtitle,
-  AnimatedDescription,
   SectionDivider,
 } from "../components/atoms";
-import { DecorativeBackground } from "../components/molecules";
+import { DecorativeBackground, PhotoValidationDisplay } from "../components/molecules";
+import { validatePassportPhoto } from "../utils/passportPhotoValidator";
+import type { PhotoValidationResult } from "../utils/passportPhotoValidator";
+import { passportPhotoRequirements } from "../utils/passportPhotoValidator";
 
 // File validation helpers
 const validateFile = (
@@ -149,6 +156,17 @@ const validationSchema = yup.object({
     .test("fileType", "Only PNG, JPG, or JPEG images are allowed", (value) => {
       if (!value) return false;
       return validateFile(value as File, ["png", "jpg", "jpeg"], 2);
+    })
+    .test("photoValidation", "Photo does not meet passport requirements", async (value) => {
+      if (!value || !(value instanceof File)) return false;
+      
+      try {
+        const validationResult = await validatePassportPhoto(value);
+        return validationResult.isValid;
+      } catch (error) {
+        console.error('Photo validation error:', error);
+        return false;
+      }
     }),
 
   // Driving license information
@@ -286,6 +304,20 @@ const ApplyForIdp: React.FC = () => {
   const [alertSeverity, setAlertSeverity] = useState<
     "success" | "warning" | "error"
   >("success");
+  
+  // Photo validation state
+  const [photoValidationState, setPhotoValidationState] = useState<{
+    isValidating: boolean;
+    validationResult: PhotoValidationResult | null;
+    showValidationDetails: boolean;
+  }>({
+    isValidating: false,
+    validationResult: null,
+    showValidationDetails: false,
+  });
+
+  // Photo requirements state
+  const [showPhotoRequirements, setShowPhotoRequirements] = useState(false);
 
   const {
     control,
@@ -430,12 +462,57 @@ const ApplyForIdp: React.FC = () => {
   const applicationFee = watchedIsMember ? 250000 : 350000;
 
   // File handling functions
-  const handleFileUpload = (fieldName: keyof IDPFormData, file: File) => {
+  const handleFileUpload = async (fieldName: keyof IDPFormData, file: File) => {
     setValue(fieldName, file, { shouldValidate: true });
+    
+    // If it's a passport photo, validate it
+    if (fieldName === 'passportPhoto') {
+      setPhotoValidationState(prev => ({
+        ...prev,
+        isValidating: true,
+        validationResult: null,
+      }));
+      
+      try {
+        const validationResult = await validatePassportPhoto(file);
+        setPhotoValidationState(prev => ({
+          ...prev,
+          isValidating: false,
+          validationResult,
+          showValidationDetails: true,
+        }));
+        
+        if (!validationResult.isValid) {
+          showAlertMessage(
+            `Photo validation failed: ${validationResult.errors[0] || 'Please check photo requirements'}`,
+            "warning"
+          );
+        } else {
+          showAlertMessage("Photo validation passed!", "success");
+        }
+      } catch (error) {
+        console.error('Photo validation error:', error);
+        setPhotoValidationState(prev => ({
+          ...prev,
+          isValidating: false,
+          validationResult: null,
+        }));
+        showAlertMessage("Failed to validate photo. Please try again.", "error");
+      }
+    }
   };
 
   const handleFileRemove = (fieldName: keyof IDPFormData) => {
     setValue(fieldName, undefined, { shouldValidate: true });
+    
+    // Clear photo validation state when removing passport photo
+    if (fieldName === 'passportPhoto') {
+      setPhotoValidationState({
+        isValidating: false,
+        validationResult: null,
+        showValidationDetails: false,
+      });
+    }
   };
 
   const createImagePreviewUrl = (file: File): string => {
@@ -579,6 +656,90 @@ const ApplyForIdp: React.FC = () => {
           <FormHelperText error sx={{ mt: 1 }}>
             {fieldError.message}
           </FormHelperText>
+        )}
+        
+        {/* Photo Requirements Button - Always visible for passport photo */}
+        {fieldName === 'passportPhoto' && (
+          <Box sx={{ mt: 2 }}>
+            <Button
+              variant="outlined"
+              size="small"
+              startIcon={<InfoIcon />}
+              endIcon={showPhotoRequirements ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+              onClick={() => setShowPhotoRequirements(!showPhotoRequirements)}
+              sx={{ 
+                mb: showPhotoRequirements ? 2 : 0,
+                borderColor: 'primary.main',
+                color: 'primary.main',
+                '&:hover': {
+                  backgroundColor: 'primary.main',
+                  borderColor: 'primary.dark',
+                  color: 'white',
+                }
+              }}
+            >
+              {showPhotoRequirements ? 'Hide Photo Requirements' : 'Show Photo Requirements'}
+            </Button>
+            
+            {/* Photo Requirements Display */}
+            <Collapse in={showPhotoRequirements}>
+              <Card sx={{ mt: 2, border: '1px solid', borderColor: 'primary.light' }}>
+                <CardContent sx={{ p: 2 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+                    Passport Photo Requirements
+                  </Typography>
+                  {passportPhotoRequirements.map((category, categoryIndex) => (
+                    <Box key={categoryIndex} sx={{ mb: categoryIndex < passportPhotoRequirements.length - 1 ? 3 : 0 }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1, color: 'text.primary' }}>
+                        {category.category}
+                      </Typography>
+                      <List dense sx={{ pl: 2 }}>
+                        {category.requirements.map((requirement, reqIndex) => (
+                          <ListItem key={reqIndex} sx={{ py: 0.25, px: 0 }}>
+                            <ListItemIcon sx={{ minWidth: 20 }}>
+                              <CheckCircleIcon sx={{ fontSize: 16, color: 'success.main' }} />
+                            </ListItemIcon>
+                            <ListItemText 
+                              primary={requirement} 
+                              primaryTypographyProps={{ 
+                                variant: 'body2',
+                                sx: { lineHeight: 1.4 }
+                              }} 
+                            />
+                          </ListItem>
+                        ))}
+                      </List>
+                    </Box>
+                  ))}
+                  <Alert severity="info" sx={{ mt: 2 }}>
+                    <Typography variant="body2">
+                      <strong>Tip:</strong> Upload a photo that meets these requirements to ensure faster processing of your application.
+                    </Typography>
+                  </Alert>
+                </CardContent>
+              </Card>
+            </Collapse>
+          </Box>
+        )}
+        
+        {/* Photo Validation Display for Passport Photo */}
+        {fieldName === 'passportPhoto' && fieldValue && (
+          <Box sx={{ mt: 2 }}>
+            {photoValidationState.isValidating && (
+              <Alert severity="info" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <CircularProgress size={16} />
+                <Typography variant="body2">Validating photo...</Typography>
+              </Alert>
+            )}
+            
+            {photoValidationState.validationResult && (
+              <PhotoValidationDisplay 
+                validationResult={photoValidationState.validationResult}
+                onRetake={() => handleFileRemove(fieldName)}
+                showDetails={photoValidationState.showValidationDetails}
+              />
+            )}
+          </Box>
         )}
       </Box>
     );
@@ -1230,7 +1391,7 @@ const ApplyForIdp: React.FC = () => {
                             />
                           </Grid>
 
-                          <Grid item xs={12} md={6}>
+                          <Grid item xs={12}>
                             <FileUploadField
                               fieldName="passportPhoto"
                               label="Passport Photo"
