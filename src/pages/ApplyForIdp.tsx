@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -95,6 +95,25 @@ const validateFile = (
   return true;
 };
 
+// Photo validation cache to avoid repeated computations
+interface PhotoValidationCache {
+  [fileHash: string]: {
+    validationResult: PhotoValidationResult;
+    timestamp: number;
+    fileName: string; // Store for debugging
+    fileSize: number; // Store for verification
+  };
+}
+
+// Create a unique file hash using file content
+const createFileHash = async (file: File): Promise<string> => {
+  const arrayBuffer = await file.arrayBuffer();
+  const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  return hashHex;
+};
+
 // Validation schema based on idp.md requirements
 const validationSchema = yup.object({
   // Membership info
@@ -156,17 +175,6 @@ const validationSchema = yup.object({
     .test("fileType", "Only PNG, JPG, or JPEG images are allowed", (value) => {
       if (!value) return false;
       return validateFile(value as File, ["png", "jpg", "jpeg"], 2);
-    })
-    .test("photoValidation", "Photo does not meet passport requirements", async (value) => {
-      if (!value || !(value instanceof File)) return false;
-      
-      try {
-        const validationResult = await validatePassportPhoto(value);
-        return validationResult.isValid;
-      } catch (error) {
-        console.error('Photo validation error:', error);
-        return false;
-      }
     }),
 
   // Driving license information
@@ -305,19 +313,65 @@ const ApplyForIdp: React.FC = () => {
     "success" | "warning" | "error"
   >("success");
   
+  // Photo validation cache to avoid repeated computations
+  const [photoValidationCache, setPhotoValidationCache] = useState<PhotoValidationCache>({});
+  
   // Photo validation state
   const [photoValidationState, setPhotoValidationState] = useState<{
     isValidating: boolean;
     validationResult: PhotoValidationResult | null;
     showValidationDetails: boolean;
+    isPhotoValid: boolean; // Track if current photo passes validation
   }>({
     isValidating: false,
     validationResult: null,
     showValidationDetails: false,
+    isPhotoValid: false,
   });
 
   // Photo requirements state
   const [showPhotoRequirements, setShowPhotoRequirements] = useState(false);
+
+  // URL management for object URLs to prevent memory leaks
+  const objectUrlsRef = useRef<Map<string, string>>(new Map());
+  
+  // Cleanup all object URLs when component unmounts
+  useEffect(() => {
+    return () => {
+      objectUrlsRef.current.forEach((url) => {
+        URL.revokeObjectURL(url);
+      });
+      objectUrlsRef.current.clear();
+    };
+  }, []);
+
+  // Create and manage object URLs with automatic cleanup
+  const createManagedImageUrl = useCallback((file: File): string => {
+    const fileKey = `${file.name}-${file.size}-${file.lastModified}`;
+    
+    // Check if we already have a URL for this file
+    const existingUrl = objectUrlsRef.current.get(fileKey);
+    if (existingUrl) {
+      return existingUrl;
+    }
+    
+    // Create new URL and store it
+    const url = URL.createObjectURL(file);
+    objectUrlsRef.current.set(fileKey, url);
+    
+    return url;
+  }, []);
+
+  // Clean up specific file URL
+  const revokeManagedImageUrl = useCallback((file: File) => {
+    const fileKey = `${file.name}-${file.size}-${file.lastModified}`;
+    const url = objectUrlsRef.current.get(fileKey);
+    
+    if (url) {
+      URL.revokeObjectURL(url);
+      objectUrlsRef.current.delete(fileKey);
+    }
+  }, []);
 
   const {
     control,
@@ -405,6 +459,30 @@ const ApplyForIdp: React.FC = () => {
         break;
       case 3:
         fieldsToValidate = ["passportBioDataPage", "visaCopy", "passportPhoto"];
+        
+        // Additional check for passport photo validation
+        const passportPhoto = watch("passportPhoto") as File | undefined;
+        if (passportPhoto) {
+          // Check if we have a valid validation result for the current photo
+          if (!photoValidationState.isPhotoValid || photoValidationState.isValidating) {
+            showAlertMessage(
+              photoValidationState.isValidating 
+                ? "Please wait for photo validation to complete"
+                : "Please upload a valid passport photo that meets all requirements",
+              "warning"
+            );
+            return;
+          }
+          
+          // Additional safety check: ensure validation result exists
+          if (!photoValidationState.validationResult) {
+            showAlertMessage(
+              "Photo validation incomplete. Please re-upload your photo.",
+              "warning"
+            );
+            return;
+          }
+        }
         break;
       case 4:
         fieldsToValidate = [
@@ -465,22 +543,78 @@ const ApplyForIdp: React.FC = () => {
   const handleFileUpload = async (fieldName: keyof IDPFormData, file: File) => {
     setValue(fieldName, file, { shouldValidate: true });
     
-    // If it's a passport photo, validate it
+    // If it's a passport photo, validate it with content-based caching
     if (fieldName === 'passportPhoto') {
+      // Start validation immediately (show loading state)
       setPhotoValidationState(prev => ({
         ...prev,
         isValidating: true,
         validationResult: null,
+        isPhotoValid: false,
       }));
       
       try {
+        // Generate file hash for accurate caching
+        const fileHash = await createFileHash(file);
+        
+        // Check cache with hash-based key
+        const cachedResult = photoValidationCache[fileHash];
+        const cacheValidityPeriod = 10 * 60 * 1000; // 10 minutes
+        const now = Date.now();
+        
+        // Verify cache entry is still valid and matches current file
+        if (cachedResult && 
+            (now - cachedResult.timestamp) < cacheValidityPeriod &&
+            cachedResult.fileSize === file.size) {
+          
+          // Use cached result
+          setPhotoValidationState({
+            isValidating: false,
+            validationResult: cachedResult.validationResult,
+            showValidationDetails: true,
+            isPhotoValid: cachedResult.validationResult.isValid,
+          });
+          
+          if (!cachedResult.validationResult.isValid) {
+            showAlertMessage(
+              `Photo validation failed: ${cachedResult.validationResult.errors[0] || 'Please check photo requirements'}`,
+              "warning"
+            );
+          } else {
+            showAlertMessage("Photo validation passed! (from cache)", "success");
+          }
+          return;
+        }
+        
+        // Perform fresh validation
         const validationResult = await validatePassportPhoto(file);
-        setPhotoValidationState(prev => ({
-          ...prev,
+        
+        // Cache the result with file hash
+        setPhotoValidationCache(prev => {
+          // Clean up old cache entries (keep only last 10 entries to prevent memory issues)
+          const entries = Object.entries(prev);
+          const sortedEntries = entries.sort((a, b) => b[1].timestamp - a[1].timestamp);
+          const recentEntries = sortedEntries.slice(0, 9); // Keep 9, add 1 new = 10 total
+          
+          const cleanedCache = Object.fromEntries(recentEntries);
+          
+          return {
+            ...cleanedCache,
+            [fileHash]: {
+              validationResult,
+              timestamp: now,
+              fileName: file.name,
+              fileSize: file.size,
+            }
+          };
+        });
+        
+        setPhotoValidationState({
           isValidating: false,
           validationResult,
           showValidationDetails: true,
-        }));
+          isPhotoValid: validationResult.isValid,
+        });
         
         if (!validationResult.isValid) {
           showAlertMessage(
@@ -492,17 +626,24 @@ const ApplyForIdp: React.FC = () => {
         }
       } catch (error) {
         console.error('Photo validation error:', error);
-        setPhotoValidationState(prev => ({
-          ...prev,
+        setPhotoValidationState({
           isValidating: false,
           validationResult: null,
-        }));
+          showValidationDetails: false,
+          isPhotoValid: false,
+        });
         showAlertMessage("Failed to validate photo. Please try again.", "error");
       }
     }
   };
 
   const handleFileRemove = (fieldName: keyof IDPFormData) => {
+    // Get the current file before removing it to clean up its URL
+    const currentFile = watch(fieldName) as File | undefined;
+    if (currentFile) {
+      revokeManagedImageUrl(currentFile);
+    }
+    
     setValue(fieldName, undefined, { shouldValidate: true });
     
     // Clear photo validation state when removing passport photo
@@ -511,12 +652,18 @@ const ApplyForIdp: React.FC = () => {
         isValidating: false,
         validationResult: null,
         showValidationDetails: false,
+        isPhotoValid: false,
       });
+      
+      // Optional: Clear relevant cache entries to prevent confusion
+      // Note: We don't clear the entire cache as other uploaded files might still be valid
+      // The cache will naturally expire or be cleaned up by the LRU mechanism
     }
   };
 
+  // Legacy function name kept for backward compatibility, now uses managed URLs
   const createImagePreviewUrl = (file: File): string => {
-    return URL.createObjectURL(file);
+    return createManagedImageUrl(file);
   };
 
   const formatFileSize = (bytes: number): string => {
@@ -608,16 +755,6 @@ const ApplyForIdp: React.FC = () => {
                   <img
                     src={createImagePreviewUrl(fieldValue)}
                     alt="Passport preview"
-                    onLoad={() => {
-                      // Clean up object URL when image loads
-                      setTimeout(
-                        () =>
-                          URL.revokeObjectURL(
-                            createImagePreviewUrl(fieldValue)
-                          ),
-                        1000
-                      );
-                    }}
                   />
                 </PhotoPreview>
               ) : (

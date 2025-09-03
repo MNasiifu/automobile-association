@@ -38,6 +38,7 @@ import { PageHeader } from "../components/molecules";
 import { config } from "../utils/config/config";
 import theme from "../theme";
 import { useNavigate } from "react-router-dom";
+import { MockIdpVerificationService } from "../utils/mockIdpDatabase";
 
 const FeatureCard = styled(Card)(({ theme }) => ({
   height: "100%",
@@ -149,55 +150,50 @@ const VerifyIdp: React.FC = () => {
 
     setLoading(true);
 
-    // Simulate API call to AA Uganda database
-    setTimeout(() => {
-      // Mock verification logic based on AA Uganda patterns
-      const mockResult: VerificationResult = {
-        status: searchValue.toLowerCase().includes("invalid")
-          ? "invalid"
-          : searchValue.toLowerCase().includes("expired")
-          ? "expired"
-          : searchValue.toLowerCase().includes("suspended")
-          ? "suspended"
-          : "valid",
-        idpNumber: searchValue.toUpperCase(),
-        holderName: searchValue.toLowerCase().includes("invalid")
-          ? undefined
-          : "John Doe Mukasa",
-        issueDate: "2024-01-15",
-        expiryDate: "2025-01-14",
-        licenseNumber: "UG/DL/123456/2023",
-        countries: [
-          "Kenya",
-          "Tanzania",
-          "Rwanda",
-          "South Sudan",
-          "Congo DR",
-          "Burundi",
-          "South Africa",
-          "Nigeria",
-          "Ghana",
-          "Egypt",
-          "Morocco",
-          "Tunisia",
-          "Germany",
-          "France",
-          "United Kingdom",
-          "Italy",
-          "Spain",
-          "Netherlands",
-        ],
-        type: "1968 Vienna Convention IDP",
-        issuingAuthority: "Automobile Association of Uganda",
-        membershipType: searchValue.toLowerCase().includes("member")
-          ? "AA Member"
-          : "Non-Member",
-        validityStatus: "Active and Valid",
-      };
-
-      setResult(mockResult);
+    try {
+      // Use structured mock database lookup instead of fragile string matching
+      const verificationResult = await MockIdpVerificationService.verifyIdp(searchValue);
+      
+      if (verificationResult) {
+        // Convert MockIdpRecord to VerificationResult format
+        const result: VerificationResult = {
+          status: verificationResult.status,
+          idpNumber: verificationResult.idpNumber,
+          holderName: verificationResult.holderName,
+          issueDate: verificationResult.issueDate,
+          expiryDate: verificationResult.expiryDate,
+          licenseNumber: verificationResult.licenseNumber,
+          countries: verificationResult.countries,
+          type: verificationResult.type,
+          issuingAuthority: verificationResult.issuingAuthority,
+          membershipType: verificationResult.membershipType,
+          validityStatus: verificationResult.validityStatus,
+        };
+        setResult(result);
+      } else {
+        // IDP not found in database
+        const notFoundResult: VerificationResult = {
+          status: "invalid",
+          idpNumber: searchValue.toUpperCase(),
+          holderName: undefined,
+          issueDate: undefined,
+          expiryDate: undefined,
+          licenseNumber: undefined,
+          countries: undefined,
+          type: undefined,
+          issuingAuthority: "Automobile Association of Uganda",
+          membershipType: undefined,
+          validityStatus: "Not Found in Database",
+        };
+        setResult(notFoundResult);
+      }
+    } catch (error) {
+      console.error("Error verifying IDP:", error);
+      setAlertMessage("An error occurred while verifying the IDP. Please try again.");
+      setShowAlert(true);
+    } finally {
       setLoading(false);
-    }, 2500);
+    }
   };
 
   const getStatusIcon = (status: string) => {
@@ -581,6 +577,80 @@ const VerifyIdp: React.FC = () => {
           </Grid>
         </Container>
       </Box>
+
+      {/* Test Cases Section for Development */}
+      {import.meta.env.DEV && (
+        <Box sx={{ py: 6, backgroundColor: "warning.50" }}>
+          <Container maxWidth="lg">
+            <Box sx={{ textAlign: "center", mb: 4 }}>
+              <Heading variant="h3" align="center" gutterBottom>
+                🧪 Test Cases (Development Mode)
+              </Heading>
+              <Typography
+                variant="h6"
+                color="text.secondary"
+                sx={{ maxWidth: 600, mx: "auto" }}
+              >
+                Use these predefined IDP numbers to test different verification scenarios
+              </Typography>
+            </Box>
+
+            <Grid container spacing={3}>
+              {MockIdpVerificationService.getTestCases().map((testCase, index) => (
+                <Grid item xs={12} sm={6} md={4} key={index}>
+                  <Card 
+                    sx={{ 
+                      cursor: 'pointer', 
+                      transition: 'all 0.2s',
+                      '&:hover': { 
+                        transform: 'translateY(-2px)',
+                        boxShadow: 3 
+                      }
+                    }}
+                    onClick={() => setSearchValue(testCase.idpNumber)}
+                  >
+                    <CardContent>
+                      <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                        {testCase.description}
+                      </Typography>
+                      <Typography 
+                        variant="body1" 
+                        sx={{ 
+                          fontFamily: 'monospace',
+                          backgroundColor: 'grey.100',
+                          p: 1,
+                          borderRadius: 1,
+                          mb: 1
+                        }}
+                      >
+                        {testCase.idpNumber}
+                      </Typography>
+                      <Chip 
+                        label={`Expected: ${testCase.expectedStatus}`}
+                        size="small"
+                        color={
+                          testCase.expectedStatus === 'valid' ? 'success' :
+                          testCase.expectedStatus === 'expired' ? 'warning' : 'error'
+                        }
+                      />
+                      <Typography variant="caption" display="block" sx={{ mt: 1, fontStyle: 'italic' }}>
+                        Click to test this case
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+
+            <Box sx={{ mt: 4, p: 3, backgroundColor: 'info.50', borderRadius: 2 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
+                <strong>Note:</strong> This section is only visible in development mode. 
+                The verification system also supports realistic fallback results for arbitrary valid Uganda IDP patterns (UG + year + numbers).
+              </Typography>
+            </Box>
+          </Container>
+        </Box>
+      )}
 
       {/* Information Section */}
       <Box sx={{ py: 8, backgroundColor: "grey.50" }}>

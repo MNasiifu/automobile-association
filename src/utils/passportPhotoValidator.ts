@@ -72,57 +72,6 @@ export const loadFaceApiModels = async (): Promise<void> => {
   }
 };
 
-export interface PhotoValidationResult {
-  isValid: boolean;
-  errors: string[];
-  warnings: string[];
-  score: number; // 0-100
-  details: {
-    hasDetectedFace: boolean;
-    faceCount: number;
-    facePosition: {
-      centered: boolean;
-      tooHigh: boolean;
-      tooLow: boolean;
-      tooLeft: boolean;
-      tooRight: boolean;
-    };
-    faceSize: {
-      tooSmall: boolean;
-      tooLarge: boolean;
-      appropriate: boolean;
-    };
-    eyesDetected: boolean;
-    eyesOpen: boolean;
-    facingCamera: boolean;
-    headTilt: number; // degrees
-    expression: {
-      neutral: boolean;
-      smiling: boolean;
-      eyesClosed: boolean;
-    };
-    backgroundAnalysis: {
-      isWhite: boolean;
-      hasComplexBackground: boolean;
-      backgroundColor: string;
-    };
-    imageQuality: {
-      resolution: { width: number; height: number };
-      isHighQuality: boolean;
-      isColor: boolean;
-      hasFilters: boolean;
-      sharpness: number;
-    };
-    landmarks: {
-      chinVisible: boolean;
-      shouldersVisible: boolean;
-      earsVisible: boolean;
-      eyebrowsVisible: boolean;
-      foreheadVisible: boolean;
-    };
-  };
-}
-
 const analyzeImageQuality = (canvas: HTMLCanvasElement): {
   isHighQuality: boolean;
   isColor: boolean;
