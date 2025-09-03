@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, Link } from 'react-router-dom';
 import { 
   ThemeProvider, 
@@ -22,7 +22,6 @@ import {
   About, 
   Services,
   Contact,
-  Careers,
   InternationalDrivingPermit,
   VehicleValuation,
   FleetManagement,
@@ -30,7 +29,12 @@ import {
   VehicleInspection,
   InsuranceServices,
   AutomotiveAdvisory,
-  MembershipPage
+  MembershipPage,
+  WhoWeAre,
+  Team,
+  Affiliation,
+  Gallery,
+  Careers
 } from './pages';
 import { navigationItems } from './data/companyData';
 import * as Icons from '@mui/icons-material';
@@ -218,11 +222,17 @@ const App: React.FC = () => {
           <Box sx={{ 
             flexGrow: 1,
             width: '100%',
-            overflowX: 'hidden'
+            overflowX: 'hidden',
+            marginTop: { xs: '64px', md: '72px' } // This matches the minHeight values from Navigation's Toolbar
           }}>
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<About />} />
+              <Route path="/about/who-we-are" element={<WhoWeAre />} />
+              <Route path="/about/team" element={<Team />} />
+              <Route path="/about/affiliation" element={<Affiliation />} />
+              <Route path="/about/careers" element={<Careers />} />
+              <Route path="/about/gallery" element={<Gallery />} />
               <Route path="/services" element={<Services />} />
               <Route path="/services/vehicle-valuation" element={<VehicleValuation />} />
               <Route path="/services/fleet-management" element={<FleetManagement />} />
@@ -233,7 +243,16 @@ const App: React.FC = () => {
               <Route path="/membership" element={<MembershipPage />} />
               <Route path="/idp" element={<InternationalDrivingPermit />} />
               <Route path="/contact" element={<Contact />} />
-              <Route path="/careers" element={<Careers />} />
+              <Route path="/driving-school/about" element={
+                <Suspense fallback={<Box sx={{ p: 4, textAlign: 'center' }}>Loading...</Box>}>
+                  {React.createElement(React.lazy(() => import('./pages/driving-school/About')))}
+                </Suspense>
+              } />
+              <Route path="/driving-school/refresher" element={
+                <Suspense fallback={<Box sx={{ p: 4, textAlign: 'center' }}>Loading...</Box>}>
+                  {React.createElement(React.lazy(() => import('./pages/driving-school/Refresher')))}
+                </Suspense>
+              } />
             </Routes>
           </Box>
           

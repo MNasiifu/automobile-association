@@ -129,8 +129,6 @@ const Footer: React.FC = () => {
               {[
                 { Icon: Facebook, href: companyInfo.social.facebook },
                 { Icon: Twitter, href: companyInfo.social.twitter },
-                { Icon: LinkedIn, href: companyInfo.social.linkedin },
-                { Icon: Instagram, href: companyInfo.social.instagram }
               ].map(({ Icon, href }, index) => (
                 <Box
                   key={href}

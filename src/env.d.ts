@@ -2,7 +2,6 @@
 
 interface ImportMetaEnv {
   readonly VITE_RECAPTCHA_SITE_KEY: string
-  // more env variables...
 }
 
 interface ImportMeta {

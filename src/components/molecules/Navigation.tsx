@@ -34,11 +34,24 @@ const LinkBehavior = React.forwardRef<HTMLAnchorElement, RouterLinkProps>(
   }
 );
 
-const StyledAppBar = styled(AppBar)(({ theme }) => ({
+interface StyledAppBarProps {
+  trigger: boolean;
+}
+
+const StyledAppBar = styled(AppBar, {
+  shouldForwardProp: (prop) => prop !== 'trigger',
+})<StyledAppBarProps>(({ theme, trigger }) => ({
   backgroundColor: theme.palette.background.default,
   color: theme.palette.text.primary,
-  boxShadow: '0 2px 12px rgba(0, 0, 0, 0.08)',
+  boxShadow: trigger ? '0 2px 12px rgba(0, 0, 0, 0.12)' : '0 2px 12px rgba(0, 0, 0, 0.08)',
   borderBottom: `1px solid ${theme.palette.grey[200]}`,
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  right: 0,
+  zIndex: theme.zIndex.appBar,
+  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+  transform: `translateY(0)`,
   '& .MuiToolbar-root': {
     justifyContent: 'space-between',
   }
@@ -57,10 +70,28 @@ const Logo = styled(RouterLink)(({ theme }) => ({
     marginRight: theme.spacing(1.25),
   },
   '& .logo-text': {
-    fontWeight: 800,
-    fontSize: '1.1rem',
+    fontWeight: 500,
+    fontSize: '0.85rem',
     color: theme.palette.primary.main,
     whiteSpace: 'nowrap',
+    letterSpacing: '0.5px',
+    textTransform: 'uppercase',
+    background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    marginLeft: theme.spacing(1),
+    padding: theme.spacing(0.5, 0),
+    position: 'relative',
+    '&::after': {
+      content: '""',
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      width: '100%',
+      height: '2px',
+      background: `linear-gradient(90deg, ${theme.palette.secondary.main}00, ${theme.palette.secondary.main}, ${theme.palette.secondary.main}00)`,
+      opacity: 0.5,
+    },
     [theme.breakpoints.down('md')]: {
       display: 'none',
     },
@@ -166,11 +197,11 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
   const openDropdown = Boolean(activeKey && childrenItems.length > 0);
 
   return (
-    <StyledAppBar position="sticky" elevation={trigger ? 2 : 0}>
+    <StyledAppBar trigger={trigger} elevation={trigger ? 2 : 0}>
       <Toolbar sx={{ px: { xs: 2, sm: 3, md: 4 }, minHeight: { xs: 64, md: 72 } }}>
         <Logo to="/" aria-label="AA Uganda Home">
           <img src={AAULogo} alt="AA Uganda Logo" />
-          <Typography className="logo-text" sx={{ fontSize: '1rem'}}>{companyInfo.phrase}</Typography>
+          <Typography className="logo-text">{companyInfo.phrase}</Typography>
         </Logo>
 
         <NavLinks
