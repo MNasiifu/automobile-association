@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Box, 
   Container, 
@@ -15,7 +16,8 @@ import {
 import { 
   ExpandMore as ExpandMoreIcon, 
   Verified as VerifiedIcon,
-  Search as SearchIcon
+  Search as SearchIcon,
+  PostAdd as PostAddIcon
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import { Heading, Button } from '../components/atoms';
@@ -70,15 +72,15 @@ const VerificationCard = styled(Paper)(({ theme }) => ({
 }));
 
 const InternationalDrivingPermit: React.FC = () => {
+  const navigate = useNavigate();
   const [verificationNumber, setVerificationNumber] = useState<string>('');
   const [verificationResult, setVerificationResult] = useState<string>('');
   const [showAlert, setShowAlert] = useState<boolean>(false);
 
   const handleApplicationSelect = (applicationId: string) => {
     console.log('Selected application:', applicationId);
-    // In a real app, this would redirect to application form
-    setVerificationResult('Redirecting to application form...');
-    setShowAlert(true);
+    // Navigate to the apply page
+    navigate('/idp/apply');
   };
 
   const handleVerification = () => {
@@ -88,15 +90,8 @@ const InternationalDrivingPermit: React.FC = () => {
       return;
     }
 
-    // Simulate verification process
-    setTimeout(() => {
-      if (verificationNumber.length >= 8) {
-        setVerificationResult('✅ IDP Verified: Valid International Driving Permit');
-      } else {
-        setVerificationResult('❌ Invalid IDP Number: Please check and try again');
-      }
-      setShowAlert(true);
-    }, 1000);
+    // Navigate to verify page with the number
+    navigate(`/idp/verify?number=${encodeURIComponent(verificationNumber)}`);
   };
 
   return (
@@ -115,7 +110,8 @@ const InternationalDrivingPermit: React.FC = () => {
                 variant="contained"
                 color="primary"
                 size="large"
-                onClick={() => document.getElementById('applications')?.scrollIntoView({ behavior: 'smooth' })}
+                startIcon={<PostAddIcon />}
+                onClick={() => navigate('/idp/apply')}
               >
                 Apply for IDP
               </Button>
@@ -125,7 +121,7 @@ const InternationalDrivingPermit: React.FC = () => {
                 color="primary"
                 size="large"
                 startIcon={<VerifiedIcon />}
-                onClick={() => document.getElementById('verification')?.scrollIntoView({ behavior: 'smooth' })}
+                onClick={() => navigate('/idp/verify')}
               >
                 Verify IDP
               </Button>

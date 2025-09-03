@@ -252,7 +252,7 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
             variant="contained"
             color="secondary"
             component={LinkBehavior as any}
-            {...({ to: '/idp' } as any)}
+            {...({ to: 'idp/apply' } as any)}
             sx={{
               fontWeight: 900,
               bgcolor: 'secondary.main',
