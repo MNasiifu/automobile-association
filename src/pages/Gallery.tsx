@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Container, Typography, ImageList, ImageListItem } from '@mui/material';
+import { Box, Container, Typography } from '@mui/material';
 import { PageHeader } from '../components/molecules';
 
 // Import all images
@@ -9,7 +9,6 @@ import drivingSchoolImg from '../assets/images/driving-school.jpg';
 import car1Img from '../assets/images/car1.jpeg';
 import roadImg from '../assets/images/road.jpg';
 import rescueServiceImg from '../assets/images/rescue.jpg';
-import stripImg from '../assets/images/STRIPWEBSITE.png';
 import towingImg from '../assets/images/TOWINGANDRECOVERYFRESHCAR.jpeg';
 
 const Gallery: React.FC = () => {
@@ -20,7 +19,6 @@ const Gallery: React.FC = () => {
     { img: car1Img, title: 'Vehicle Services' },
     { img: roadImg, title: 'Road Safety' },
     { img: rescueServiceImg, title: 'Emergency Response' },
-    { img: stripImg, title: 'AA Uganda Services' },
     { img: towingImg, title: 'Towing Service' },
   ];
 
@@ -32,21 +30,51 @@ const Gallery: React.FC = () => {
       />
       
       <Container maxWidth="lg" sx={{ py: 8 }}>
-        <ImageList variant="masonry" cols={3} gap={16}>
+        <Box sx={{ display: 'grid', gap: 3, width: '100%', gridTemplateColumns: {
+          xs: '1fr',
+          sm: 'repeat(2, 1fr)',
+          md: 'repeat(3, 1fr)'
+        }}}>
           {images.map((item, index) => (
-            <ImageListItem key={index}>
-              <img
+            <Box
+              key={index}
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 1.5,
+                '&:hover img': {
+                  transform: 'scale(1.05)'
+                }
+              }}
+            >
+              <Box
+                component="img"
                 src={item.img}
                 alt={item.title}
                 loading="lazy"
-                style={{ borderRadius: 8 }}
+                sx={{
+                  width: '100%',
+                  aspectRatio: '4/3',
+                  height: 280,
+                  objectFit: 'cover',
+                  borderRadius: 2,
+                  transition: 'transform 0.3s ease-in-out',
+                }}
               />
-              <Typography variant="caption" sx={{ mt: 1 }}>
+              <Typography 
+                variant="subtitle2" 
+                sx={{ 
+                  textAlign: 'center',
+                  fontWeight: 500,
+                  color: 'text.secondary'
+                }}
+              >
                 {item.title}
               </Typography>
-            </ImageListItem>
+            </Box>
           ))}
-        </ImageList>
+        </Box>
       </Container>
     </Box>
   );

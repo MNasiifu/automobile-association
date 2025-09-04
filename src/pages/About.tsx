@@ -8,6 +8,8 @@ import {
   Paper,
   Stack,
   Button,
+  ImageList,
+  ImageListItem,
 } from '@mui/material';
 import { ExpandMore, ExpandLess } from '@mui/icons-material';
 import { styled, alpha } from '@mui/material/styles';
@@ -32,7 +34,7 @@ import {
   milestones,
 } from '../data/companyData';
 
-import GalleryCarousel from '../components/molecules/GalleryCarousel';
+
 
 import stripeImg from '../assets/images/STRIPWEBSITE.png';
 import heroImg from '../assets/images/AA-rescue.jpg';
@@ -512,17 +514,45 @@ const About: React.FC = () => {
 
       <StripeDivider imageSrc={stripeImg} reverse />
 
-      <Box component="section" sx={{ width: '100vw', position: 'relative', left: '50%', transform: 'translateX(-50%)', mb: 6 }}>
-        <Container maxWidth={false}>
+      <Box component="section" sx={{ mb: 6 }}>
+        <Container maxWidth="lg">
           <Heading id="gallery-heading" variant="h3" gutterBottom sx={{ textAlign: 'center', mb: 4 }}>
             Gallery
           </Heading>
-          <GalleryCarousel 
-            images={gallery} 
-            interval={4200} 
-            speed={650}
-            heights={{ xs: 300, sm: 400, md: 500, lg: 600 }}
-          />
+          <ImageList 
+            variant="quilted" 
+            cols={3} 
+            gap={16} 
+            sx={{ 
+              overflow: 'hidden',
+              '& .MuiImageListItem-root': {
+                height: '240px !important'
+              }
+            }}
+            rowHeight={240}
+          >
+            {gallery.map((src, index) => (
+              <ImageListItem key={index}>
+                <Box
+                  component="img"
+                  src={src}
+                  alt={`Gallery ${index + 1}`}
+                  loading="lazy"
+                  sx={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    borderRadius: 1,
+                    transition: 'transform 0.3s ease-in-out',
+                    display: 'block',
+                    '&:hover': {
+                      transform: 'scale(1.05)'
+                    }
+                  }}
+                />
+              </ImageListItem>
+            ))}
+          </ImageList>
         </Container>
       </Box>
     </Box>
