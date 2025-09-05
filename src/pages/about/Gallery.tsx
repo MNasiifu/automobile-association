@@ -1,17 +1,17 @@
 import React from 'react';
 import { Box, Container, Typography } from '@mui/material';
-import { PageHeader } from '../components/molecules';
-import { SEO } from '../components/SEO';
-import { gallerySEO } from '../data/seoData';
+import { PageHeader } from '../../components/molecules';
+import { SEO } from '../../components/SEO';
+import { gallerySEO } from '../../data/seoData';
 
 // Import all images
-import rescueImg from '../assets/images/AA-rescue.jpg';
-import defensiveDrivingImg from '../assets/images/defensive-driving.jpeg';
-import drivingSchoolImg from '../assets/images/driving-school.jpg';
-import car1Img from '../assets/images/car1.jpeg';
-import roadImg from '../assets/images/road.jpg';
-import rescueServiceImg from '../assets/images/rescue.jpg';
-import towingImg from '../assets/images/TOWINGANDRECOVERYFRESHCAR.jpeg';
+import rescueImg from '../../assets/images/AA-rescue.jpg';
+import defensiveDrivingImg from '../../assets/images/defensive-driving.jpeg';
+import drivingSchoolImg from '../../assets/images/driving-school.jpg';
+import car1Img from '../../assets/images/car1.jpeg';
+import roadImg from '../../assets/images/road.jpg';
+import rescueServiceImg from '../../assets/images/rescue.jpg';
+import towingImg from '../../assets/images/TOWINGANDRECOVERYFRESHCAR.jpeg';
 
 const Gallery: React.FC = () => {
   const images = [
