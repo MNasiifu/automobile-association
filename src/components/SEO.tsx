@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useLocation } from 'react-router-dom';
 import type { SEOData } from '../types/seo';
 
 const DEFAULT_SEO: Partial<SEOData> = {
-  title: 'AA Uganda - Your Trusted Partner on Uganda\'s Roads',
+  title: 'AA Uganda - Automobile Association of Uganda',
   description: 'Automobile Association of Uganda provides 24/7 rescue services, professional driving school, vehicle inspections, and automotive advisory services across Uganda.',
   keywords: 'AA Uganda, automobile association, rescue services, driving school, vehicle inspection, Uganda, emergency assistance, motor insurance',
   ogType: 'website',
@@ -34,11 +34,33 @@ export const SEO: React.FC<SEOProps> = ({ seoData }) => {
     twitterDescription: seoData.twitterDescription || seoData.description || DEFAULT_SEO.description!,
   };
 
-  // Debug logging
-  console.log('SEO Component - seoData:', seoData);
-  console.log('SEO Component - finalSEO:', finalSEO);
-  console.log('SEO Component - description:', finalSEO.description);
-  console.log('SEO Component - keywords:', finalSEO.keywords);
+  // Immediately update title to prevent flash and force meta tag updates
+  useEffect(() => {
+    // Update title immediately
+    if (finalSEO.title) {
+      document.title = finalSEO.title;
+    }
+    
+    // Update description
+    let descMeta = document.querySelector('meta[name="description"]');
+    if (!descMeta) {
+      descMeta = document.createElement('meta');
+      descMeta.setAttribute('name', 'description');
+      document.head.appendChild(descMeta);
+    }
+    descMeta.setAttribute('content', finalSEO.description);
+    
+    // Update keywords
+    if (finalSEO.keywords) {
+      let keywordsMeta = document.querySelector('meta[name="keywords"]');
+      if (!keywordsMeta) {
+        keywordsMeta = document.createElement('meta');
+        keywordsMeta.setAttribute('name', 'keywords');
+        document.head.appendChild(keywordsMeta);
+      }
+      keywordsMeta.setAttribute('content', finalSEO.keywords);
+    }
+  }, [finalSEO.title, finalSEO.description, finalSEO.keywords]);
 
   // Robots meta tag
   const robotsContent: string[] = [];
