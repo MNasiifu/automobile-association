@@ -35,6 +35,8 @@ import {
 import { styled } from "@mui/material/styles";
 import { Button, Heading } from "../components/atoms";
 import { PageHeader } from "../components/molecules";
+import { SEO } from "../components/SEO";
+import { verifyIdpSEO } from "../data/seoData";
 import { config } from "../utils/config/config";
 import theme from "../theme";
 import { useNavigate } from "react-router-dom";
@@ -243,6 +245,7 @@ const VerifyIdp: React.FC = () => {
 
   return (
     <Box>
+      <SEO seoData={verifyIdpSEO} />
       {/* Page Header */}
       <PageHeader
         title="Verify International Driving Permit"

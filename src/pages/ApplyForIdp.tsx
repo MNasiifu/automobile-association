@@ -70,6 +70,8 @@ import {
   SectionDivider,
 } from "../components/atoms";
 import { DecorativeBackground, PhotoValidationDisplay } from "../components/molecules";
+import { SEO } from "../components/SEO";
+import { applyIdpSEO } from "../data/seoData";
 import { validatePassportPhoto } from "../utils/passportPhotoValidator";
 import type { PhotoValidationResult } from "../utils/passportPhotoValidator";
 import { passportPhotoRequirements } from "../utils/passportPhotoValidator";
@@ -885,6 +887,7 @@ const ApplyForIdp: React.FC = () => {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Box>
+        <SEO seoData={applyIdpSEO} />
         {/* Page Header */}
         <HeaderContainer>
           <DecorativeBackground />

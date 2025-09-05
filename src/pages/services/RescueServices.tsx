@@ -50,6 +50,8 @@ import {
 import { styled } from '@mui/material/styles';
 import { PageHeader } from '../../components/molecules';
 import { Heading } from '../../components/atoms';
+import { SEO } from '../../components/SEO';
+import { rescueServicesSEO } from '../../data/seoData';
 import { config } from '../../utils/config/config';
 import { colors } from '../../theme/colors';
 
@@ -471,6 +473,7 @@ const RescueServices: React.FC = () => {
 
   return (
     <Box>
+      <SEO seoData={rescueServicesSEO} />
       <PageHeader
         title="Rescue & Roadside Assistance"
         subtitle="Professional emergency response and roadside assistance across Uganda"

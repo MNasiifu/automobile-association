@@ -1,6 +1,8 @@
 import React from 'react';
 import { Box, Container, Typography } from '@mui/material';
 import { PageHeader } from '../components/molecules';
+import { SEO } from '../components/SEO';
+import { gallerySEO } from '../data/seoData';
 
 // Import all images
 import rescueImg from '../assets/images/AA-rescue.jpg';
@@ -24,6 +26,7 @@ const Gallery: React.FC = () => {
 
   return (
     <Box>
+      <SEO seoData={gallerySEO} />
       <PageHeader
         title="Gallery"
         subtitle="Visual journey through our services and activities"

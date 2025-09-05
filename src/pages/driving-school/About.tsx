@@ -2,6 +2,8 @@ import React from 'react';
 import { Box, Container, Typography, Grid, Paper } from '@mui/material';
 import { Phone, DirectionsCar, School, AccessTime, CardMembership } from '@mui/icons-material';
 import { PageHeader } from '../../components/molecules';
+import { SEO } from '../../components/SEO';
+import { drivingSchoolAboutSEO } from '../../data/seoData';
 
 const FeatureCard = ({ icon, title, description }: { icon: React.ReactNode, title: string, description: React.ReactNode }) => (
   <Paper
@@ -81,6 +83,7 @@ const About: React.FC = () => {
 
   return (
     <Box>
+      <SEO seoData={drivingSchoolAboutSEO} />
       <PageHeader
         title="About Our Driving School"
         subtitle="Professional Class B Driver Training in Uganda"

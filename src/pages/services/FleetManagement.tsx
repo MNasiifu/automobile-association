@@ -34,6 +34,8 @@ import {
 import { styled } from '@mui/material/styles';
 import { ContactButtons, PageHeader } from '../../components/molecules';
 import { Heading } from '../../components/atoms';
+import { SEO } from '../../components/SEO';
+import { fleetManagementSEO } from '../../data/seoData';
 import { config } from '../../utils/config/config';
 
 const HeroSection = styled(Box)(({ theme }) => ({
@@ -198,6 +200,7 @@ const FleetManagement: React.FC = () => {
 
   return (
     <Box>
+      <SEO seoData={fleetManagementSEO} />
       <PageHeader
         title="Fleet Management Solutions"
         subtitle="Comprehensive telematics and fuel management solutions tailored to Ugandan operations"
