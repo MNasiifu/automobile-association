@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react';
-import { HelmetData } from 'react-helmet-async';
+import { type HelmetDataContext } from '@dr.pogodin/react-helmet';
 
-export const HelmetContext = createContext<HelmetData | undefined>(undefined);
+export const HelmetContext = createContext<HelmetDataContext | undefined>(undefined);
 
 export const useHelmet = () => {
   const context = useContext(HelmetContext);

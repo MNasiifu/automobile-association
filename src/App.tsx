@@ -1,6 +1,6 @@
 import React, { useState, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, Link } from 'react-router-dom';
-import { HelmetProvider, HelmetData } from 'react-helmet-async';
+import { HelmetProvider } from '@dr.pogodin/react-helmet';
 import { 
   ThemeProvider, 
   CssBaseline, 
