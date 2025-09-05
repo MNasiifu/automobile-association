@@ -53,7 +53,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ open, onClose }) => {
           variant="contained"
           color="secondary"
           component={Link}
-          to="/idp"
+          to="/idp/apply"
           onClick={onClose}
           sx={{
             fontWeight: 900,

@@ -23,6 +23,8 @@ import {
   Services,
   Contact,
   InternationalDrivingPermit,
+  ApplyForIdp,
+  VerifyIdp,
   VehicleValuation,
   FleetManagement,
   RescueServices,
@@ -242,6 +244,8 @@ const App: React.FC = () => {
               <Route path="/services/automotive-advisory" element={<AutomotiveAdvisory />} />
               <Route path="/membership" element={<MembershipPage />} />
               <Route path="/idp" element={<InternationalDrivingPermit />} />
+              <Route path="/idp/apply" element={<ApplyForIdp />} />
+              <Route path="/idp/verify" element={<VerifyIdp />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/driving-school/about" element={
                 <Suspense fallback={<Box sx={{ p: 4, textAlign: 'center' }}>Loading...</Box>}>

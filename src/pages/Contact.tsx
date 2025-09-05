@@ -9,7 +9,7 @@ import {
   Snackbar,
   Alert,
 } from '@mui/material';
-import { parsePhoneNumber } from 'libphonenumber-js/min';
+import { parsePhoneNumber } from 'libphonenumber-js';
 import { Phone, Email, LocationOn } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import { Heading, Button, Card } from '../components/atoms';
@@ -105,23 +105,9 @@ const Contact: React.FC = () => {
       // Remove any spaces or special characters
       const cleanNumber = phoneNumber.replace(/\s+/g, '');
       
+      // Try to parse with provided country code first
       if (countryCode) {
-        console.log('Validating number:', {
-          input: cleanNumber,
-          countryCode
-        });
-        
         const parsed = parsePhoneNumber(cleanNumber, countryCode as any);
-        
-        if (parsed) {
-          console.log('Parsed result:', {
-            nationalNumber: parsed.nationalNumber,
-            countryCallingCode: parsed.countryCallingCode,
-            number: parsed.number,
-            formatInternational: parsed.formatInternational(),
-            isValid: parsed.isValid()
-          });
-        }
         
         if (!parsed) {
           return { 
@@ -130,67 +116,32 @@ const Contact: React.FC = () => {
           };
         }
 
-        // Check if country code matches
-        if (!cleanNumber.startsWith(`+${parsed.countryCallingCode}`)) {
+        // Basic validation using libphonenumber-js
+        if (!parsed.isValid()) {
           return {
             isValid: false,
-            error: `Phone number should start with +${parsed.countryCallingCode}`
+            error: `Invalid phone number format for ${countryNameOf(countryCode)}`
           };
         }
 
-        // Check if number after country code starts with 0
-        // Extract the part after the country code from the clean number
-        const afterCountryCode = cleanNumber.substring(cleanNumber.indexOf(parsed.countryCallingCode) + parsed.countryCallingCode.length);
-        if (afterCountryCode.startsWith('0')) {
-          return {
-            isValid: false,
-            error: `Do not include 0 after country code +${parsed.countryCallingCode}`
-          };
-        }
-
-        // Also check the national number format
-        const nationalNumber = parsed.nationalNumber || '';
-        if (nationalNumber.startsWith('0')) {
+        // Check if the number starts with 0 after country code (common user error)
+        if (parsed.nationalNumber?.startsWith('0')) {
           return {
             isValid: false,
             error: `Do not include 0 after country code +${parsed.countryCallingCode}`
           };
         }
 
-        // Common phone number lengths by country
-        const countryLengths: { [key: string]: number } = {
-          'UG': 9, // Uganda
-          'KE': 9, // Kenya
-          'TZ': 9, // Tanzania
-          'RW': 9, // Rwanda
-          'BI': 8, // Burundi
-          'ET': 9, // Ethiopia
-          'SS': 9, // South Sudan
-          'CD': 9, // DR Congo
-          // Add more countries as needed
+        return {
+          isValid: true,
+          formattedNumber: parsed.formatInternational(),
+          type: parsed.getType(),
+          countryCallingCode: parsed.countryCallingCode,
+          nationalNumber: parsed.nationalNumber
         };
-
-        const expectedLength = countryLengths[countryCode] || 9; // Default to 9 if country not in list
-        if (nationalNumber.length !== expectedLength) {
-          return {
-            isValid: false,
-            error: `Phone number should be ${expectedLength} digits after +${parsed.countryCallingCode}`
-          };
-        }
-
-        if (parsed.isValid()) {
-          return {
-            isValid: true,
-            formattedNumber: parsed.formatInternational(),
-            type: parsed.getType(),
-            countryCallingCode: parsed.countryCallingCode,
-            nationalNumber: parsed.nationalNumber
-          };
-        }
       }
       
-      // If no country code provided or country-specific validation fails,
-      // try to parse without a specific country
+      // If no country code provided, try to parse and validate the number
       const parsed = parsePhoneNumber(cleanNumber);
       if (parsed?.isValid()) {
         return {

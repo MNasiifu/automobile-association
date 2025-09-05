@@ -5,6 +5,7 @@ export { default as VerificationModal } from './VerificationModal';
 export { default as Navigation } from './Navigation';
 export { default as PageHeader } from './PageHeader';
 export { default as ContactButtons } from './ContactButtons';
+export { default as PhotoValidationDisplay } from './PhotoValidationDisplay';
 
 // PageHeader subcomponents
 export { default as DecorativeBackground } from './DecorativeBackground';

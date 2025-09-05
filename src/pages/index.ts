@@ -2,6 +2,8 @@ export { default as Home } from './Home';
 export { default as About } from './About';
 export { default as Services } from './Services';
 export { default as InternationalDrivingPermit } from './Idp';
+export { default as ApplyForIdp } from './ApplyForIdp';
+export { default as VerifyIdp } from './VerifyIdp';
 export { default as Contact } from './Contact';
 export { default as PageHeaderDemo } from './PageHeaderDemo';
 
