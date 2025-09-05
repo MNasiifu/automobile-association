@@ -95,7 +95,7 @@ const analyzeImageQuality = (canvas: HTMLCanvasElement): {
   }
   
   // Calculate sharpness using Laplacian variance
-  const grayData = [];
+  const grayData: number[] = [];
   for (let i = 0; i < data.length; i += 4) {
     const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
     grayData.push(gray);

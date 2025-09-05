@@ -7,6 +7,12 @@ export { default as VerifyIdp } from './VerifyIdp';
 export { default as Contact } from './Contact';
 export { default as PageHeaderDemo } from './PageHeaderDemo';
 
+// About section pages
+export { default as WhoWeAre } from './WhoWeAre';
+export { default as Team } from './Team';
+export { default as Affiliation } from './Affiliation';
+export { default as Gallery } from './Gallery';
+
 // Service pages
 export { default as VehicleValuation } from './services/VehicleValuation';
 export { default as FleetManagement } from './services/FleetManagement';
