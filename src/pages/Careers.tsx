@@ -1,12 +1,14 @@
 // src/pages/Careers.tsx
 import React from 'react';
-import { Grid } from '@mui/material';
-import { Box, Container, Typography, Button } from '@mui/material';
+import { Box, Container, Typography, Button, Grid } from '@mui/material';
 import { PageHeader } from '../components/molecules';
+import { SEO } from '../components/SEO';
+import { careersSEO } from '../data/seoData';
 
 const Careers: React.FC = () => {
   return (
     <Box>
+      <SEO seoData={careersSEO} />
       <PageHeader
         title="Careers at AA Uganda"
         subtitle="Join a team committed to safer roads and excellent service."
@@ -14,7 +16,7 @@ const Careers: React.FC = () => {
 
       <Container maxWidth="lg" sx={{ py: { xs: 6, md: 8 } }}>
         <Grid container spacing={4} justifyContent="center">
-          <Grid xs={12} md={8}>
+          <Grid item xs={12} md={8}>
             <Box
               sx={{
                 p: { xs: 3, md: 5 },

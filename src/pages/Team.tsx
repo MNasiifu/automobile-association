@@ -1,11 +1,14 @@
 import React from 'react';
 import { Box, Container, Typography, Grid, Avatar } from '@mui/material';
 import { PageHeader } from '../components/molecules';
+import { SEO } from '../components/SEO';
+import { teamSEO } from '../data/seoData';
 import { board, management } from '../data/companyData';
 
 const Team: React.FC = () => {
   return (
     <Box>
+      <SEO seoData={teamSEO} />
       <PageHeader
         title="Our Team"
         subtitle="Meet the dedicated professionals leading AA Uganda"

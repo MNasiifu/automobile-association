@@ -1,11 +1,14 @@
 import React from 'react';
 import { Box, Container, Typography, Paper, Button } from '@mui/material';
 import { PageHeader } from '../../components/molecules';
+import { SEO } from '../../components/SEO';
+import { drivingSchoolRefresherSEO } from '../../data/seoData';
 import { AccessTime, Event, Construction } from '@mui/icons-material';
 
 const RefresherCourses: React.FC = () => {
   return (
     <Box>
+      <SEO seoData={drivingSchoolRefresherSEO} />
       <PageHeader
         title="Refresher Courses"
         subtitle="Update and enhance your driving skills with our specialized refresher programs"

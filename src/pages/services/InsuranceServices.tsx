@@ -35,6 +35,8 @@ import {
 import { styled } from "@mui/material/styles";
 import { ContactButtons, PageHeader } from "../../components/molecules";
 import { Heading } from "../../components/atoms";
+import { SEO } from "../../components/SEO";
+import { insuranceServicesSEO } from "../../data/seoData";
 import { config } from "../../utils/config/config";
 
 const HeroSection = styled(Box)(({ theme }) => ({
@@ -247,6 +249,7 @@ const InsuranceServices: React.FC = () => {
 
   return (
     <Box>
+      <SEO seoData={insuranceServicesSEO} />
       <PageHeader
         title="Motor Insurance Services"
         subtitle="Comprehensive vehicle protection and peace of mind on Uganda's roads"

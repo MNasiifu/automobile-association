@@ -41,6 +41,8 @@ import {
 import { styled } from "@mui/material/styles";
 import { ContactButtons, PageHeader } from "../../components/molecules";
 import { Heading } from "../../components/atoms";
+import { SEO } from "../../components/SEO";
+import { automotiveAdvisorySEO } from "../../data/seoData";
 import { config } from "../../utils/config/config";
 
 const HeroSection = styled(Box)(({ theme }) => ({
@@ -449,6 +451,7 @@ const AutomotiveAdvisory: React.FC = () => {
 
   return (
     <Box>
+      <SEO seoData={automotiveAdvisorySEO} />
       <PageHeader
         title="Automotive Advisory Services"
         subtitle="Expert guidance for every motorist in Uganda - buy smarter, maintain cheaper, drive safer"
