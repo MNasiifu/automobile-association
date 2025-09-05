@@ -20,14 +20,14 @@ import {
   ThumbUpAlt,
   Security,
 } from '@mui/icons-material';
-import { PageHeader } from '../components/molecules';
-import { SEO } from '../components/SEO';
-import { whoWeAreSEO } from '../data/seoData';
-import { companyInfo, milestones } from '../data/companyData';
+import { PageHeader } from '../../components/molecules';
+import { SEO } from '../../components/SEO';
+import { whoWeAreSEO } from '../../data/seoData';
+import { companyInfo, milestones } from '../../data/companyData';
 import { ExpandMore, ExpandLess } from '@mui/icons-material';
-import heroImg from '../assets/images/AA-rescue.jpg';
-import stripeImg from '../assets/images/STRIPWEBSITE.png';
-import { StripeDivider } from '../components/atoms';
+import heroImg from '../../assets/images/AA-rescue.jpg';
+import stripeImg from '../../assets/images/STRIPWEBSITE.png';
+import { StripeDivider } from '../../components/atoms';
 
 const MissionVisionCard = ({
   icon,

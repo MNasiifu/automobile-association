@@ -59,7 +59,7 @@ export const homeSEO: SEOData = {
 // About page SEO
 export const aboutSEO: SEOData = {
   title: 'About AA Uganda - 65+ Years of Road Safety Excellence | Automobile Association',
-  description: 'Learn about AA Uganda\'s rich history since 1955, our mission to enhance road safety, and our commitment to serving motorists across Uganda with professional automotive services.',
+  description: 'Learn about AA Uganda\'s rich history since 1986, our mission to enhance road safety, and our commitment to serving motorists across Uganda with professional automotive services.',
   keywords: 'AA Uganda history, automobile association Uganda, road safety, FIA member, Uganda motoring organization, vehicle safety, driving excellence',
   structuredData: {
     '@context': 'https://schema.org',

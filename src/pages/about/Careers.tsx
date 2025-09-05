@@ -1,9 +1,9 @@
 // src/pages/Careers.tsx
 import React from 'react';
 import { Box, Container, Typography, Button, Grid } from '@mui/material';
-import { PageHeader } from '../components/molecules';
-import { SEO } from '../components/SEO';
-import { careersSEO } from '../data/seoData';
+import { PageHeader } from '../../components/molecules';
+import { SEO } from '../../components/SEO';
+import { careersSEO } from '../../data/seoData';
 
 const Careers: React.FC = () => {
   return (

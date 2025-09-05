@@ -12,11 +12,11 @@ import {
 import { parsePhoneNumber } from 'libphonenumber-js';
 import { Phone, Email, LocationOn } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
-import { Heading, Button, Card } from '../components/atoms';
-import { PageHeader } from '../components/molecules';
-import { SEO } from '../components/SEO';
-import { companyInfo } from '../data/companyData';
-import { contactSEO } from '../data/seoData';
+import { Heading, Button, Card } from '../../components/atoms';
+import { PageHeader } from '../../components/molecules';
+import { SEO } from '../../components/SEO';
+import { companyInfo } from '../../data/companyData';
+import { contactSEO } from '../../data/seoData';
 import emailjs from '@emailjs/browser';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { MuiTelInput } from 'mui-tel-input';

@@ -1,17 +1,18 @@
 export { default as Home } from './Home';
-export { default as About } from './About';
 export { default as Services } from './Services';
 export { default as InternationalDrivingPermit } from './Idp';
 export { default as ApplyForIdp } from './ApplyForIdp';
 export { default as VerifyIdp } from './VerifyIdp';
-export { default as Contact } from './Contact';
 export { default as PageHeaderDemo } from './PageHeaderDemo';
 
 // About section pages
-export { default as WhoWeAre } from './WhoWeAre';
-export { default as Team } from './Team';
-export { default as Affiliation } from './Affiliation';
-export { default as Gallery } from './Gallery';
+export { default as About } from './about/About';
+export { default as Team } from './about/Team';
+export { default as Contact } from './about/Contact';
+export { default as WhoWeAre } from './about/WhoWeAre';
+export { default as Careers } from './about/Careers';
+export { default as Affiliation } from './about/Affiliation';
+export { default as Gallery } from './about/Gallery';
 
 // Service pages
 export { default as VehicleValuation } from './services/VehicleValuation';
@@ -21,4 +22,3 @@ export { default as VehicleInspection } from './services/VehicleInspection';
 export { default as InsuranceServices } from './services/InsuranceServices';
 export { default as AutomotiveAdvisory } from './services/AutomotiveAdvisory';
 export { default as MembershipPage } from './services/MembershipPage';
-export { default as Careers } from './Careers';

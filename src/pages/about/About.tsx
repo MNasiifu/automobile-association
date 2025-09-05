@@ -23,9 +23,9 @@ import {
   Flag,
   Visibility,
 } from '@mui/icons-material';
-import { Heading, Card, CountUpAnimation, StripeDivider } from '../components/atoms';
-import { PageHeader } from '../components/molecules';
-import { SEO } from '../components/SEO';
+import { Heading, Card, CountUpAnimation, StripeDivider } from '../../components/atoms';
+import { PageHeader } from '../../components/molecules';
+import { SEO } from '../../components/SEO';
 import { useLocation } from 'react-router-dom';
 import {
   companyInfo,
@@ -33,22 +33,22 @@ import {
   board,
   management,
   milestones,
-} from '../data/companyData';
-import { aboutSEO } from '../data/seoData';
+} from '../../data/companyData';
+import { aboutSEO } from '../../data/seoData';
 
 
 
-import stripeImg from '../assets/images/STRIPWEBSITE.png';
-import heroImg from '../assets/images/AA-rescue.jpg';
+import stripeImg from '../../assets/images/STRIPWEBSITE.png';
+import heroImg from '../../assets/images/AA-rescue.jpg';
 
-import g1 from '../assets/images/AA-rescue.jpg';
-import g2 from '../assets/images/rescue.jpg';
-import g3 from '../assets/images/car1.jpeg';
-import g4 from '../assets/images/defensive-driving.jpeg';
-import g5 from '../assets/images/driving-school.jpg';
-import g6 from '../assets/images/road.jpg';
-import g7 from '../assets/images/TOWINGANDRECOVERYFRESHCAR.jpeg';
-import fiaLogo from '../assets/images/FIA.jpeg';
+import g1 from '../../assets/images/AA-rescue.jpg';
+import g2 from '../../assets/images/rescue.jpg';
+import g3 from '../../assets/images/car1.jpeg';
+import g4 from '../../assets/images/defensive-driving.jpeg';
+import g5 from '../../assets/images/driving-school.jpg';
+import g6 from '../../assets/images/road.jpg';
+import g7 from '../../assets/images/TOWINGANDRECOVERYFRESHCAR.jpeg';
+import fiaLogo from '../../assets/images/FIA.jpeg';
 
 function useHashScroll() {
   const location = useLocation();
