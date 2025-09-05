@@ -21,6 +21,9 @@ import {
   Security,
 } from '@mui/icons-material';
 import { PageHeader } from '../components/molecules';
+import { SEO } from '../components/SEO';
+import { SEOTest } from '../components/SEOTest';
+import { whoWeAreSEO } from '../data/seoData';
 import { companyInfo, milestones } from '../data/companyData';
 import { ExpandMore, ExpandLess } from '@mui/icons-material';
 import heroImg from '../assets/images/AA-rescue.jpg';
@@ -143,6 +146,8 @@ export const WhoWeAre: React.FC = () => {
 
   return (
     <Box>
+      <SEOTest />
+      <SEO seoData={whoWeAreSEO} />
       <PageHeader
         title="Who We Are"
         subtitle="Discover our mission, vision, values, and journey in serving Uganda's motoring community"

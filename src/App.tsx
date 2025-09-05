@@ -1,5 +1,6 @@
 import React, { useState, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, Link } from 'react-router-dom';
+import { HelmetProvider, HelmetData } from 'react-helmet-async';
 import { 
   ThemeProvider, 
   CssBaseline, 
@@ -204,69 +205,71 @@ const App: React.FC = () => {
   };
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Router>
-        <Box sx={{ 
-            minHeight: '100vh', 
-            width: '100%',
-            display: 'flex', 
-            flexDirection: 'column',
-            overflow: 'hidden'
-          }}>
-          {/* Navigation */}
-          <Navigation onMenuClick={handleMobileMenuToggle} />
-          
-          {/* Mobile Menu Drawer */}
-          <MobileMenu open={mobileMenuOpen} onClose={handleMobileMenuClose} />
-          
-          {/* Main Content */}
+    <HelmetProvider context={{}}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Router>
           <Box sx={{ 
-            flexGrow: 1,
-            width: '100%',
-            overflowX: 'hidden',
-            marginTop: { xs: '64px', md: '72px' } // This matches the minHeight values from Navigation's Toolbar
-          }}>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/about/who-we-are" element={<WhoWeAre />} />
-              <Route path="/about/team" element={<Team />} />
-              <Route path="/about/affiliation" element={<Affiliation />} />
-              <Route path="/about/careers" element={<Careers />} />
-              <Route path="/about/gallery" element={<Gallery />} />
-              <Route path="/services" element={<Services />} />
-              <Route path="/services/vehicle-valuation" element={<VehicleValuation />} />
-              <Route path="/services/fleet-management" element={<FleetManagement />} />
-              <Route path="/services/rescue-services" element={<RescueServices />} />
-              <Route path="/services/vehicle-inspection" element={<VehicleInspection />} />
-              <Route path="/services/insurance-services" element={<InsuranceServices />} />
-              <Route path="/services/automotive-advisory" element={<AutomotiveAdvisory />} />
-              <Route path="/membership" element={<MembershipPage />} />
-              <Route path="/idp" element={<InternationalDrivingPermit />} />
-              <Route path="/idp/apply" element={<ApplyForIdp />} />
-              <Route path="/idp/verify" element={<VerifyIdp />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/driving-school/about" element={
-                <Suspense fallback={<Box sx={{ p: 4, textAlign: 'center' }}>Loading...</Box>}>
-                  {React.createElement(React.lazy(() => import('./pages/driving-school/About')))}
-                </Suspense>
-              } />
-              <Route path="/driving-school/refresher" element={
-                <Suspense fallback={<Box sx={{ p: 4, textAlign: 'center' }}>Loading...</Box>}>
-                  {React.createElement(React.lazy(() => import('./pages/driving-school/Refresher')))}
-                </Suspense>
-              } />
-            </Routes>
+              minHeight: '100vh', 
+              width: '100%',
+              display: 'flex', 
+              flexDirection: 'column',
+              overflow: 'hidden'
+            }}>
+            {/* Navigation */}
+            <Navigation onMenuClick={handleMobileMenuToggle} />
+            
+            {/* Mobile Menu Drawer */}
+            <MobileMenu open={mobileMenuOpen} onClose={handleMobileMenuClose} />
+            
+            {/* Main Content */}
+            <Box sx={{ 
+              flexGrow: 1,
+              width: '100%',
+              overflowX: 'hidden',
+              marginTop: { xs: '64px', md: '72px' } // This matches the minHeight values from Navigation's Toolbar
+            }}>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/about/who-we-are" element={<WhoWeAre />} />
+                <Route path="/about/team" element={<Team />} />
+                <Route path="/about/affiliation" element={<Affiliation />} />
+                <Route path="/about/careers" element={<Careers />} />
+                <Route path="/about/gallery" element={<Gallery />} />
+                <Route path="/services" element={<Services />} />
+                <Route path="/services/vehicle-valuation" element={<VehicleValuation />} />
+                <Route path="/services/fleet-management" element={<FleetManagement />} />
+                <Route path="/services/rescue-services" element={<RescueServices />} />
+                <Route path="/services/vehicle-inspection" element={<VehicleInspection />} />
+                <Route path="/services/insurance-services" element={<InsuranceServices />} />
+                <Route path="/services/automotive-advisory" element={<AutomotiveAdvisory />} />
+                <Route path="/membership" element={<MembershipPage />} />
+                <Route path="/idp" element={<InternationalDrivingPermit />} />
+                <Route path="/idp/apply" element={<ApplyForIdp />} />
+                <Route path="/idp/verify" element={<VerifyIdp />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/driving-school/about" element={
+                  <Suspense fallback={<Box sx={{ p: 4, textAlign: 'center' }}>Loading...</Box>}>
+                    {React.createElement(React.lazy(() => import('./pages/driving-school/About')))}
+                  </Suspense>
+                } />
+                <Route path="/driving-school/refresher" element={
+                  <Suspense fallback={<Box sx={{ p: 4, textAlign: 'center' }}>Loading...</Box>}>
+                    {React.createElement(React.lazy(() => import('./pages/driving-school/Refresher')))}
+                  </Suspense>
+                } />
+              </Routes>
+            </Box>
+            
+            {/* Footer */}
+            <Footer />
+            {/* WhatsApp Button */}
+            <WhatsAppButton />
           </Box>
-          
-          {/* Footer */}
-          <Footer />
-          {/* WhatsApp Button */}
-          <WhatsAppButton />
-        </Box>
-      </Router>
-    </ThemeProvider>
+        </Router>
+      </ThemeProvider>
+    </HelmetProvider>
   );
 };
 

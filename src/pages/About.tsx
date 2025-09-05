@@ -25,6 +25,7 @@ import {
 } from '@mui/icons-material';
 import { Heading, Card, CountUpAnimation, StripeDivider } from '../components/atoms';
 import { PageHeader } from '../components/molecules';
+import { SEO } from '../components/SEO';
 import { useLocation } from 'react-router-dom';
 import {
   companyInfo,
@@ -33,6 +34,7 @@ import {
   management,
   milestones,
 } from '../data/companyData';
+import { aboutSEO } from '../data/seoData';
 
 
 
@@ -256,6 +258,7 @@ const About: React.FC = () => {
 
   return (
     <Box>
+      <SEO seoData={aboutSEO} />
       <PageHeader
         title="About AAU"
         subtitle="Uganda's trusted partner for road safety, training, inspections, insurance and roadside assistance."

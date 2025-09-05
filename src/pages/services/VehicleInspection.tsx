@@ -36,6 +36,8 @@ import {
 import { styled } from "@mui/material/styles";
 import { ContactButtons, PageHeader } from "../../components/molecules";
 import { Heading } from "../../components/atoms";
+import { SEO } from "../../components/SEO";
+import { vehicleInspectionSEO } from "../../data/seoData";
 import { config } from "../../utils/config/config";
 
 const HeroSection = styled(Box)(({ theme }) => ({
@@ -285,6 +287,7 @@ const VehicleInspection: React.FC = () => {
 
   return (
     <Box>
+      <SEO seoData={vehicleInspectionSEO} />
       <PageHeader
         title="Professional Vehicle Inspection"
         subtitle="Comprehensive vehicle assessments to ensure safety and compliance"

@@ -14,7 +14,9 @@ import { Phone, Email, LocationOn } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import { Heading, Button, Card } from '../components/atoms';
 import { PageHeader } from '../components/molecules';
+import { SEO } from '../components/SEO';
 import { companyInfo } from '../data/companyData';
+import { contactSEO } from '../data/seoData';
 import emailjs from '@emailjs/browser';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { MuiTelInput } from 'mui-tel-input';
@@ -311,6 +313,7 @@ const isFormValid = () =>
 
   return (
     <Box>
+      <SEO seoData={contactSEO} />
       <PageHeader
         title="Contact Us"
         subtitle="Get in touch with AAU for emergency assistance, inquiries, or to learn more about our services."

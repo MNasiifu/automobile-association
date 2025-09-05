@@ -10,6 +10,8 @@ import {
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import { PageHeader } from '../../components/molecules';
+import { SEO } from '../../components/SEO';
+import { membershipSEO } from '../../data/seoData';
 
 const ComingSoonSection = styled(Box)(({ theme }) => ({
   minHeight: '60vh',
@@ -47,6 +49,7 @@ const IconWrapper = styled(Box)(({ theme }) => ({
 const MembershipPage: React.FC = () => {
   return (
     <Box>
+      <SEO seoData={membershipSEO} />
       <PageHeader
         title="AA Uganda Membership"
         subtitle="Trusted roadside support and exclusive benefits across Uganda"

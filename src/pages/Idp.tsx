@@ -19,6 +19,8 @@ import {
   Search as SearchIcon,
   PostAdd as PostAddIcon
 } from '@mui/icons-material';
+import { SEO } from '../components/SEO';
+import { idpSEO } from '../data/seoData';
 import { styled } from '@mui/material/styles';
 import { Heading, Button } from '../components/atoms';
 import { IDPCard, PageHeader } from '../components/molecules';
@@ -96,6 +98,7 @@ const InternationalDrivingPermit: React.FC = () => {
 
   return (
     <Box>
+      <SEO seoData={idpSEO} />
       <PageHeader
         title="International Driving Permit"
         subtitle="Get your IDP through AAU - your gateway to driving internationally with confidence and legal compliance."
