@@ -20,7 +20,7 @@ export const companyInfo = {
     phone: "+256752760252 | +256776760252",
     emergency: {
       phone: "+256772366004",
-      name: "Mr. Richard"
+      name: "Mr. Richard Ssewagudde",
     },
     email: "odongkara@aau.co.ug",
     website: "www.aauganda.co.ug",
@@ -41,6 +41,45 @@ export const companyInfo = {
 };
 
 import type {  NavItem } from '../types/navigation';
+// Company information and static data for AA Uganda
+import felixImg from '../assets/images/people/Felix.jpeg';
+import edirisaImg from '../assets/images/people/Idrisi-AAU.jpeg';
+
+// Person type and management array
+export type Person = {
+  name: string;
+  role: string;
+  img?: string;
+};
+
+export const management: Person[] = [
+  {
+    name: 'FELIX ODONGKARA CANDIDA',
+    role: 'President',
+    img: felixImg,
+  },
+  {
+    name: 'HAJI EDIRISA NSUBUGA',
+    role: 'Secretary General',
+    img: edirisaImg,
+  },
+  {
+    name: 'MAUREEN BYARYGABA',
+    role: 'Senior Accountant',
+  },
+  {
+    name: 'RICHARD SSEWAGUDDE',
+    role: 'Head of Road Rescue Ops',
+  },
+  {
+    name: 'ROBINA',
+    role: 'Head of Driving School',
+  },
+  {
+    name: 'GRAHAM',
+    role: 'IT Specialist',
+  },
+];
 
 export const navigationItems: ReadonlyArray<NavItem> = [
   { label: 'Home', path: '/' },
@@ -118,26 +157,6 @@ export const heroContent = {
   ],
 };
 
-type Person = { name: string; role: string };
-
-export const board: Person[] = [
-  { name: 'Jane K.', role: 'Board Chair' },
-  { name: 'Michael O.', role: 'Vice Chair' },
-  { name: 'Grace A.', role: 'Board Member' },
-  { name: 'Peter N.', role: 'Board Member' },
-  { name: 'Ruth S.', role: 'Board Member' },
-  { name: 'Paul T.', role: 'Board Member' },
-];
-
-export const management: Person[] = [
-  { name: 'John M.', role: 'Chief Executive Officer' },
-  { name: 'Sarah N.', role: 'Head of Operations' },
-  { name: 'David B.', role: 'Head of Training' },
-  { name: 'Rita T.', role: 'Head of Finance' },
-  { name: 'Agnes K.', role: 'Head of ICT' },
-  { name: 'Tom W.', role: 'Head of Membership' },
-];
-
 export const milestones = [
   { year: 2023, text: 'Introduced enhanced inspection & advisory services.' },
   { year: 2020, text: 'Digitized member services with online applications and support.' },
@@ -150,7 +169,6 @@ export default {
   companyInfo,
   navigationItems,
   heroContent,
-  board,
   management,
   affiliates,
 };

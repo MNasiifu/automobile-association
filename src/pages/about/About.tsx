@@ -30,7 +30,6 @@ import { useLocation } from 'react-router-dom';
 import {
   companyInfo,
   affiliates,
-  board,
   management,
   milestones,
 } from '../../data/companyData';
@@ -417,25 +416,6 @@ const About: React.FC = () => {
       </Section>
 
       <StripeDivider imageSrc={stripeImg} />
-
-      <Section id="board" aria-labelledby="board-heading">
-        <Container maxWidth="lg">
-          <Heading id="board-heading" variant="h3" gutterBottom>
-            Board of Directors
-          </Heading>
-          <Grid
-            container
-            spacing={{ xs: 2, sm: 3, md: 3.5, lg: 4 }}
-            sx={{ justifyContent: 'center' }}
-          >
-            {board.map((p) => (
-              <Grid key={p.name} xs={12} sm={6} md={4} lg={3}>
-                <PersonCard name={p.name} role={p.role} />
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
-      </Section>
 
       <Section id="management" aria-labelledby="management-heading">
         <Container maxWidth="lg">

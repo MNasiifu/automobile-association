@@ -13,7 +13,9 @@ const PersonCard: React.FC<PersonCardProps> = ({ name, role }) => (
       p: 3,
       textAlign: 'center',
       borderRadius: 2,
-      minHeight: { xs: 260, sm: 280 },
+      minHeight: 320,
+      minWidth: 260,
+      maxWidth: 320,
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
@@ -48,7 +50,14 @@ const PersonCard: React.FC<PersonCardProps> = ({ name, role }) => (
     <Typography variant="h6" sx={{ fontWeight: 800 }}>
       {name}
     </Typography>
-    <Typography variant="body2" color="text.secondary">
+    <Typography
+      variant="subtitle1"
+      color="text.secondary"
+      sx={{
+        fontWeight: 600,
+        fontSize: { xs: '1.1rem', sm: '1.15rem', md: '1.2rem' },
+      }}
+    >
       {role}
     </Typography>
   </Paper>
