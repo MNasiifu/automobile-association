@@ -21,4 +21,4 @@ export { default as RescueServices } from './services/RescueServices';
 export { default as VehicleInspection } from './services/VehicleInspection';
 export { default as InsuranceServices } from './services/InsuranceServices';
 export { default as AutomotiveAdvisory } from './services/AutomotiveAdvisory';
-export { default as MembershipPage } from './services/MembershipPage';
+export { default as MembershipPage } from './Membership';

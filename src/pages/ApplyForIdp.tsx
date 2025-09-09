@@ -15,7 +15,6 @@ import {
   Snackbar,
   Card,
   CardContent,
-  Chip,
   FormHelperText,
   Radio,
   RadioGroup,
@@ -40,8 +39,6 @@ import dayjs, { Dayjs } from "dayjs";
 import {
   DriveEta,
   Public as PublicIcon,
-  Security as SecurityIcon,
-  Speed as SpeedIcon,
   CheckCircle as CheckCircleIcon,
   AccountCircle,
   Description,
@@ -204,16 +201,7 @@ const validationSchema = yup.object({
 
 type IDPFormData = yup.InferType<typeof validationSchema>;
 
-const FeatureCard = styled(Card)(({ theme }) => ({
-  height: "100%",
-  transition: "all 0.3s ease-in-out",
-  border: `1px solid ${theme.palette.divider}`,
-  "&:hover": {
-    transform: "translateY(-4px)",
-    boxShadow: theme.shadows[8],
-    borderColor: theme.palette.primary.main,
-  },
-}));
+
 
 const StyledStepper = styled(Stepper)(({ theme }) => ({
   "& .MuiStepLabel-root .Mui-completed": {
@@ -286,25 +274,6 @@ const drivingPermitClasses = [
   { value: "D", label: "Class D - Heavy Motor Vehicles" },
   { value: "E", label: "Class E - Articulated Vehicles" },
   { value: "F", label: "Class F - Public Service Vehicles" },
-];
-
-const membershipBenefits = [
-  {
-    icon: <CardMembership sx={{ fontSize: 40, color: "primary.main" }} />,
-    title: "AA Member Rate",
-    description: "Pay only UGX 250,000 instead of UGX 350,000",
-    savings: "Save UGX 100,000",
-  },
-  {
-    icon: <SpeedIcon sx={{ fontSize: 40, color: "primary.main" }} />,
-    title: "Priority Processing",
-    description: "Faster processing times for AA members",
-  },
-  {
-    icon: <SecurityIcon sx={{ fontSize: 40, color: "primary.main" }} />,
-    title: "Additional Support",
-    description: "Access to AA roadside assistance and travel support",
-  },
 ];
 
 const ApplyForIdp: React.FC = () => {
@@ -926,52 +895,7 @@ const ApplyForIdp: React.FC = () => {
           </ContentContainer>
         </HeaderContainer>
 
-        {/* Membership Benefits Section */}
-        <Box sx={{ py: 6, backgroundColor: "grey.50" }}>
-          <Container maxWidth="lg">
-            <Box sx={{ textAlign: "center", mb: 4 }}>
-              <Heading variant="h3" align="center" gutterBottom>
-                Why Join AA Uganda?
-              </Heading>
-              <Typography variant="h6" color="text.secondary">
-                Enjoy exclusive benefits and significant savings as an AA member
-              </Typography>
-            </Box>
-
-            <Grid container spacing={3}>
-              {membershipBenefits.map((benefit, index) => (
-                <Grid item xs={12} md={4} key={index}>
-                  <FeatureCard>
-                    <CardContent sx={{ textAlign: "center", p: 3 }}>
-                      {benefit.icon}
-                      <Typography
-                        variant="h6"
-                        sx={{ mt: 2, mb: 1, fontWeight: 600 }}
-                      >
-                        {benefit.title}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{ mb: 2 }}
-                      >
-                        {benefit.description}
-                      </Typography>
-                      {"savings" in benefit && (
-                        <Chip
-                          label={benefit.savings}
-                          color="secondary"
-                          variant="filled"
-                          sx={{ fontWeight: 600 }}
-                        />
-                      )}
-                    </CardContent>
-                  </FeatureCard>
-                </Grid>
-              ))}
-            </Grid>
-          </Container>
-        </Box>
+       
 
         {/* Application Form Section */}
         <Box sx={{ py: 8 }}>
