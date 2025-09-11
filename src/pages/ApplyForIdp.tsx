@@ -1,7 +1,5 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
+import React from "react";
+import { Controller } from "react-hook-form";
 import {
   Box,
   Container,
@@ -72,137 +70,12 @@ import {
 import { DecorativeBackground, PhotoValidationDisplay } from "../components/molecules";
 import { SEO } from "../components/SEO";
 import { applyIdpSEO } from "../data/seoData";
-import { validatePassportPhoto } from "../utils/passportPhotoValidator";
-import type { PhotoValidationResult } from "../utils/passportPhotoValidator";
 import { passportPhotoRequirements } from "../utils/passportPhotoValidator";
-
-// File validation helpers
-const validateFile = (
-  file: File | null,
-  allowedTypes: string[],
-  maxSizeMB: number
-) => {
-  if (!file) return false;
-
-  const allowedMimeTypes = allowedTypes.map((type) => {
-    if (type === "pdf") return "application/pdf";
-    if (type === "jpg" || type === "jpeg") return "image/jpeg";
-    if (type === "png") return "image/png";
-    return type;
-  });
-
-  if (!allowedMimeTypes.includes(file.type)) return false;
-  if (file.size > maxSizeMB * 1024 * 1024) return false;
-
-  return true;
-};
-
-// Photo validation cache to avoid repeated computations
-interface PhotoValidationCache {
-  [fileHash: string]: {
-    validationResult: PhotoValidationResult;
-    timestamp: number;
-    fileName: string; // Store for debugging
-    fileSize: number; // Store for verification
-  };
-}
-
-// Create a unique file hash using file content
-const createFileHash = async (file: File): Promise<string> => {
-  const arrayBuffer = await file.arrayBuffer();
-  const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  return hashHex;
-};
-
-// Validation schema based on idp.md requirements
-const validationSchema = yup.object({
-  // Membership info
-  isMember: yup.boolean().required("Please specify if you are an AA member"),
-  membershipNumber: yup.string().when("isMember", {
-    is: true,
-    then: (schema) =>
-      schema.required("Membership number is required for AA members"),
-    otherwise: (schema) => schema.notRequired(),
-  }),
-
-  // Personal information
-  surname: yup.string().required("Surname is required"),
-  otherNames: yup.string().required("Other names are required"),
-  dateOfBirth: yup
-    .date()
-    .nullable()
-    .required("Date of birth is required")
-    .max(new Date(), "Date of birth cannot be in the future"),
-  placeOfBirth: yup.string().required("Place of birth is required"),
-
-  // Contact information
-  postalAddress: yup.string().required("Postal address is required"),
-  emailAddress: yup
-    .string()
-    .email("Invalid email format")
-    .required("Email address is required"),
-  telephoneNumber: yup.string().required("Telephone number is required"),
-  mobileNumber: yup.string().required("Mobile number is required"),
-  residentialAddress: yup.string().required("Residential address is required"),
-  streetRoadPlot: yup.string().required("Street/Road/Plot is required"),
-
-  // Passport and visa information
-  passportNumber: yup.string().required("Passport number is required"),
-  countryOfAcquiredVisa: yup
-    .string()
-    .required("Country of acquired visa is required"),
-
-  // File uploads
-  passportBioDataPage: yup
-    .mixed<File>()
-    .required("Passport bio-data page is required")
-    .test("fileType", "Only PDF files are allowed", (value) => {
-      if (!value) return false;
-      return validateFile(value as File, ["pdf"], 5);
-    }),
-
-  visaCopy: yup
-    .mixed<File>()
-    .required("Visa copy is required")
-    .test("fileType", "Only PDF files are allowed", (value) => {
-      if (!value) return false;
-      return validateFile(value as File, ["pdf"], 5);
-    }),
-
-  passportPhoto: yup
-    .mixed<File>()
-    .required("Passport photo is required")
-    .test("fileType", "Only PNG, JPG, or JPEG images are allowed", (value) => {
-      if (!value) return false;
-      return validateFile(value as File, ["png", "jpg", "jpeg"], 2);
-    }),
-
-  // Driving license information
-  ugandaDrivingPermitNumber: yup
-    .string()
-    .required("Uganda driving permit number is required"),
-  expiryDateOfDrivingPermit: yup
-    .date()
-    .nullable()
-    .required("Expiry date of driving permit is required")
-    .min(new Date(), "Driving permit must be valid"),
-  classesOfDrivingPermit: yup
-    .array()
-    .of(yup.string().required())
-    .min(1, "At least one driving permit class is required"),
-
-  // Terms and declaration
-  termsAccepted: yup
-    .boolean()
-    .oneOf([true], "You must accept the terms and conditions"),
-  declarationAccepted: yup
-    .boolean()
-    .oneOf([true], "You must confirm the declaration"),
-});
-
-type IDPFormData = yup.InferType<typeof validationSchema>;
+import useApplyForIdp, { 
+  type IDPFormData, 
+  drivingPermitClasses, 
+  membershipBenefits 
+} from "../hooks/useApplyForIdp";
 
 const FeatureCard = styled(Card)(({ theme }) => ({
   height: "100%",
@@ -279,402 +152,41 @@ const PhotoPreview = styled(Box)(({ theme }) => ({
   },
 }));
 
-const drivingPermitClasses = [
-  { value: "A", label: "Class A - Motorcycles" },
-  { value: "B", label: "Class B - Light Motor Vehicles" },
-  { value: "C", label: "Class C - Medium Motor Vehicles" },
-  { value: "D", label: "Class D - Heavy Motor Vehicles" },
-  { value: "E", label: "Class E - Articulated Vehicles" },
-  { value: "F", label: "Class F - Public Service Vehicles" },
-];
-
-const membershipBenefits = [
-  {
-    icon: <CardMembership sx={{ fontSize: 40, color: "primary.main" }} />,
-    title: "AA Member Rate",
-    description: "Pay only UGX 250,000 instead of UGX 350,000",
-    savings: "Save UGX 100,000",
-  },
-  {
-    icon: <SpeedIcon sx={{ fontSize: 40, color: "primary.main" }} />,
-    title: "Priority Processing",
-    description: "Faster processing times for AA members",
-  },
-  {
-    icon: <SecurityIcon sx={{ fontSize: 40, color: "primary.main" }} />,
-    title: "Additional Support",
-    description: "Access to AA roadside assistance and travel support",
-  },
-];
-
 const ApplyForIdp: React.FC = () => {
-  const [activeStep, setActiveStep] = useState(0);
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [alertSeverity, setAlertSeverity] = useState<
-    "success" | "warning" | "error"
-  >("success");
-  
-  // Photo validation cache to avoid repeated computations
-  const [photoValidationCache, setPhotoValidationCache] = useState<PhotoValidationCache>({});
-  
-  // Photo validation state
-  const [photoValidationState, setPhotoValidationState] = useState<{
-    isValidating: boolean;
-    validationResult: PhotoValidationResult | null;
-    showValidationDetails: boolean;
-    isPhotoValid: boolean; // Track if current photo passes validation
-  }>({
-    isValidating: false,
-    validationResult: null,
-    showValidationDetails: false,
-    isPhotoValid: false,
-  });
-
-  // Photo requirements state
-  const [showPhotoRequirements, setShowPhotoRequirements] = useState(false);
-
-  // URL management for object URLs to prevent memory leaks
-  const objectUrlsRef = useRef<Map<string, string>>(new Map());
-  
-  // Cleanup all object URLs when component unmounts
-  useEffect(() => {
-    return () => {
-      objectUrlsRef.current.forEach((url) => {
-        URL.revokeObjectURL(url);
-      });
-      objectUrlsRef.current.clear();
-    };
-  }, []);
-
-  // Create and manage object URLs with automatic cleanup
-  const createManagedImageUrl = useCallback((file: File): string => {
-    const fileKey = `${file.name}-${file.size}-${file.lastModified}`;
-    
-    // Check if we already have a URL for this file
-    const existingUrl = objectUrlsRef.current.get(fileKey);
-    if (existingUrl) {
-      return existingUrl;
-    }
-    
-    // Create new URL and store it
-    const url = URL.createObjectURL(file);
-    objectUrlsRef.current.set(fileKey, url);
-    
-    return url;
-  }, []);
-
-  // Clean up specific file URL
-  const revokeManagedImageUrl = useCallback((file: File) => {
-    const fileKey = `${file.name}-${file.size}-${file.lastModified}`;
-    const url = objectUrlsRef.current.get(fileKey);
-    
-    if (url) {
-      URL.revokeObjectURL(url);
-      objectUrlsRef.current.delete(fileKey);
-    }
-  }, []);
-
   const {
+    // State
+    activeStep,
+    showAlert,
+    alertMessage,
+    alertSeverity,
+    photoValidationState,
+    showPhotoRequirements,
+    steps,
+    
+    // Form
     control,
     handleSubmit,
     watch,
-    formState: { errors, isSubmitting },
-    trigger,
-    setValue,
-  } = useForm<IDPFormData>({
-    resolver: yupResolver(validationSchema) as any,
-    defaultValues: {
-      isMember: false,
-      membershipNumber: "",
-      surname: "",
-      otherNames: "",
-      dateOfBirth: undefined,
-      placeOfBirth: "",
-      postalAddress: "",
-      emailAddress: "",
-      telephoneNumber: "",
-      mobileNumber: "",
-      residentialAddress: "",
-      streetRoadPlot: "",
-      passportNumber: "",
-      countryOfAcquiredVisa: "",
-      passportBioDataPage: undefined,
-      visaCopy: undefined,
-      passportPhoto: undefined,
-      ugandaDrivingPermitNumber: "",
-      expiryDateOfDrivingPermit: undefined,
-      classesOfDrivingPermit: [],
-      termsAccepted: false,
-      declarationAccepted: false,
-    },
-    mode: "onChange",
-  });
-
-  const watchedIsMember = watch("isMember");
-  const watchedFormData = watch();
-
-  const steps = [
-    "Membership & Personal Info",
-    "Contact Details",
-    "Passport & Visa Info",
-    "Document Upload",
-    "Driving License Details",
-    "Declaration & Submit",
-  ];
-
-  const showAlertMessage = (
-    message: string,
-    severity: "success" | "warning" | "error" = "success"
-  ) => {
-    setAlertMessage(message);
-    setAlertSeverity(severity);
-    setShowAlert(true);
-  };
-
-  const handleNext = async () => {
-    let fieldsToValidate: (keyof IDPFormData)[] = [];
-
-    switch (activeStep) {
-      case 0:
-        fieldsToValidate = [
-          "isMember",
-          "surname",
-          "otherNames",
-          "dateOfBirth",
-          "placeOfBirth",
-        ];
-        if (watchedIsMember) fieldsToValidate.push("membershipNumber");
-        break;
-      case 1:
-        fieldsToValidate = [
-          "postalAddress",
-          "emailAddress",
-          "telephoneNumber",
-          "mobileNumber",
-          "residentialAddress",
-          "streetRoadPlot",
-        ];
-        break;
-      case 2:
-        fieldsToValidate = ["passportNumber", "countryOfAcquiredVisa"];
-        break;
-      case 3:
-        fieldsToValidate = ["passportBioDataPage", "visaCopy", "passportPhoto"];
-        
-        // Additional check for passport photo validation
-        const passportPhoto = watch("passportPhoto") as File | undefined;
-        if (passportPhoto) {
-          // Check if we have a valid validation result for the current photo
-          if (!photoValidationState.isPhotoValid || photoValidationState.isValidating) {
-            showAlertMessage(
-              photoValidationState.isValidating 
-                ? "Please wait for photo validation to complete"
-                : "Please upload a valid passport photo that meets all requirements",
-              "warning"
-            );
-            return;
-          }
-          
-          // Additional safety check: ensure validation result exists
-          if (!photoValidationState.validationResult) {
-            showAlertMessage(
-              "Photo validation incomplete. Please re-upload your photo.",
-              "warning"
-            );
-            return;
-          }
-        }
-        break;
-      case 4:
-        fieldsToValidate = [
-          "ugandaDrivingPermitNumber",
-          "expiryDateOfDrivingPermit",
-          "classesOfDrivingPermit",
-        ];
-        break;
-      case 5:
-        fieldsToValidate = ["termsAccepted", "declarationAccepted"];
-        break;
-    }
-
-    const isStepValid = await trigger(fieldsToValidate);
-
-    if (!isStepValid) {
-      showAlertMessage(
-        "Please fill in all required fields correctly",
-        "warning"
-      );
-      return;
-    }
-
-    if (activeStep === steps.length - 1) {
-      handleFormSubmit(watchedFormData);
-    } else {
-      setActiveStep((prev) => prev + 1);
-    }
-  };
-
-  const handleBack = () => {
-    setActiveStep((prev) => prev - 1);
-  };
-
-  const handleFormSubmit = async (data: IDPFormData) => {
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      showAlertMessage(
-        "Application submitted successfully! You will receive a confirmation email shortly.",
-        "success"
-      );
-      console.log("Form submitted:", data);
-
-      // In a real app, you would submit to your backend here
-    } catch (error) {
-      showAlertMessage(
-        "Failed to submit application. Please try again.",
-        "error"
-      );
-    }
-  };
-
-  const applicationFee = watchedIsMember ? 250000 : 350000;
-
-  // File handling functions
-  const handleFileUpload = async (fieldName: keyof IDPFormData, file: File) => {
-    setValue(fieldName, file, { shouldValidate: true });
+    errors,
+    isSubmitting,
+    watchedIsMember,
     
-    // If it's a passport photo, validate it with content-based caching
-    if (fieldName === 'passportPhoto') {
-      // Start validation immediately (show loading state)
-      setPhotoValidationState(prev => ({
-        ...prev,
-        isValidating: true,
-        validationResult: null,
-        isPhotoValid: false,
-      }));
-      
-      try {
-        // Generate file hash for accurate caching
-        const fileHash = await createFileHash(file);
-        
-        // Check cache with hash-based key
-        const cachedResult = photoValidationCache[fileHash];
-        const cacheValidityPeriod = 10 * 60 * 1000; // 10 minutes
-        const now = Date.now();
-        
-        // Verify cache entry is still valid and matches current file
-        if (cachedResult && 
-            (now - cachedResult.timestamp) < cacheValidityPeriod &&
-            cachedResult.fileSize === file.size) {
-          
-          // Use cached result
-          setPhotoValidationState({
-            isValidating: false,
-            validationResult: cachedResult.validationResult,
-            showValidationDetails: true,
-            isPhotoValid: cachedResult.validationResult.isValid,
-          });
-          
-          if (!cachedResult.validationResult.isValid) {
-            showAlertMessage(
-              `Photo validation failed: ${cachedResult.validationResult.errors[0] || 'Please check photo requirements'}`,
-              "warning"
-            );
-          } else {
-            showAlertMessage("Photo validation passed! (from cache)", "success");
-          }
-          return;
-        }
-        
-        // Perform fresh validation
-        const validationResult = await validatePassportPhoto(file);
-        
-        // Cache the result with file hash
-        setPhotoValidationCache(prev => {
-          // Clean up old cache entries (keep only last 10 entries to prevent memory issues)
-          const entries = Object.entries(prev);
-          const sortedEntries = entries.sort((a, b) => b[1].timestamp - a[1].timestamp);
-          const recentEntries = sortedEntries.slice(0, 9); // Keep 9, add 1 new = 10 total
-          
-          const cleanedCache = Object.fromEntries(recentEntries);
-          
-          return {
-            ...cleanedCache,
-            [fileHash]: {
-              validationResult,
-              timestamp: now,
-              fileName: file.name,
-              fileSize: file.size,
-            }
-          };
-        });
-        
-        setPhotoValidationState({
-          isValidating: false,
-          validationResult,
-          showValidationDetails: true,
-          isPhotoValid: validationResult.isValid,
-        });
-        
-        if (!validationResult.isValid) {
-          showAlertMessage(
-            `Photo validation failed: ${validationResult.errors[0] || 'Please check photo requirements'}`,
-            "warning"
-          );
-        } else {
-          showAlertMessage("Photo validation passed!", "success");
-        }
-      } catch (error) {
-        console.error('Photo validation error:', error);
-        setPhotoValidationState({
-          isValidating: false,
-          validationResult: null,
-          showValidationDetails: false,
-          isPhotoValid: false,
-        });
-        showAlertMessage("Failed to validate photo. Please try again.", "error");
-      }
-    }
-  };
-
-  const handleFileRemove = (fieldName: keyof IDPFormData) => {
-    // Get the current file before removing it to clean up its URL
-    const currentFile = watch(fieldName) as File | undefined;
-    if (currentFile) {
-      revokeManagedImageUrl(currentFile);
-    }
+    // Computed values
+    applicationFee,
     
-    setValue(fieldName, undefined, { shouldValidate: true });
+    // Handlers
+    handleNext,
+    handleBack,
+    handleFormSubmit,
+    handleFileUpload,
+    handleFileRemove,
+    createImagePreviewUrl,
+    formatFileSize,
     
-    // Clear photo validation state when removing passport photo
-    if (fieldName === 'passportPhoto') {
-      setPhotoValidationState({
-        isValidating: false,
-        validationResult: null,
-        showValidationDetails: false,
-        isPhotoValid: false,
-      });
-      
-      // Optional: Clear relevant cache entries to prevent confusion
-      // Note: We don't clear the entire cache as other uploaded files might still be valid
-      // The cache will naturally expire or be cleaned up by the LRU mechanism
-    }
-  };
-
-  // Legacy function name kept for backward compatibility, now uses managed URLs
-  const createImagePreviewUrl = (file: File): string => {
-    return createManagedImageUrl(file);
-  };
-
-  const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return "0 Bytes";
-    const k = 1024;
-    const sizes = ["Bytes", "KB", "MB", "GB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-  };
+    // State setters
+    setShowAlert,
+    setShowPhotoRequirements,
+  } = useApplyForIdp();
 
   // File Upload Component
   const FileUploadField: React.FC<{
@@ -939,36 +451,45 @@ const ApplyForIdp: React.FC = () => {
             </Box>
 
             <Grid container spacing={3}>
-              {membershipBenefits.map((benefit, index) => (
-                <Grid item xs={12} md={4} key={index}>
-                  <FeatureCard>
-                    <CardContent sx={{ textAlign: "center", p: 3 }}>
-                      {benefit.icon}
-                      <Typography
-                        variant="h6"
-                        sx={{ mt: 2, mb: 1, fontWeight: 600 }}
-                      >
-                        {benefit.title}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{ mb: 2 }}
-                      >
-                        {benefit.description}
-                      </Typography>
-                      {"savings" in benefit && (
-                        <Chip
-                          label={benefit.savings}
-                          color="secondary"
-                          variant="filled"
-                          sx={{ fontWeight: 600 }}
-                        />
-                      )}
-                    </CardContent>
-                  </FeatureCard>
-                </Grid>
-              ))}
+              {membershipBenefits.map((benefit, index) => {
+                // Render the appropriate icon based on the icon name
+                const IconComponent = 
+                  benefit.icon === "CardMembership" ? CardMembership :
+                  benefit.icon === "SpeedIcon" ? SpeedIcon :
+                  benefit.icon === "SecurityIcon" ? SecurityIcon :
+                  CardMembership; // fallback
+                
+                return (
+                  <Grid item xs={12} md={4} key={index}>
+                    <FeatureCard>
+                      <CardContent sx={{ textAlign: "center", p: 3 }}>
+                        <IconComponent sx={{ fontSize: 40, color: "primary.main" }} />
+                        <Typography
+                          variant="h6"
+                          sx={{ mt: 2, mb: 1, fontWeight: 600 }}
+                        >
+                          {benefit.title}
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ mb: 2 }}
+                        >
+                          {benefit.description}
+                        </Typography>
+                        {"savings" in benefit && (
+                          <Chip
+                            label={benefit.savings}
+                            color="secondary"
+                            variant="filled"
+                            sx={{ fontWeight: 600 }}
+                          />
+                        )}
+                      </CardContent>
+                    </FeatureCard>
+                  </Grid>
+                );
+              })}
             </Grid>
           </Container>
         </Box>
@@ -1157,7 +678,7 @@ const ApplyForIdp: React.FC = () => {
                                 <TextField
                                   {...field}
                                   fullWidth
-                                  label="Surname *"
+                                  label="First Name *"
                                   error={!!error}
                                   helperText={error?.message}
                                   InputProps={{
@@ -1180,7 +701,7 @@ const ApplyForIdp: React.FC = () => {
                                 <TextField
                                   {...field}
                                   fullWidth
-                                  label="Other Names *"
+                                  label="Last Name *"
                                   error={!!error}
                                   helperText={error?.message}
                                   InputProps={{
