@@ -25,6 +25,7 @@ import {
   Contact,
   InternationalDrivingPermit,
   ApplyForIdp,
+  IdpApplicationSuccess,
   VerifyIdp,
   VehicleValuation,
   FleetManagement,
@@ -247,6 +248,7 @@ const App: React.FC = () => {
                 <Route path="/membership" element={<MembershipPage />} />
                 <Route path="/idp" element={<InternationalDrivingPermit />} />
                 <Route path="/idp/apply" element={<ApplyForIdp />} />
+                <Route path="/idp/apply-success" element={<IdpApplicationSuccess />} />
                 <Route path="/idp/verify" element={<VerifyIdp />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/driving-school/about" element={

@@ -10,7 +10,6 @@ import {
   FormControlLabel,
   Checkbox,
   Alert,
-  Snackbar,
   Card,
   CardContent,
   Chip,
@@ -37,7 +36,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
 import {
   DriveEta,
-  Public as PublicIcon,
+
   Security as SecurityIcon,
   Speed as SpeedIcon,
   CheckCircle as CheckCircleIcon,
@@ -66,6 +65,7 @@ import {
   AnimatedTitle,
   AnimatedSubtitle,
   SectionDivider,
+  AlertNotification,
 } from "../components/atoms";
 import { DecorativeBackground, PhotoValidationDisplay } from "../components/molecules";
 import { SEO } from "../components/SEO";
@@ -159,6 +159,7 @@ const ApplyForIdp: React.FC = () => {
     showAlert,
     alertMessage,
     alertSeverity,
+    alertConfig,
     photoValidationState,
     showPhotoRequirements,
     steps,
@@ -958,30 +959,6 @@ const ApplyForIdp: React.FC = () => {
                               )}
                             />
                           </Grid>
-
-                          <Grid item xs={12} sm={6}>
-                            <Controller
-                              name="countryOfAcquiredVisa"
-                              control={control}
-                              render={({ field, fieldState: { error } }) => (
-                                <TextField
-                                  {...field}
-                                  fullWidth
-                                  label="Country of Acquired Visa *"
-                                  error={!!error}
-                                  helperText={error?.message}
-                                  placeholder="e.g., Kenya, Tanzania, Rwanda"
-                                  InputProps={{
-                                    startAdornment: (
-                                      <PublicIcon
-                                        sx={{ mr: 1, color: "text.secondary" }}
-                                      />
-                                    ),
-                                  }}
-                                />
-                              )}
-                            />
-                          </Grid>
                         </Grid>
 
                         <Alert severity="info" sx={{ mt: 3 }}>
@@ -1505,21 +1482,22 @@ const ApplyForIdp: React.FC = () => {
           </Container>
         </Box>
 
-        {/* Alert Snackbar */}
-        <Snackbar
+        {/* Enhanced Alert Notification - Top Right Positioning */}
+        <AlertNotification
           open={showAlert}
-          autoHideDuration={6000}
+          message={alertMessage}
+          severity={alertSeverity}
           onClose={() => setShowAlert(false)}
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        >
-          <Alert
-            onClose={() => setShowAlert(false)}
-            severity={alertSeverity}
-            sx={{ width: "100%" }}
-          >
-            {alertMessage}
-          </Alert>
-        </Snackbar>
+          autoHideDuration={alertConfig?.autoHideDuration || 6000}
+          position={
+            alertConfig?.anchorOrigin?.vertical === 'top' && alertConfig?.anchorOrigin?.horizontal === 'right' 
+              ? 'top-right'
+              : alertConfig?.anchorOrigin?.vertical === 'top' && alertConfig?.anchorOrigin?.horizontal === 'center'
+              ? 'top-center'
+              : 'bottom-center'
+          }
+          showCloseButton={alertConfig?.showCloseButton ?? true}
+        />
       </Box>
     </LocalizationProvider>
   );

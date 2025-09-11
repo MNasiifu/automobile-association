@@ -1,31 +1,15 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import { validatePassportPhoto } from "../utils/passportPhotoValidator";
 import type { PhotoValidationResult } from "../utils/passportPhotoValidator";
 import { applyForIdp } from "../api";
+import type { CreateMemberData, PendingIdpData } from "../types";
+import { concatenateWithCommas, formatDateToYYYYMMDD, getCurrentDateFormatted } from "../utils";
 
-// File validation helpers
-const validateFile = (
-  file: File | null,
-  allowedTypes: string[],
-  maxSizeMB: number
-) => {
-  if (!file) return false;
 
-  const allowedMimeTypes = allowedTypes.map((type) => {
-    if (type === "pdf") return "application/pdf";
-    if (type === "jpg" || type === "jpeg") return "image/jpeg";
-    if (type === "png") return "image/png";
-    return type;
-  });
-
-  if (!allowedMimeTypes.includes(file.type)) return false;
-  if (file.size > maxSizeMB * 1024 * 1024) return false;
-
-  return true;
-};
 
 // Photo validation cache to avoid repeated computations
 interface PhotoValidationCache {
@@ -80,34 +64,31 @@ const validationSchema = yup.object({
 
   // Passport and visa information
   passportNumber: yup.string().required("Passport number is required"),
-  countryOfAcquiredVisa: yup
-    .string()
-    .required("Country of acquired visa is required"),
 
   // File uploads
   passportBioDataPage: yup
-    .mixed<File>()
-    .required("Passport bio-data page is required")
-    .test("fileType", "Only PDF files are allowed", (value) => {
-      if (!value) return false;
-      return validateFile(value as File, ["pdf"], 5);
-    }),
+    .mixed<File>(),
+    // .required("Passport bio-data page is required")
+    // .test("fileType", "Only PDF files are allowed", (value) => {
+    //   if (!value) return false;
+    //   return validateFile(value as File, ["pdf"], 5);
+    // }),
 
   visaCopy: yup
-    .mixed<File>()
-    .required("Visa copy is required")
-    .test("fileType", "Only PDF files are allowed", (value) => {
-      if (!value) return false;
-      return validateFile(value as File, ["pdf"], 5);
-    }),
+    .mixed<File>(),
+    // .required("Visa copy is required")
+    // .test("fileType", "Only PDF files are allowed", (value) => {
+    //   if (!value) return false;
+    //   return validateFile(value as File, ["pdf"], 5);
+    // }),
 
   passportPhoto: yup
-    .mixed<File>()
-    .required("Passport photo is required")
-    .test("fileType", "Only PNG, JPG, or JPEG images are allowed", (value) => {
-      if (!value) return false;
-      return validateFile(value as File, ["png", "jpg", "jpeg"], 2);
-    }),
+    .mixed<File>(),
+    // .required("Passport photo is required")
+    // .test("fileType", "Only PNG, JPG, or JPEG images are allowed", (value) => {
+    //   if (!value) return false;
+    //   return validateFile(value as File, ["png", "jpg", "jpeg"], 2);
+    // }),
 
   // Driving license information
   ugandaDrivingPermitNumber: yup
@@ -163,6 +144,9 @@ export const membershipBenefits = [
 ];
 
 const useApplyForIdp = () => {
+  // Navigation hook
+  const navigate = useNavigate();
+  
   // State management
   const [activeStep, setActiveStep] = useState(0);
   const [showAlert, setShowAlert] = useState(false);
@@ -170,6 +154,20 @@ const useApplyForIdp = () => {
   const [alertSeverity, setAlertSeverity] = useState<
     "success" | "warning" | "error"
   >("success");
+  
+  // Enhanced alert configuration for better UX
+  const [alertConfig, setAlertConfig] = useState<{
+    autoHideDuration: number | null;
+    anchorOrigin: { 
+      vertical: "top" | "bottom"; 
+      horizontal: "left" | "center" | "right" 
+    };
+    showCloseButton: boolean;
+  }>({
+    autoHideDuration: 6000,
+    anchorOrigin: { vertical: "top", horizontal: "right" },
+    showCloseButton: true,
+  });
   
   // Photo validation cache to avoid repeated computations
   const [photoValidationCache, setPhotoValidationCache] = useState<PhotoValidationCache>({});
@@ -201,6 +199,7 @@ const useApplyForIdp = () => {
     formState: { errors, isSubmitting },
     trigger,
     setValue,
+    reset,
   } = useForm<IDPFormData>({
     resolver: yupResolver(validationSchema) as any,
     defaultValues: {
@@ -217,7 +216,6 @@ const useApplyForIdp = () => {
       residentialAddress: "",
       streetRoadPlot: "",
       passportNumber: "",
-      countryOfAcquiredVisa: "",
       passportBioDataPage: undefined,
       visaCopy: undefined,
       passportPhoto: undefined,
@@ -281,14 +279,35 @@ const useApplyForIdp = () => {
     }
   }, []);
 
-  // Alert management
+  // Enhanced alert management with top-right positioning
   const showAlertMessage = (
     message: string,
-    severity: "success" | "warning" | "error" = "success"
+    severity: "success" | "warning" | "error" = "success",
+    options?: {
+      autoHideDuration?: number;
+      position?: "top-right" | "top-center" | "bottom-center";
+      persistent?: boolean;
+    }
   ) => {
     setAlertMessage(message);
     setAlertSeverity(severity);
     setShowAlert(true);
+    
+    // Update alert configuration based on options
+    const position = options?.position || "top-right";
+    const duration = options?.persistent ? null : (options?.autoHideDuration || 6000);
+    
+    const anchorConfig = {
+      "top-right": { vertical: "top" as const, horizontal: "right" as const },
+      "top-center": { vertical: "top" as const, horizontal: "center" as const },
+      "bottom-center": { vertical: "bottom" as const, horizontal: "center" as const },
+    };
+    
+    setAlertConfig({
+      autoHideDuration: duration,
+      anchorOrigin: anchorConfig[position],
+      showCloseButton: true,
+    });
   };
 
   // Navigation handlers
@@ -317,34 +336,34 @@ const useApplyForIdp = () => {
         ];
         break;
       case 2:
-        fieldsToValidate = ["passportNumber", "countryOfAcquiredVisa"];
+        fieldsToValidate = ["passportNumber"];
         break;
       case 3:
         fieldsToValidate = ["passportBioDataPage", "visaCopy", "passportPhoto"];
         
         // Additional check for passport photo validation
-        const passportPhoto = watch("passportPhoto") as File | undefined;
-        if (passportPhoto) {
-          // Check if we have a valid validation result for the current photo
-          if (!photoValidationState.isPhotoValid || photoValidationState.isValidating) {
-            showAlertMessage(
-              photoValidationState.isValidating 
-                ? "Please wait for photo validation to complete"
-                : "Please upload a valid passport photo that meets all requirements",
-              "warning"
-            );
-            return;
-          }
+        // const passportPhoto = watch("passportPhoto") as File | undefined;
+        // if (passportPhoto) {
+        //   // Check if we have a valid validation result for the current photo
+        //   if (!photoValidationState.isPhotoValid || photoValidationState.isValidating) {
+        //     showAlertMessage(
+        //       photoValidationState.isValidating 
+        //         ? "Please wait for photo validation to complete"
+        //         : "Please upload a valid passport photo that meets all requirements",
+        //       "warning"
+        //     );
+        //     return;
+        //   }
           
-          // Additional safety check: ensure validation result exists
-          if (!photoValidationState.validationResult) {
-            showAlertMessage(
-              "Photo validation incomplete. Please re-upload your photo.",
-              "warning"
-            );
-            return;
-          }
-        }
+        //   // Additional safety check: ensure validation result exists
+        //   if (!photoValidationState.validationResult) {
+        //     showAlertMessage(
+        //       "Photo validation incomplete. Please re-upload your photo.",
+        //       "warning"
+        //     );
+        //     return;
+        //   }
+        // }
         break;
       case 4:
         fieldsToValidate = [
@@ -363,7 +382,8 @@ const useApplyForIdp = () => {
     if (!isStepValid) {
       showAlertMessage(
         "Please fill in all required fields correctly",
-        "warning"
+        "warning",
+        { position: "top-right", autoHideDuration: 5000 }
       );
       return;
     }
@@ -381,23 +401,93 @@ const useApplyForIdp = () => {
 
   // Form submission handler
   const handleFormSubmit = async (data: IDPFormData) => {
-    console.log("Form submitted:", data);
-    // try {
-    //   await applyForIdp(data);
+    const currentDate = getCurrentDateFormatted();
 
-    //   showAlertMessage(
-    //     "Application submitted successfully! An AAU member will review and approve your IDP.",
-    //     "success"
-    //   );
+    const { membershipNumber, surname, otherNames, dateOfBirth,classesOfDrivingPermit, expiryDateOfDrivingPermit, placeOfBirth, postalAddress, emailAddress, telephoneNumber, mobileNumber, residentialAddress, streetRoadPlot, ugandaDrivingPermitNumber, passportNumber } = data;
 
-    //   // In a real app, you would submit to your backend here
-    // } catch (error: unknown) {
-    //     console.log("::debug error:",error);
-    //   showAlertMessage(
-    //     `${error || "Failed to submit application. Please try again."}`,
-    //     "error"
-    //   );
-    // }
+    const expiryDate = formatDateToYYYYMMDD(expiryDateOfDrivingPermit);
+    const formatedDob = formatDateToYYYYMMDD(dateOfBirth);
+    const clientClasses = concatenateWithCommas(classesOfDrivingPermit ?? ["B"]);
+    const currentDateTimeStamp = new Date().getTime();
+
+    const memberPostData: CreateMemberData = {
+        aa_member_no: membershipNumber ? Number(membershipNumber) : null,
+        surname: surname,
+        onames: otherNames,
+        paddress: postalAddress,
+        email: emailAddress,
+        tel: telephoneNumber,
+        mobile: mobileNumber,
+        passport: passportNumber,
+        raddress: residentialAddress,
+        street: streetRoadPlot,
+        pob: placeOfBirth,
+        dob: formatedDob,
+        licence: ugandaDrivingPermitNumber,
+        classes: clientClasses,
+        e_date: expiryDate,
+        pp_photo: null,
+        p_date: currentDate,
+    };
+
+    const pendingIdpPostData: PendingIdpData = {
+        status: "pending",
+        application_date: currentDate,
+        application_date_tz: currentDateTimeStamp,
+    }
+
+    try {
+      await applyForIdp(memberPostData, pendingIdpPostData);
+
+      // Reset the form to initial state
+      reset();
+      
+      // Reset step to first step
+      setActiveStep(0);
+      
+      // Clear photo validation state
+      setPhotoValidationState({
+        isValidating: false,
+        validationResult: null,
+        showValidationDetails: false,
+        isPhotoValid: false,
+      });
+      
+      // Clear photo validation cache
+      setPhotoValidationCache({});
+      
+      // Clean up all object URLs
+      objectUrlsRef.current.forEach((url) => {
+        URL.revokeObjectURL(url);
+      });
+      objectUrlsRef.current.clear();
+
+      // Show success alert briefly before navigation
+      showAlertMessage(
+        "Application submitted successfully! Redirecting to confirmation page...",
+        "success",
+        { position: "top-right", autoHideDuration: 2000 }
+      );
+
+      // Navigate to success page after a short delay
+      setTimeout(() => {
+        navigate("/idp/apply-success", { 
+          state: { 
+            applicantName: `${surname} ${otherNames}`,
+            applicationDate: currentDate,
+            email: emailAddress 
+          } 
+        });
+      }, 2000);
+      
+    } catch (error: unknown) {
+        console.log("::debug error:",error);
+      showAlertMessage(
+        `${error || "Failed to submit application. Please try again."}`,
+        "error",
+        { position: "top-right", autoHideDuration: 10000 }
+      );
+    }
   };
 
   // File handling functions
@@ -439,16 +529,22 @@ const useApplyForIdp = () => {
           if (!cachedResult.validationResult.isValid) {
             showAlertMessage(
               `Photo validation failed: ${cachedResult.validationResult.errors[0] || 'Please check photo requirements'}`,
-              "warning"
+              "warning",
+              { position: "top-right", autoHideDuration: 8000 }
             );
           } else {
-            showAlertMessage("Photo validation passed! (from cache)", "success");
+            showAlertMessage(
+              "Photo validation passed! (from cache)", 
+              "success",
+              { position: "top-right", autoHideDuration: 3000 }
+            );
           }
           return;
         }
         
         // Perform fresh validation
         const validationResult = await validatePassportPhoto(file);
+        console.log("::debug validationResult:", validationResult);
         
         // Cache the result with file hash
         setPhotoValidationCache(prev => {
@@ -480,10 +576,15 @@ const useApplyForIdp = () => {
         if (!validationResult.isValid) {
           showAlertMessage(
             `Photo validation failed: ${validationResult.errors[0] || 'Please check photo requirements'}`,
-            "warning"
+            "warning",
+            { position: "top-right", autoHideDuration: 8000 }
           );
         } else {
-          showAlertMessage("Photo validation passed!", "success");
+          showAlertMessage(
+            "Photo validation passed!", 
+            "success",
+            { position: "top-right", autoHideDuration: 4000 }
+          );
         }
       } catch (error) {
         console.error('Photo validation error:', error);
@@ -493,7 +594,11 @@ const useApplyForIdp = () => {
           showValidationDetails: false,
           isPhotoValid: false,
         });
-        showAlertMessage("Failed to validate photo. Please try again.", "error");
+        showAlertMessage(
+          "Failed to validate photo. Please try again.", 
+          "error",
+          { position: "top-right", autoHideDuration: 6000 }
+        );
       }
     }
   };
@@ -544,6 +649,7 @@ const useApplyForIdp = () => {
     showAlert,
     alertMessage,
     alertSeverity,
+    alertConfig,
     photoValidationState,
     showPhotoRequirements,
     steps,
@@ -556,6 +662,7 @@ const useApplyForIdp = () => {
     isSubmitting,
     trigger,
     setValue,
+    reset,
     watchedIsMember,
     watchedFormData,
     

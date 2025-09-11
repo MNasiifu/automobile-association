@@ -11,7 +11,6 @@ export const validateMemberData = (memberData: CreateMemberData): { isValid: boo
     const errors: string[] = [];
 
     // Required field validations
-    if (!memberData.aa_member_no) errors.push('AA member number is required');
     if (!memberData.surname) errors.push('Surname is required');
     if (!memberData.onames) errors.push('Other names are required');
     if (!memberData.email) errors.push('Email is required');
@@ -77,7 +76,7 @@ export const getAAUMemberByNumber = async (memberNumber: number) => {
 export const applyForIdp = async (
     memberData: CreateMemberData, 
     pendingIdpData: PendingIdpData
-): Promise<CreateMemberResponse> => {
+) => {
     try {
         // Validate data before insertion
         const validation = validateMemberData(memberData);
@@ -99,25 +98,6 @@ export const applyForIdp = async (
                 error: error?.message || data[0]?.error_message || 'Idp application failed'
             };
         }
-
-        // Fetch the created member data
-        const { data: memberResult, error: fetchError } = await supabase
-            .from('member')
-            .select('*')
-            .eq('member_id', data[0]?.member_id)
-            .single();
-
-        if (fetchError) {
-            return {
-                data: null,
-                error: fetchError.message
-            };
-        }
-
-        return {
-            data: memberResult,
-            error: null
-        };
     } catch (error) {
         return {
             data: null,
