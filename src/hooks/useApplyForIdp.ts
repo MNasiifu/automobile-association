@@ -21,6 +21,27 @@ interface PhotoValidationCache {
   };
 }
 
+// File validation helpers
+const validateFile = (
+    file: File | null,
+    allowedTypes: string[],
+    maxSizeMB: number
+  ) => {
+    if (!file) return false;
+  
+    const allowedMimeTypes = allowedTypes.map((type) => {
+      if (type === "pdf") return "application/pdf";
+      if (type === "jpg" || type === "jpeg") return "image/jpeg";
+      if (type === "png") return "image/png";
+      return type;
+    });
+  
+    if (!allowedMimeTypes.includes(file.type)) return false;
+    if (file.size > maxSizeMB * 1024 * 1024) return false;
+  
+    return true;
+  };
+
 // Create a unique file hash using file content
 const createFileHash = async (file: File): Promise<string> => {
   const arrayBuffer = await file.arrayBuffer();
@@ -67,28 +88,28 @@ const validationSchema = yup.object({
 
   // File uploads
   passportBioDataPage: yup
-    .mixed<File>(),
-    // .required("Passport bio-data page is required")
-    // .test("fileType", "Only PDF files are allowed", (value) => {
-    //   if (!value) return false;
-    //   return validateFile(value as File, ["pdf"], 5);
-    // }),
+    .mixed<File>()
+    .required("Passport bio-data page is required")
+    .test("fileType", "Only PDF files are allowed", (value) => {
+      if (!value) return false;
+      return validateFile(value as File, ["pdf"], 5);
+    }),
 
   visaCopy: yup
-    .mixed<File>(),
-    // .required("Visa copy is required")
-    // .test("fileType", "Only PDF files are allowed", (value) => {
-    //   if (!value) return false;
-    //   return validateFile(value as File, ["pdf"], 5);
-    // }),
+    .mixed<File>()
+    .required("Visa copy is required")
+    .test("fileType", "Only PDF files are allowed", (value) => {
+      if (!value) return false;
+      return validateFile(value as File, ["pdf"], 5);
+    }),
 
   passportPhoto: yup
-    .mixed<File>(),
-    // .required("Passport photo is required")
-    // .test("fileType", "Only PNG, JPG, or JPEG images are allowed", (value) => {
-    //   if (!value) return false;
-    //   return validateFile(value as File, ["png", "jpg", "jpeg"], 2);
-    // }),
+    .mixed<File>()
+    .required("Passport photo is required")
+    .test("fileType", "Only PNG, JPG, or JPEG images are allowed", (value) => {
+      if (!value) return false;
+      return validateFile(value as File, ["png", "jpg", "jpeg"], 2);
+    }),
 
   // Driving license information
   ugandaDrivingPermitNumber: yup

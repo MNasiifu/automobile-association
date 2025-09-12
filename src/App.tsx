@@ -1,4 +1,4 @@
-import React, { useState, Suspense } from 'react';
+import React, { useState, Suspense, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, Link } from 'react-router-dom';
 import { HelmetProvider } from '@dr.pogodin/react-helmet';
 import { 
@@ -43,6 +43,7 @@ import {
 import { navigationItems } from './data/companyData';
 import * as Icons from '@mui/icons-material';
 import type { NavItem } from './types/navigation';
+import { preloadFaceApiModels } from './utils/passportPhotoValidator';
 
 // Mobile Menu Component
 const MobileMenu: React.FC<{ open: boolean; onClose: () => void }> = ({ open, onClose }) => {
@@ -196,6 +197,11 @@ const MobileMenu: React.FC<{ open: boolean; onClose: () => void }> = ({ open, on
 
 const App: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Preload face-api models early in the app lifecycle
+  useEffect(() => {
+    preloadFaceApiModels();
+  }, []);
 
   const handleMobileMenuToggle = () => {
     setMobileMenuOpen(!mobileMenuOpen);
