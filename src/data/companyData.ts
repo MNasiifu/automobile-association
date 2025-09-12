@@ -1,5 +1,21 @@
-// Company information and static data for AA Uganda
+
 import fiaImage from '../assets/images/FIA.jpeg';
+import type {  NavItem } from '../types/navigation';
+import felixImg from '../assets/images/people/Felix.jpeg';
+import edirisaImg from '../assets/images/people/Idrisi-AAU.jpeg';
+import maureenImg from '../assets/images/people/Maureen.jpeg';
+import richardImg from '../assets/images/people/Richard.jpeg';
+import robinaImg from '../assets/images/people/Robina.jpeg';
+import margretImg from '../assets/images/people/Margret.jpeg';
+
+// Person type and management array
+export type Person = {
+  name: string;
+  role: string;
+  img?: string;
+  category?: string;
+};
+
 export const companyInfo = {
   name: "Automobile Association of Uganda",
   phrase: "Inspring Mobility",
@@ -40,45 +56,45 @@ export const companyInfo = {
   ],
 };
 
-import type {  NavItem } from '../types/navigation';
-// Company information and static data for AA Uganda
-import felixImg from '../assets/images/people/Felix.jpeg';
-import edirisaImg from '../assets/images/people/Idrisi-AAU.jpeg';
 
-// Person type and management array
-export type Person = {
-  name: string;
-  role: string;
-  img?: string;
-};
 
 export const management: Person[] = [
   {
     name: 'FELIX ODONGKARA CANDIDA',
     role: 'President',
     img: felixImg,
+    category: 'executive',
   },
   {
     name: 'HAJI EDIRISA NSUBUGA',
     role: 'Secretary General',
     img: edirisaImg,
+    category: 'executive',
   },
   {
-    name: 'MAUREEN BYARYGABA',
-    role: 'Senior Accountant',
+    name: 'MAUREEN BYARUGABA',
+    role: 'Accountant',
+    img: maureenImg,
+    category: 'senior-staff',
+  },
+  {
+    name: 'MAGRATE ISIKO ',
+    role: 'Manager Membership and Marketing',
+    img: margretImg,
+    category: 'staff',
   },
   {
     name: 'RICHARD SSEWAGUDDE',
-    role: 'Head of Road Rescue Ops',
+    role: 'Rescue Manager',
+    img: richardImg,
+    category: 'staff',
   },
   {
-    name: 'ROBINA',
-    role: 'Head of Driving School',
-  },
-  {
-    name: 'GRAHAM',
-    role: 'IT Specialist',
-  },
+    name: 'Robiina Grace Namagembe ',
+    role: 'Front desk  officer',
+    img: robinaImg,
+    category: 'staff',
+  }
 ];
 
 export const navigationItems: ReadonlyArray<NavItem> = [
