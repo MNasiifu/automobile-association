@@ -15,6 +15,12 @@ import {
 import { fileToDataUrl } from "../utils/fileUtils";
 import { useGlobalLoading } from "../contexts";
 
+// File size constants (in MB) - exported for use in other components
+export const FILE_SIZE_LIMITS = {
+  PDF_MAX_SIZE: 1, // 1MB for PDF documents
+  IMAGE_MAX_SIZE: 1, // 1MB for images
+} as const;
+
 // Photo validation cache to avoid repeated computations
 interface PhotoValidationCache {
   [fileHash: string]: {
@@ -25,13 +31,57 @@ interface PhotoValidationCache {
   };
 }
 
+// File validation result interface
+export interface FileValidationResult {
+  isValid: boolean;
+  error?: string;
+  details?: {
+    fileName: string;
+    fileSize: number;
+    fileType: string;
+    maxSizeMB: number;
+    allowedTypes: string[];
+  };
+}
+
+// Helper function to get user-friendly file type descriptions
+const getFileTypeDescription = (mimeType: string): string => {
+  const typeMap: Record<string, string> = {
+    'application/pdf': 'PDF',
+    'image/jpeg': 'JPEG',
+    'image/jpg': 'JPG', 
+    'image/png': 'PNG',
+    'image/gif': 'GIF',
+    'image/webp': 'WebP'
+  };
+  
+  return typeMap[mimeType] || mimeType.split('/')[1]?.toUpperCase() || 'Unknown';
+};
+
 // File validation helpers
 const validateFile = (
   file: File | null,
   allowedTypes: string[],
   maxSizeMB: number
-) => {
-  if (!file) return false;
+): FileValidationResult => {
+  if (!file) {
+    return { isValid: false, error: "No file selected" };
+  }
+
+  // Check for empty file
+  if (file.size === 0) {
+    return { 
+      isValid: false, 
+      error: "File is empty. Please select a valid file",
+      details: {
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type,
+        maxSizeMB,
+        allowedTypes
+      }
+    };
+  }
 
   const allowedMimeTypes = allowedTypes.map((type) => {
     if (type === "pdf") return "application/pdf";
@@ -40,10 +90,49 @@ const validateFile = (
     return type;
   });
 
-  if (!allowedMimeTypes.includes(file.type)) return false;
-  if (file.size > maxSizeMB * 1024 * 1024) return false;
+  // Check file type
+  if (!allowedMimeTypes.includes(file.type)) {
+    const typeNames = allowedTypes.map(type => type.toUpperCase()).join(", ");
+    const actualTypeDescription = getFileTypeDescription(file.type);
+    return { 
+      isValid: false, 
+      error: `Invalid file type "${actualTypeDescription}". Only ${typeNames} files are allowed`,
+      details: {
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type,
+        maxSizeMB,
+        allowedTypes
+      }
+    };
+  }
 
-  return true;
+  // Check file size
+  if (file.size > maxSizeMB * 1024 * 1024) {
+    const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+    return { 
+      isValid: false, 
+      error: `File size (${fileSizeMB}MB) exceeds the maximum allowed size of ${maxSizeMB}MB`,
+      details: {
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type,
+        maxSizeMB,
+        allowedTypes
+      }
+    };
+  }
+
+  return { 
+    isValid: true,
+    details: {
+      fileName: file.name,
+      fileSize: file.size,
+      fileType: file.type,
+      maxSizeMB,
+      allowedTypes
+    }
+  };
 };
 
 // Create a unique file hash using file content
@@ -96,25 +185,40 @@ const validationSchema = yup.object({
   passportBioDataPage: yup
     .mixed<File>()
     .required("Passport bio-data page is required")
-    .test("fileType", "Only PDF files are allowed", (value) => {
+    .test("fileValidation", "File validation failed", function(value) {
       if (!value) return false;
-      return validateFile(value as File, ["pdf"], 5);
+      
+      const validation = validateFile(value as File, ["pdf"], FILE_SIZE_LIMITS.PDF_MAX_SIZE);
+      if (!validation.isValid) {
+        return this.createError({ message: validation.error });
+      }
+      return true;
     }),
 
   visaCopy: yup
     .mixed<File>()
     .required("Visa copy is required")
-    .test("fileType", "Only PDF files are allowed", (value) => {
+    .test("fileValidation", "File validation failed", function(value) {
       if (!value) return false;
-      return validateFile(value as File, ["pdf"], 5);
+      
+      const validation = validateFile(value as File, ["pdf"], FILE_SIZE_LIMITS.PDF_MAX_SIZE);
+      if (!validation.isValid) {
+        return this.createError({ message: validation.error });
+      }
+      return true;
     }),
 
   passportPhoto: yup
     .mixed<File>()
     .required("Passport photo is required")
-    .test("fileType", "Only PNG, JPG, or JPEG images are allowed", (value) => {
+    .test("fileValidation", "File validation failed", function(value) {
       if (!value) return false;
-      return validateFile(value as File, ["png", "jpg", "jpeg"], 2);
+      
+      const validation = validateFile(value as File, ["png", "jpg", "jpeg"], FILE_SIZE_LIMITS.IMAGE_MAX_SIZE);
+      if (!validation.isValid) {
+        return this.createError({ message: validation.error });
+      }
+      return true;
     }),
 
   // Driving license information

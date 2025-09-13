@@ -74,7 +74,8 @@ import { passportPhotoRequirements } from "../utils/passportPhotoValidator";
 import useApplyForIdp, { 
   type IDPFormData, 
   drivingPermitClasses, 
-  membershipBenefits 
+  membershipBenefits,
+  FILE_SIZE_LIMITS 
 } from "../hooks/useApplyForIdp";
 
 const FeatureCard = styled(Card)(({ theme }) => ({
@@ -1008,7 +1009,7 @@ const ApplyForIdp: React.FC = () => {
                                   }}
                                 />
                               }
-                              maxSizeMB={5}
+                              maxSizeMB={FILE_SIZE_LIMITS.PDF_MAX_SIZE}
                               description="Upload a clear copy of your passport's bio-data page containing your photo and personal information"
                             />
                           </Grid>
@@ -1027,7 +1028,7 @@ const ApplyForIdp: React.FC = () => {
                                   }}
                                 />
                               }
-                              maxSizeMB={5}
+                              maxSizeMB={FILE_SIZE_LIMITS.PDF_MAX_SIZE}
                               description="Upload a copy of your visa for the country you intend to travel to"
                             />
                           </Grid>
@@ -1046,7 +1047,7 @@ const ApplyForIdp: React.FC = () => {
                                   }}
                                 />
                               }
-                              maxSizeMB={2}
+                              maxSizeMB={FILE_SIZE_LIMITS.IMAGE_MAX_SIZE}
                               description="Upload a recent passport-size photograph (white background preferred)"
                               showPreview={true}
                             />
