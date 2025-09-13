@@ -30,6 +30,12 @@ export interface PendingIdpData {
   application_date_tz: number;
 }
 
+export interface IdpDocument {
+  visa_pdf_base64: string;
+  passport_pdf_base64: string;
+  passport_photo_base64: string;
+}
+
 export interface CreateMemberResponse {
   data: Member | null;
   error: string | null;

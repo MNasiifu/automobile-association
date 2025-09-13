@@ -13,5 +13,13 @@ export default defineConfig({
   ],
   optimizeDeps: {
     include: ['@emotion/styled']
+  },
+  server: {
+    cors: {
+      origin: ['http://localhost:5173', 'http://localhost:3000', 'https://aauganda.co.ug'],
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+    }
   }
 })
