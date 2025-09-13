@@ -1587,13 +1587,9 @@ const ApplyForIdp: React.FC = () => {
                         }
                         sx={{
                           minWidth: { xs: '140px', sm: '180px' },
-                          background: activeStep === steps.length - 1 
-                          ? `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})` 
-                          : `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})`,
+                          background: `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})`,
                           '&:hover': {
-                            background: activeStep === steps.length - 1 
-                              ? `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})` 
-                              : `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})`,
+                            background: `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})`,
                             transform: isSubmitting ? 'none' : 'scale(1.02)',
                           },
                           '&:disabled': {

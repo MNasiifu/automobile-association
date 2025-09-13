@@ -945,7 +945,7 @@ const IdpAbout: React.FC = () => {
                 <Button
                   variant="contained"
                   size="large"
-                  onClick={() => navigate('/apply-for-idp')}
+                  onClick={() => navigate('/idp/apply')}
                   startIcon={<Assignment />}
                   sx={{
                     background: 'white',
@@ -1008,7 +1008,7 @@ const IdpAbout: React.FC = () => {
                         Phone
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        {config.company.contactNumber + ' / ' + config.company.secondaryContactNumber}
+                      {`${config.company.contactNumber} / ${config.company.secondaryContactNumber}`}
                       </Typography>
                     </Box>
                   </Box>

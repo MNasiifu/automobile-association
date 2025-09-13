@@ -1,6 +1,5 @@
 export { default as Home } from './Home';
 export { default as Services } from './Services';
-export { default as InternationalDrivingPermit } from './Idp';
 export { default as IdpAbout } from './IdpAbout';
 export { default as ApplyForIdp } from './ApplyForIdp';
 export { default as IdpApplicationSuccess } from './IdpApplicationSuccess';
