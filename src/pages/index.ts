@@ -1,13 +1,12 @@
 export { default as Home } from './Home';
 export { default as Services } from './Services';
-export { default as InternationalDrivingPermit } from './Idp';
+export { default as IdpAbout } from './IdpAbout';
 export { default as ApplyForIdp } from './ApplyForIdp';
 export { default as IdpApplicationSuccess } from './IdpApplicationSuccess';
 export { default as VerifyIdp } from './VerifyIdp';
 export { default as PageHeaderDemo } from './PageHeaderDemo';
 
 // About section pages
-export { default as About } from './about/About';
 export { default as Team } from './about/Team';
 export { default as Contact } from './about/Contact';
 export { default as WhoWeAre } from './about/WhoWeAre';

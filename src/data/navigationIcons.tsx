@@ -19,6 +19,7 @@ import {
   LocalLibrary as InstituteIcon,
   LocationOn as BranchesIcon,
   Newspaper as MediaIcon,
+  Info as InfoIcon,
 } from '@mui/icons-material';
 
 export const menuIcons = {
@@ -49,4 +50,6 @@ export const menuIcons = {
   'Insurance Services': CarnetIcon,
   'Automotive Advisory': InstituteIcon,
   'Membership': MediaIcon,
+  'Info': InfoIcon,
+  'About IDP': InfoIcon,
 } as const;
