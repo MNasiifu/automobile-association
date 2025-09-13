@@ -21,8 +21,7 @@ import { WhatsAppButton } from './components/atoms';
 import { ScrollToTop } from './components';
 import { GlobalLoadingProvider } from './contexts';
 import { 
-  Home, 
-  About, 
+  Home,
   Services,
   Contact,
   IdpAbout,
@@ -250,7 +249,6 @@ const App: React.FC = () => {
             }}>
               <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/about" element={<About />} />
                 <Route path="/about/who-we-are" element={<WhoWeAre />} />
                 <Route path="/about/team" element={<Team />} />
                 <Route path="/about/affiliation" element={<Affiliation />} />

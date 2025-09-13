@@ -7,7 +7,6 @@ export { default as VerifyIdp } from './VerifyIdp';
 export { default as PageHeaderDemo } from './PageHeaderDemo';
 
 // About section pages
-export { default as About } from './about/About';
 export { default as Team } from './about/Team';
 export { default as Contact } from './about/Contact';
 export { default as WhoWeAre } from './about/WhoWeAre';
