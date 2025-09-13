@@ -2,7 +2,6 @@ import React, { createContext, useContext } from "react";
 import type { ReactNode } from "react";
 import useLoading from "../../hooks/useLoading";
 import LinearProgressLoader from "../atoms/LinearProgressLoader";
-import { Box } from "@mui/material";
 
 interface GlobalLoaderContextType {
   /**

@@ -37,7 +37,7 @@ interface LinearProgressLoaderProps {
 
 const LoaderContainer = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'height' && prop !== 'zIndex' && prop !== 'fixed',
-})<{ height: number; zIndex: number; fixed: boolean }>(({ theme, height, zIndex, fixed }) => ({
+})<{ height: number; zIndex: number; fixed: boolean }>(({ height, zIndex, fixed }) => ({
   position: fixed ? 'fixed' : 'absolute',
   top: '1px',
   left: 0,
@@ -50,7 +50,7 @@ const LoaderContainer = styled(Box, {
 
 const StyledLinearProgress = styled(LinearProgress, {
   shouldForwardProp: (prop) => prop !== 'height',
-})<{ height: number }>(({ theme, height }) => ({
+})<{ height: number }>(({ theme }) => ({
   height: "6px",
   borderRadius: 0,
   '& .MuiLinearProgress-bar': {

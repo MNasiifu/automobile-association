@@ -1,11 +1,10 @@
 import supabase from "../utils/superbaseClient";
+import { secureLog, validateOrigin, API_CONFIG } from "../utils/securityConfig";
 import type {
   CreateMemberData,
   IdpDocument,
   PendingIdpData,
 } from "../types/member";
-
-const supabaseKey = import.meta.env.VITE_SUPABASE_KEY;
 
 /**
  * Enhanced fetch wrapper for Supabase Edge Functions that handles CORS properly
@@ -19,16 +18,23 @@ export const callSupabaseEdgeFunction = async (
   requestBody: any,
   accessToken?: string | null
 ) => {
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  // Validate origin before making requests
+  if (!validateOrigin()) {
+    const error = `Invalid origin: ${window.location.origin}. This request is not allowed from the current domain.`;
+    secureLog.error(error);
+    throw new Error(error);
+  }
+
+  const supabaseUrl = API_CONFIG.supabaseUrl;
   const edgeFunctionUrl = `${supabaseUrl}/functions/v1/${functionName}`;
 
-  console.log(`Making request to ${functionName}:`, edgeFunctionUrl);
+  secureLog.info(`Making request to ${functionName}:`, edgeFunctionUrl);
 
   try {
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
-      "apikey": supabaseKey,
-      // Explicitly set origin to avoid CORS issues
+      "apikey": API_CONFIG.supabaseKey,
+      // Explicitly set origin for CORS compliance
       "Origin": window.location.origin,
     };
 
@@ -40,28 +46,30 @@ export const callSupabaseEdgeFunction = async (
       method: "POST",
       headers,
       body: JSON.stringify(requestBody),
+      // Ensure credentials are only sent when necessary
+      credentials: 'omit', // Don't send cookies/credentials unless explicitly needed
     });
 
-    console.log(`${functionName} response status:`, response.status);
+    secureLog.info(`${functionName} response status:`, response.status);
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`${functionName} HTTP Error Response:`, errorText);
+      secureLog.error(`${functionName} HTTP Error Response:`, errorText);
       throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText}`);
     }
 
     const data = await response.json();
-    console.log(`Response from ${functionName}:`, data);
+    secureLog.debug(`Response from ${functionName}:`, data);
 
     // Check if the edge function returned an error in the response body
     if (data && data.error) {
-      console.error(`${functionName} returned error:`, data.error);
+      secureLog.error(`${functionName} returned error:`, data.error);
       throw new Error(data.error);
     }
 
     return data;
   } catch (error) {
-    console.error(`${functionName} error:`, error);
+    secureLog.error(`${functionName} error:`, error);
     throw error;
   }
 };

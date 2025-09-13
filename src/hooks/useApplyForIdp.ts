@@ -616,12 +616,6 @@ const useApplyForIdp = () => {
         passport_photo_base64: passportPhotoBase64,
       };
 
-      showAlertMessage(
-        "Submitting application to server...",
-        "success",
-        { position: "top-right", autoHideDuration: 6000 }
-      );
-
       const { error } = await applyForIdp(memberPostData, pendingIdpPostData, idpDocuments);
 
       if (error) {
@@ -666,13 +660,6 @@ const useApplyForIdp = () => {
           },
         });
       }, 500);
-
-      // Show success alert briefly before navigation
-      showAlertMessage(
-        "Application submitted successfully! Redirecting to confirmation page...",
-        "success",
-        { position: "top-right", autoHideDuration: 6000 }
-      );
     } catch (error: unknown) {
       console.error("::debug error:", error);
       showAlertMessage(
