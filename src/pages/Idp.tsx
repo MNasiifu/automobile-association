@@ -111,10 +111,18 @@ const InternationalDrivingPermit: React.FC = () => {
             <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap', mb: 4 }}>
               <Button
                 variant="contained"
-                color="primary"
+                color="secondary"
                 size="large"
                 startIcon={<PostAddIcon />}
                 onClick={() => navigate('/idp/apply')}
+                sx={{ 
+                  fontWeight: 700,
+                  bgcolor: 'secondary.main',
+                  color: 'primary.main',
+                  '&:hover': {
+                    bgcolor: 'secondary.light',
+                  },
+                }}
               >
                 Apply for IDP
               </Button>
@@ -127,6 +135,16 @@ const InternationalDrivingPermit: React.FC = () => {
                 onClick={() => navigate('/idp/verify')}
               >
                 Verify IDP
+              </Button>
+
+              <Button
+                variant="text"
+                color="primary"
+                size="large"
+                onClick={() => navigate('/idp/about')}
+                sx={{ textDecoration: 'underline' }}
+              >
+                Learn More About IDP
               </Button>
             </Box>
           </Box>

@@ -28,7 +28,7 @@ import {
   Tooltip,
   CircularProgress,
   Collapse,
-  Chip,
+
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -37,8 +37,7 @@ import dayjs, { Dayjs } from "dayjs";
 import {
   DriveEta,
   ArrowBack,
-  Security as SecurityIcon,
-  Speed as SpeedIcon,
+
   CheckCircle as CheckCircleIcon,
   AccountCircle,
   Description,
@@ -74,20 +73,11 @@ import { passportPhotoRequirements } from "../utils/passportPhotoValidator";
 import useApplyForIdp, { 
   type IDPFormData, 
   drivingPermitClasses, 
-  membershipBenefits,
+
   FILE_SIZE_LIMITS 
 } from "../hooks/useApplyForIdp";
 
-const FeatureCard = styled(Card)(({ theme }) => ({
-  height: "100%",
-  transition: "all 0.3s ease-in-out",
-  border: `1px solid ${theme.palette.divider}`,
-  "&:hover": {
-    transform: "translateY(-4px)",
-    boxShadow: theme.shadows[8],
-    borderColor: theme.palette.primary.main,
-  },
-}));
+
 
 const StyledStepper = styled(Stepper)(({ theme }) => ({
   "& .MuiStepLabel-root .Mui-completed": {
@@ -468,61 +458,7 @@ const ApplyForIdp: React.FC = () => {
           </ContentContainer>
         </HeaderContainer>
 
-        {/* Membership Benefits Section */}
-        <Box sx={{ py: 6, backgroundColor: "grey.50" }}>
-          <Container maxWidth="lg">
-            <Box sx={{ textAlign: "center", mb: 4 }}>
-              <Heading variant="h3" align="center" gutterBottom>
-                Why Join AA Uganda?
-              </Heading>
-              <Typography variant="h6" color="text.secondary">
-                Enjoy exclusive benefits and significant savings as an AA member
-              </Typography>
-            </Box>
 
-            <Grid container spacing={3}>
-              {membershipBenefits.map((benefit, index) => {
-                // Render the appropriate icon based on the icon name
-                const IconComponent = 
-                  benefit.icon === "CardMembership" ? CardMembership :
-                  benefit.icon === "SpeedIcon" ? SpeedIcon :
-                  benefit.icon === "SecurityIcon" ? SecurityIcon :
-                  CardMembership; // fallback
-                
-                return (
-                  <Grid item xs={12} md={4} key={index}>
-                    <FeatureCard>
-                      <CardContent sx={{ textAlign: "center", p: 3 }}>
-                        <IconComponent sx={{ fontSize: 40, color: "primary.main" }} />
-                        <Typography
-                          variant="h6"
-                          sx={{ mt: 2, mb: 1, fontWeight: 600 }}
-                        >
-                          {benefit.title}
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{ mb: 2 }}
-                        >
-                          {benefit.description}
-                        </Typography>
-                        {"savings" in benefit && (
-                          <Chip
-                            label={benefit.savings}
-                            color="secondary"
-                            variant="filled"
-                            sx={{ fontWeight: 600 }}
-                          />
-                        )}
-                      </CardContent>
-                    </FeatureCard>
-                  </Grid>
-                );
-              })}
-            </Grid>
-          </Container>
-        </Box>
 
         {/* Application Form Section */}
         <Box sx={{ py: 8 }}>

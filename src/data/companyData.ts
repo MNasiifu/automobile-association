@@ -103,6 +103,7 @@ export const navigationItems: ReadonlyArray<NavItem> = [
     label: 'IDP',
     path: '/idp',
     children: [
+      { label: 'About IDP', path: '/idp/about', icon: 'Info' },
       { label: 'Apply for IDP', path: '/idp/apply', icon: 'PostAdd' },
       { label: 'Verify IDP', path: '/idp/verify', icon: 'VerifiedUser' },
     ],
