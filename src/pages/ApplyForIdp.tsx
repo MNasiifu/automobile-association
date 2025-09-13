@@ -76,6 +76,7 @@ import useApplyForIdp, {
 
   FILE_SIZE_LIMITS 
 } from "../hooks/useApplyForIdp";
+import theme from "../theme";
 
 
 
@@ -537,7 +538,7 @@ const ApplyForIdp: React.FC = () => {
                         sx={{
                           width: `${((activeStep + 1) / steps.length) * 100}%`,
                           height: '100%',
-                          background: 'linear-gradient(90deg, #1976d2, #42a5f5)',
+                          background: `linear-gradient(90deg, ${theme.palette.secondary.main}, ${theme.palette.secondary.dark})`,
                           borderRadius: 4,
                           transition: 'width 0.3s ease-in-out',
                         }}
@@ -1587,12 +1588,12 @@ const ApplyForIdp: React.FC = () => {
                         sx={{
                           minWidth: { xs: '140px', sm: '180px' },
                           background: activeStep === steps.length - 1 
-                            ? 'linear-gradient(45deg, #2e7d32, #43a047)' 
-                            : 'linear-gradient(45deg, #1976d2, #42a5f5)',
+                          ? `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})` 
+                          : `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})`,
                           '&:hover': {
                             background: activeStep === steps.length - 1 
-                              ? 'linear-gradient(45deg, #1b5e20, #2e7d32)' 
-                              : 'linear-gradient(45deg, #1565c0, #1976d2)',
+                              ? `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})` 
+                              : `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})`,
                             transform: isSubmitting ? 'none' : 'scale(1.02)',
                           },
                           '&:disabled': {
