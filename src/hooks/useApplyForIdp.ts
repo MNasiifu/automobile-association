@@ -523,7 +523,7 @@ const useApplyForIdp = () => {
       showAlertMessage(
         "Please fill in all required fields correctly",
         "warning",
-        { position: "top-right", autoHideDuration: 5000 }
+        { position: "top-right", autoHideDuration: 6000 }
       );
       return;
     }
@@ -580,12 +580,6 @@ const useApplyForIdp = () => {
       let passportBioDataPdfBase64: string;
       let passportPhotoBase64: string;
 
-      showAlertMessage(
-        "Processing documents...",
-        "success",
-        { position: "top-right", autoHideDuration: 3000 }
-      );
-
       visaPdfBase64 = await fileToDataUrl(visaCopy);
       passportBioDataPdfBase64 = await fileToDataUrl(passportBioDataPage);
       passportPhotoBase64 = await fileToDataUrl(passportPhoto);
@@ -625,7 +619,7 @@ const useApplyForIdp = () => {
       showAlertMessage(
         "Submitting application to server...",
         "success",
-        { position: "top-right", autoHideDuration: 3000 }
+        { position: "top-right", autoHideDuration: 6000 }
       );
 
       const { error } = await applyForIdp(memberPostData, pendingIdpPostData, idpDocuments);
@@ -662,13 +656,6 @@ const useApplyForIdp = () => {
       });
       objectUrlsRef.current.clear();
 
-      // Show success alert briefly before navigation
-      showAlertMessage(
-        "Application submitted successfully! Redirecting to confirmation page...",
-        "success",
-        { position: "top-right", autoHideDuration: 2000 }
-      );
-
       // Navigate to success page after a short delay
       setTimeout(() => {
         navigate("/idp/apply-success", {
@@ -679,6 +666,13 @@ const useApplyForIdp = () => {
           },
         });
       }, 500);
+
+      // Show success alert briefly before navigation
+      showAlertMessage(
+        "Application submitted successfully! Redirecting to confirmation page...",
+        "success",
+        { position: "top-right", autoHideDuration: 6000 }
+      );
     } catch (error: unknown) {
       console.error("::debug error:", error);
       showAlertMessage(
@@ -742,7 +736,7 @@ const useApplyForIdp = () => {
             showAlertMessage(
               "Photo validation passed! (from cache)",
               "success",
-              { position: "top-right", autoHideDuration: 3000 }
+              { position: "top-right", autoHideDuration: 6000 }
             );
           }
           return;
@@ -792,7 +786,7 @@ const useApplyForIdp = () => {
         } else {
           showAlertMessage("Photo validation passed!", "success", {
             position: "top-right",
-            autoHideDuration: 4000,
+            autoHideDuration: 6000,
           });
         }
       } catch (error) {

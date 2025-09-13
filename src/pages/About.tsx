@@ -26,7 +26,6 @@ import {
 import { Heading, Card, CountUpAnimation, StripeDivider } from '../components/atoms';
 import { PageHeader } from '../components/molecules';
 import { SEO } from '../components/SEO';
-import { useLocation } from 'react-router-dom';
 import {
   companyInfo,
   affiliates,
@@ -35,8 +34,7 @@ import {
   milestones,
 } from '../data/companyData';
 import { aboutSEO } from '../data/seoData';
-
-
+import { useHashScroll } from '../hooks';
 
 import stripeImg from '../assets/images/STRIPWEBSITE.png';
 import heroImg from '../assets/images/AA-rescue.jpg';
@@ -49,16 +47,6 @@ import g5 from '../assets/images/driving-school.jpg';
 import g6 from '../assets/images/road.jpg';
 import g7 from '../assets/images/TOWINGANDRECOVERYFRESHCAR.jpeg';
 import fiaLogo from '../assets/images/FIA.jpeg';
-
-function useHashScroll() {
-  const location = useLocation();
-  React.useEffect(() => {
-    const hash = location.hash?.replace('#', '');
-    if (!hash) return;
-    const el = document.getElementById(decodeURIComponent(hash));
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, [location.pathname, location.hash]);
-}
 
 const animationKeyframes = {
   fadeIn: keyframes`

@@ -18,6 +18,7 @@ import theme from './theme';
 import { Navigation } from './components/molecules';
 import { Footer } from './components/organisms';
 import { WhatsAppButton } from './components/atoms';
+import { ScrollToTop } from './components';
 import { GlobalLoadingProvider } from './contexts';
 import { 
   Home, 
@@ -224,6 +225,9 @@ const App: React.FC = () => {
           }}
         >
           <Router>
+            {/* Scroll to top on route changes */}
+            <ScrollToTop behavior="instant" />
+            
           <Box sx={{ 
               minHeight: '100vh', 
               width: '100%',
@@ -278,6 +282,11 @@ const App: React.FC = () => {
                 <Route path="/demo/global-loading" element={
                   <Suspense fallback={<Box sx={{ p: 4, textAlign: 'center' }}>Loading...</Box>}>
                     {React.createElement(React.lazy(() => import('./pages/GlobalLoadingDemo')))}
+                  </Suspense>
+                } />
+                <Route path="/demo/scroll-to-top" element={
+                  <Suspense fallback={<Box sx={{ p: 4, textAlign: 'center' }}>Loading...</Box>}>
+                    {React.createElement(React.lazy(() => import('./pages/ScrollToTopDemo')))}
                   </Suspense>
                 } />
               </Routes>

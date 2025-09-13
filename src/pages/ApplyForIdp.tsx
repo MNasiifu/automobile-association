@@ -36,7 +36,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
 import {
   DriveEta,
-
+  ArrowBack,
   Security as SecurityIcon,
   Speed as SpeedIcon,
   CheckCircle as CheckCircleIcon,
@@ -188,9 +188,34 @@ const ApplyForIdp: React.FC = () => {
     formatFileSize,
     
     // State setters
+    setActiveStep,
     setShowAlert,
     setShowPhotoRequirements,
   } = useApplyForIdp();
+
+  // Enhanced keyboard navigation support
+  React.useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Allow keyboard navigation only when not typing in input fields
+      const activeElement = document.activeElement;
+      const isInputActive = activeElement?.tagName === 'INPUT' || 
+                           activeElement?.tagName === 'TEXTAREA' ||
+                           activeElement?.getAttribute('contenteditable') === 'true';
+      
+      if (isInputActive) return;
+
+      if (event.key === 'ArrowLeft' && activeStep > 0) {
+        event.preventDefault();
+        handleBack();
+      } else if (event.key === 'ArrowRight' && activeStep < steps.length - 1) {
+        event.preventDefault();
+        handleNext();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeStep, steps.length, handleBack, handleNext]);
 
   // File Upload Component
   const FileUploadField: React.FC<{
@@ -553,6 +578,37 @@ const ApplyForIdp: React.FC = () => {
               {/* Stepper */}
               <Grid item xs={12} md={4}>
                 <Paper sx={{ p: 3, position: "sticky", top: 120 }}>
+                  {/* Progress Bar */}
+                  <Box sx={{ mb: 3 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        Progress
+                      </Typography>
+                      <Typography variant="body2" color="primary.main" sx={{ fontWeight: 600 }}>
+                        {Math.round(((activeStep + 1) / steps.length) * 100)}%
+                      </Typography>
+                    </Box>
+                    <Box
+                      sx={{
+                        width: '100%',
+                        height: 8,
+                        backgroundColor: 'grey.200',
+                        borderRadius: 4,
+                        overflow: 'hidden',
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: `${((activeStep + 1) / steps.length) * 100}%`,
+                          height: '100%',
+                          background: 'linear-gradient(90deg, #1976d2, #42a5f5)',
+                          borderRadius: 4,
+                          transition: 'width 0.3s ease-in-out',
+                        }}
+                      />
+                    </Box>
+                  </Box>
+
                   <StyledStepper
                     activeStep={activeStep}
                     orientation="vertical"
@@ -562,8 +618,34 @@ const ApplyForIdp: React.FC = () => {
                   >
                     {steps.map((label, index) => (
                       <Step key={label}>
-                        <StepLabel>
-                          <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                        <StepLabel
+                          sx={{
+                            cursor: index < activeStep ? 'pointer' : 'default',
+                            '&:hover': index < activeStep ? {
+                              '& .MuiStepLabel-label': {
+                                color: 'primary.main',
+                              }
+                            } : {},
+                          }}
+                          onClick={() => {
+                            // Allow navigation to previous steps only
+                            if (index < activeStep) {
+                              setActiveStep(index);
+                            }
+                          }}
+                        >
+                          <Typography 
+                            variant="body2" 
+                            sx={{ 
+                              fontWeight: 500,
+                              color: index < activeStep ? 'text.primary' : 
+                                     index === activeStep ? 'primary.main' : 'text.secondary',
+                              '&:hover': index < activeStep ? {
+                                color: 'primary.main',
+                              } : {},
+                              transition: 'color 0.2s ease-in-out',
+                            }}
+                          >
                             {label}
                           </Typography>
                         </StepLabel>
@@ -572,7 +654,7 @@ const ApplyForIdp: React.FC = () => {
                             <Typography
                               variant="caption"
                               color="text.secondary"
-                              sx={{ mt: 1, display: "block" }}
+                              sx={{ mt: 1, display: "block", lineHeight: 1.4 }}
                             >
                               {index === 0 &&
                                 "Enter membership status and personal information"}
@@ -587,11 +669,37 @@ const ApplyForIdp: React.FC = () => {
                               {index === 5 &&
                                 "Review and confirm your application"}
                             </Typography>
+                            
+                            {/* Quick navigation buttons for current step */}
+                            <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
+                              {index > 0 && (
+                                <Button
+                                  size="small"
+                                  variant="text"
+                                  startIcon={<ArrowBack />}
+                                  onClick={handleBack}
+                                  sx={{ 
+                                    fontSize: '0.75rem',
+                                    minWidth: 'auto',
+                                    px: 1,
+                                  }}
+                                >
+                                  Back
+                                </Button>
+                              )}
+                            </Box>
                           </StepContent>
                         )}
                       </Step>
                     ))}
                   </StyledStepper>
+                  
+                  {/* Keyboard Navigation Hint */}
+                  <Alert severity="info" sx={{ mt: 2, fontSize: '0.75rem' }}>
+                    <Typography variant="caption">
+                      💡 <strong>Tip:</strong> Use keyboard ← → arrow keys for quick navigation, or click on previous steps to go back.
+                    </Typography>
+                  </Alert>
                 </Paper>
               </Grid>
 
@@ -599,6 +707,36 @@ const ApplyForIdp: React.FC = () => {
               <Grid item xs={12} md={8}>
                 <form onSubmit={handleSubmit(handleFormSubmit as any)}>
                   <FormPaper>
+                    {/* Mobile Back Button - Appears on all steps except first */}
+                    {activeStep > 0 && (
+                      <Box
+                        sx={{
+                          display: { xs: 'flex', md: 'none' },
+                          alignItems: 'center',
+                          mb: 3,
+                          pb: 2,
+                          borderBottom: 1,
+                          borderColor: 'divider',
+                        }}
+                      >
+                        <Button
+                          onClick={handleBack}
+                          variant="text"
+                          startIcon={<ArrowBack />}
+                          sx={{
+                            color: 'primary.main',
+                            '&:hover': {
+                              backgroundColor: 'primary.light',
+                              transform: 'translateX(-4px)',
+                            },
+                            transition: 'all 0.2s ease-in-out',
+                          }}
+                        >
+                          Back to {steps[activeStep - 1]}
+                        </Button>
+                      </Box>
+                    )}
+
                     {/* Step 1: Membership & Personal Info */}
                     {activeStep === 0 && (
                       <Box>
@@ -1446,21 +1584,60 @@ const ApplyForIdp: React.FC = () => {
                       sx={{
                         display: "flex",
                         justifyContent: "space-between",
+                        alignItems: "center",
                         mt: 4,
                         pt: 3,
                         borderTop: 1,
                         borderColor: "divider",
+                        gap: 2,
                       }}
                     >
-                      <Button
+                      {/* Back Button with Enhanced Styling */}
+                      {activeStep > 0 && <Button
                         disabled={activeStep === 0}
                         onClick={handleBack}
                         variant="outlined"
                         size="large"
+                        startIcon={<ArrowBack />}
+                        sx={{
+                          minWidth: { xs: '120px', sm: '140px' },
+                          borderColor: activeStep === 0 ? 'grey.300' : 'primary.main',
+                          color: activeStep === 0 ? 'grey.400' : 'primary.main',
+                          '&:hover': {
+                            color: 'grey.50',
+                            border: 'none',
+                            backgroundColor: activeStep === 0 ? 'transparent' : 'primary.light',
+                            transform: activeStep === 0 ? 'none' : 'translateX(-2px)',
+                          },
+                          '&:disabled': {
+                            borderColor: 'grey.300',
+                            color: 'grey.400',
+                            backgroundColor: 'transparent',
+                          },
+                          transition: 'all 0.2s ease-in-out',
+                        }}
                       >
                         Back
-                      </Button>
+                      </Button>}
 
+                      {/* Step Counter */}
+                      <Box
+                        sx={{
+                          display: { xs: 'none', sm: 'flex' },
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          px: 2,
+                        }}
+                      >
+                        <Typography variant="caption" color="text.secondary">
+                          Step {activeStep + 1} of {steps.length}
+                        </Typography>
+                        <Typography variant="body2" color="primary.main" sx={{ fontWeight: 500 }}>
+                          {steps[activeStep]}
+                        </Typography>
+                      </Box>
+
+                      {/* Next/Submit Button */}
                       <Button
                         variant="contained"
                         onClick={handleNext}
@@ -1471,6 +1648,24 @@ const ApplyForIdp: React.FC = () => {
                             <Verified />
                           ) : undefined
                         }
+                        sx={{
+                          minWidth: { xs: '140px', sm: '180px' },
+                          background: activeStep === steps.length - 1 
+                            ? 'linear-gradient(45deg, #2e7d32, #43a047)' 
+                            : 'linear-gradient(45deg, #1976d2, #42a5f5)',
+                          '&:hover': {
+                            background: activeStep === steps.length - 1 
+                              ? 'linear-gradient(45deg, #1b5e20, #2e7d32)' 
+                              : 'linear-gradient(45deg, #1565c0, #1976d2)',
+                            transform: isSubmitting ? 'none' : 'scale(1.02)',
+                          },
+                          '&:disabled': {
+                            background: 'grey.400',
+                            color: 'grey.200',
+                          },
+                          transition: 'all 0.2s ease-in-out',
+                          fontWeight: 600,
+                        }}
                       >
                         {isSubmitting
                           ? "Submitting..."
