@@ -18,6 +18,7 @@ import theme from './theme';
 import { Navigation } from './components/molecules';
 import { Footer } from './components/organisms';
 import { WhatsAppButton } from './components/atoms';
+import { GlobalLoadingProvider } from './contexts';
 import { 
   Home, 
   About, 
@@ -215,7 +216,14 @@ const App: React.FC = () => {
     <HelmetProvider context={{}}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Router>
+        <GlobalLoadingProvider
+          defaultConfig={{
+            color: 'primary',
+            height: 4,
+            zIndex: 1301
+          }}
+        >
+          <Router>
           <Box sx={{ 
               minHeight: '100vh', 
               width: '100%',
@@ -267,6 +275,11 @@ const App: React.FC = () => {
                     {React.createElement(React.lazy(() => import('./pages/driving-school/Refresher')))}
                   </Suspense>
                 } />
+                <Route path="/demo/global-loading" element={
+                  <Suspense fallback={<Box sx={{ p: 4, textAlign: 'center' }}>Loading...</Box>}>
+                    {React.createElement(React.lazy(() => import('./pages/GlobalLoadingDemo')))}
+                  </Suspense>
+                } />
               </Routes>
             </Box>
             
@@ -276,6 +289,7 @@ const App: React.FC = () => {
             <WhatsAppButton />
           </Box>
         </Router>
+      </GlobalLoadingProvider>
       </ThemeProvider>
     </HelmetProvider>
   );

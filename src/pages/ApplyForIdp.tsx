@@ -164,6 +164,8 @@ const ApplyForIdp: React.FC = () => {
     showPhotoRequirements,
     steps,
     
+    // Loading states are now handled by the global loading context
+    
     // Form
     control,
     handleSubmit,
@@ -401,6 +403,7 @@ const ApplyForIdp: React.FC = () => {
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Box>
         <SEO seoData={applyIdpSEO} />
+        
         {/* Page Header */}
         <HeaderContainer>
           <DecorativeBackground />

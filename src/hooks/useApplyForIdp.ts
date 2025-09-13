@@ -13,6 +13,7 @@ import {
   getCurrentDateFormatted,
 } from "../utils";
 import { fileToDataUrl } from "../utils/fileUtils";
+import { useGlobalLoading } from "../contexts";
 
 // Photo validation cache to avoid repeated computations
 interface PhotoValidationCache {
@@ -172,6 +173,9 @@ export const membershipBenefits = [
 const useApplyForIdp = () => {
   // Navigation hook
   const navigate = useNavigate();
+
+  // Loading management hook
+  const globalLoading = useGlobalLoading();
 
   // State management
   const [activeStep, setActiveStep] = useState(0);
@@ -431,88 +435,103 @@ const useApplyForIdp = () => {
     setActiveStep((prev) => prev - 1);
   };
 
-  // Form submission handler
+  // Form submission handler with loading management
   const handleFormSubmit = async (data: IDPFormData) => {
-    const currentDate = getCurrentDateFormatted();
+    try {
+      // Start loading state
+      globalLoading.startLoading('formSubmission');
 
-    const {
-      membershipNumber,
-      surname,
-      otherNames,
-      dateOfBirth,
-      classesOfDrivingPermit,
-      expiryDateOfDrivingPermit,
-      placeOfBirth,
-      postalAddress,
-      emailAddress,
-      telephoneNumber,
-      mobileNumber,
-      residentialAddress,
-      streetRoadPlot,
-      ugandaDrivingPermitNumber,
-      passportNumber,
-      visaCopy,
-      passportPhoto,
-      passportBioDataPage,
-    } = data;
+      const currentDate = getCurrentDateFormatted();
 
-    const expiryDate = formatDateToYYYYMMDD(expiryDateOfDrivingPermit);
-    const formatedDob = formatDateToYYYYMMDD(dateOfBirth);
-    const clientClasses = concatenateWithCommas(
-      classesOfDrivingPermit ?? ["B"]
-    );
-    const currentDateTimeStamp = new Date().getTime();
+      const {
+        membershipNumber,
+        surname,
+        otherNames,
+        dateOfBirth,
+        classesOfDrivingPermit,
+        expiryDateOfDrivingPermit,
+        placeOfBirth,
+        postalAddress,
+        emailAddress,
+        telephoneNumber,
+        mobileNumber,
+        residentialAddress,
+        streetRoadPlot,
+        ugandaDrivingPermitNumber,
+        passportNumber,
+        visaCopy,
+        passportPhoto,
+        passportBioDataPage,
+      } = data;
 
-    let visaPdfBase64: string;
-    let passportBioDataPdfBase64: string;
-    let passportPhotoBase64: string;
+      const expiryDate = formatDateToYYYYMMDD(expiryDateOfDrivingPermit);
+      const formatedDob = formatDateToYYYYMMDD(dateOfBirth);
+      const clientClasses = concatenateWithCommas(
+        classesOfDrivingPermit ?? ["B"]
+      );
+      const currentDateTimeStamp = new Date().getTime();
 
-    visaPdfBase64 = await fileToDataUrl(visaCopy); 
-    passportBioDataPdfBase64 = await fileToDataUrl(passportBioDataPage); 
-    passportPhotoBase64 = await fileToDataUrl(passportPhoto); 
+      // File processing
+      let visaPdfBase64: string;
+      let passportBioDataPdfBase64: string;
+      let passportPhotoBase64: string;
 
-    const memberPostData: CreateMemberData = {
-      aa_member_no: membershipNumber ? Number(membershipNumber) : null,
-      surname: surname,
-      onames: otherNames,
-      paddress: postalAddress,
-      email: emailAddress,
-      tel: telephoneNumber,
-      mobile: mobileNumber,
-      passport: passportNumber,
-      raddress: residentialAddress,
-      street: streetRoadPlot,
-      pob: placeOfBirth,
-      dob: formatedDob,
-      licence: ugandaDrivingPermitNumber,
-      classes: clientClasses,
-      e_date: expiryDate,
-      pp_photo: passportPhotoBase64,
-      p_date: currentDate,
-    };
+      showAlertMessage(
+        "Processing documents...",
+        "success",
+        { position: "top-right", autoHideDuration: 3000 }
+      );
 
-    const pendingIdpPostData: PendingIdpData = {
-      status: "pending",
-      application_date: currentDate,
-      application_date_tz: currentDateTimeStamp,
-    };
+      visaPdfBase64 = await fileToDataUrl(visaCopy);
+      passportBioDataPdfBase64 = await fileToDataUrl(passportBioDataPage);
+      passportPhotoBase64 = await fileToDataUrl(passportPhoto);
 
-    const idpDocuments: IdpDocument = {
+      const memberPostData: CreateMemberData = {
+        aa_member_no: membershipNumber ? Number(membershipNumber) : null,
+        surname: surname,
+        onames: otherNames,
+        paddress: postalAddress,
+        email: emailAddress,
+        tel: telephoneNumber,
+        mobile: mobileNumber,
+        passport: passportNumber,
+        raddress: residentialAddress,
+        street: streetRoadPlot,
+        pob: placeOfBirth,
+        dob: formatedDob,
+        licence: ugandaDrivingPermitNumber,
+        classes: clientClasses,
+        e_date: expiryDate,
+        pp_photo: passportPhotoBase64,
+        p_date: currentDate,
+      };
+
+      const pendingIdpPostData: PendingIdpData = {
+        status: "pending",
+        application_date: currentDate,
+        application_date_tz: currentDateTimeStamp,
+      };
+
+      const idpDocuments: IdpDocument = {
         visa_pdf_base64: visaPdfBase64,
         passport_pdf_base64: passportBioDataPdfBase64,
         passport_photo_base64: passportPhotoBase64,
-    };
+      };
 
-    try {
+      showAlertMessage(
+        "Submitting application to server...",
+        "success",
+        { position: "top-right", autoHideDuration: 3000 }
+      );
+
       const { error } = await applyForIdp(memberPostData, pendingIdpPostData, idpDocuments);
 
-      if (error){
+      if (error) {
         showAlertMessage(
-            `${error || "Failed to submit application. Please try again."}`,
-            "error",
-            { position: "top-right", autoHideDuration: 60000 }
+          `${error || "Failed to submit application. Please try again."}`,
+          "error",
+          { position: "top-right", autoHideDuration: 6000 }
         );
-
         return;
       }
 
@@ -555,14 +574,17 @@ const useApplyForIdp = () => {
             email: emailAddress,
           },
         });
-      }, 2000);
+      }, 500);
     } catch (error: unknown) {
       console.error("::debug error:", error);
       showAlertMessage(
         `${error || "Failed to submit application. Please try again."}`,
         "error",
-        { position: "top-right", autoHideDuration: 10000 }
+        { position: "top-right", autoHideDuration: 7000 }
       );
+    } finally {
+      // Always stop loading state
+      globalLoading.stopLoading('formSubmission');
     }
   };
 
@@ -736,6 +758,10 @@ const useApplyForIdp = () => {
     photoValidationState,
     showPhotoRequirements,
     steps,
+
+    // Loading states
+    globalLoading,
+    isFormSubmitting: globalLoading.isLoading('formSubmission'),
 
     // Form
     control,

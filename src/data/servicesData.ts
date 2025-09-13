@@ -147,30 +147,6 @@ export const serviceCategories = [
   },
 ];
 
-const idpApplydata = () => {
-  return {
-    isMember: false,
-    membershipNumber: "",
-    surname: "Prescott",
-    otherNames: "Soto",
-    dateOfBirth: "2005-08-31T21:00:00.000Z",
-    placeOfBirth: "Do ipsum delectus ",
-    postalAddress: "Nostrud velit pariat",
-    emailAddress: "jiwid@mailinator.com",
-    telephoneNumber: "+1 (804) 101-8725",
-    mobileNumber: "205",
-    residentialAddress: "Maiores modi praesen",
-    streetRoadPlot: "Nulla qui magna repe",
-    passportNumber: "920",
-    countryOfAcquiredVisa: "Eum voluptas asperna",
-    ugandaDrivingPermitNumber: "U12SE778Z",
-    expiryDateOfDrivingPermit: "2027-09-16T21:00:00.000Z",
-    classesOfDrivingPermit: ["B"],
-    termsAccepted: true,
-    declarationAccepted: true,
-  };
-};
-
 export default {
   services,
   serviceCategories,

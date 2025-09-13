@@ -26,3 +26,6 @@ export { default as WhatsAppButton } from './WhatsAppButton';
 
 // Notifications
 export { default as AlertNotification } from './AlertNotification';
+
+// Loading Components
+export { default as LinearProgressLoader } from './LinearProgressLoader';
