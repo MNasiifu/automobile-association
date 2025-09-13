@@ -1,7 +1,5 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
+import React from "react";
+import { Controller } from "react-hook-form";
 import {
   Box,
   Container,
@@ -12,7 +10,6 @@ import {
   FormControlLabel,
   Checkbox,
   Alert,
-  Snackbar,
   Card,
   CardContent,
   FormHelperText,
@@ -31,6 +28,7 @@ import {
   Tooltip,
   CircularProgress,
   Collapse,
+  Chip,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -38,7 +36,9 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
 import {
   DriveEta,
-  Public as PublicIcon,
+  ArrowBack,
+  Security as SecurityIcon,
+  Speed as SpeedIcon,
   CheckCircle as CheckCircleIcon,
   AccountCircle,
   Description,
@@ -65,143 +65,29 @@ import {
   AnimatedTitle,
   AnimatedSubtitle,
   SectionDivider,
+  AlertNotification,
 } from "../components/atoms";
 import { DecorativeBackground, PhotoValidationDisplay } from "../components/molecules";
 import { SEO } from "../components/SEO";
 import { applyIdpSEO } from "../data/seoData";
-import { validatePassportPhoto } from "../utils/passportPhotoValidator";
-import type { PhotoValidationResult } from "../utils/passportPhotoValidator";
 import { passportPhotoRequirements } from "../utils/passportPhotoValidator";
+import useApplyForIdp, { 
+  type IDPFormData, 
+  drivingPermitClasses, 
+  membershipBenefits,
+  FILE_SIZE_LIMITS 
+} from "../hooks/useApplyForIdp";
 
-// File validation helpers
-const validateFile = (
-  file: File | null,
-  allowedTypes: string[],
-  maxSizeMB: number
-) => {
-  if (!file) return false;
-
-  const allowedMimeTypes = allowedTypes.map((type) => {
-    if (type === "pdf") return "application/pdf";
-    if (type === "jpg" || type === "jpeg") return "image/jpeg";
-    if (type === "png") return "image/png";
-    return type;
-  });
-
-  if (!allowedMimeTypes.includes(file.type)) return false;
-  if (file.size > maxSizeMB * 1024 * 1024) return false;
-
-  return true;
-};
-
-// Photo validation cache to avoid repeated computations
-interface PhotoValidationCache {
-  [fileHash: string]: {
-    validationResult: PhotoValidationResult;
-    timestamp: number;
-    fileName: string; // Store for debugging
-    fileSize: number; // Store for verification
-  };
-}
-
-// Create a unique file hash using file content
-const createFileHash = async (file: File): Promise<string> => {
-  const arrayBuffer = await file.arrayBuffer();
-  const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  return hashHex;
-};
-
-// Validation schema based on idp.md requirements
-const validationSchema = yup.object({
-  // Membership info
-  isMember: yup.boolean().required("Please specify if you are an AA member"),
-  membershipNumber: yup.string().when("isMember", {
-    is: true,
-    then: (schema) =>
-      schema.required("Membership number is required for AA members"),
-    otherwise: (schema) => schema.notRequired(),
-  }),
-
-  // Personal information
-  surname: yup.string().required("Surname is required"),
-  otherNames: yup.string().required("Other names are required"),
-  dateOfBirth: yup
-    .date()
-    .nullable()
-    .required("Date of birth is required")
-    .max(new Date(), "Date of birth cannot be in the future"),
-  placeOfBirth: yup.string().required("Place of birth is required"),
-
-  // Contact information
-  postalAddress: yup.string().required("Postal address is required"),
-  emailAddress: yup
-    .string()
-    .email("Invalid email format")
-    .required("Email address is required"),
-  telephoneNumber: yup.string().required("Telephone number is required"),
-  mobileNumber: yup.string().required("Mobile number is required"),
-  residentialAddress: yup.string().required("Residential address is required"),
-  streetRoadPlot: yup.string().required("Street/Road/Plot is required"),
-
-  // Passport and visa information
-  passportNumber: yup.string().required("Passport number is required"),
-  countryOfAcquiredVisa: yup
-    .string()
-    .required("Country of acquired visa is required"),
-
-  // File uploads
-  passportBioDataPage: yup
-    .mixed<File>()
-    .required("Passport bio-data page is required")
-    .test("fileType", "Only PDF files are allowed", (value) => {
-      if (!value) return false;
-      return validateFile(value as File, ["pdf"], 5);
-    }),
-
-  visaCopy: yup
-    .mixed<File>()
-    .required("Visa copy is required")
-    .test("fileType", "Only PDF files are allowed", (value) => {
-      if (!value) return false;
-      return validateFile(value as File, ["pdf"], 5);
-    }),
-
-  passportPhoto: yup
-    .mixed<File>()
-    .required("Passport photo is required")
-    .test("fileType", "Only PNG, JPG, or JPEG images are allowed", (value) => {
-      if (!value) return false;
-      return validateFile(value as File, ["png", "jpg", "jpeg"], 2);
-    }),
-
-  // Driving license information
-  ugandaDrivingPermitNumber: yup
-    .string()
-    .required("Uganda driving permit number is required"),
-  expiryDateOfDrivingPermit: yup
-    .date()
-    .nullable()
-    .required("Expiry date of driving permit is required")
-    .min(new Date(), "Driving permit must be valid"),
-  classesOfDrivingPermit: yup
-    .array()
-    .of(yup.string().required())
-    .min(1, "At least one driving permit class is required"),
-
-  // Terms and declaration
-  termsAccepted: yup
-    .boolean()
-    .oneOf([true], "You must accept the terms and conditions"),
-  declarationAccepted: yup
-    .boolean()
-    .oneOf([true], "You must confirm the declaration"),
-});
-
-type IDPFormData = yup.InferType<typeof validationSchema>;
-
-
+const FeatureCard = styled(Card)(({ theme }) => ({
+  height: "100%",
+  transition: "all 0.3s ease-in-out",
+  border: `1px solid ${theme.palette.divider}`,
+  "&:hover": {
+    transform: "translateY(-4px)",
+    boxShadow: theme.shadows[8],
+    borderColor: theme.palette.primary.main,
+  },
+}));
 
 const StyledStepper = styled(Stepper)(({ theme }) => ({
   "& .MuiStepLabel-root .Mui-completed": {
@@ -267,383 +153,69 @@ const PhotoPreview = styled(Box)(({ theme }) => ({
   },
 }));
 
-const drivingPermitClasses = [
-  { value: "A", label: "Class A - Motorcycles" },
-  { value: "B", label: "Class B - Light Motor Vehicles" },
-  { value: "C", label: "Class C - Medium Motor Vehicles" },
-  { value: "D", label: "Class D - Heavy Motor Vehicles" },
-  { value: "E", label: "Class E - Articulated Vehicles" },
-  { value: "F", label: "Class F - Public Service Vehicles" },
-];
-
 const ApplyForIdp: React.FC = () => {
-  const [activeStep, setActiveStep] = useState(0);
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [alertSeverity, setAlertSeverity] = useState<
-    "success" | "warning" | "error"
-  >("success");
-  
-  // Photo validation cache to avoid repeated computations
-  const [photoValidationCache, setPhotoValidationCache] = useState<PhotoValidationCache>({});
-  
-  // Photo validation state
-  const [photoValidationState, setPhotoValidationState] = useState<{
-    isValidating: boolean;
-    validationResult: PhotoValidationResult | null;
-    showValidationDetails: boolean;
-    isPhotoValid: boolean; // Track if current photo passes validation
-  }>({
-    isValidating: false,
-    validationResult: null,
-    showValidationDetails: false,
-    isPhotoValid: false,
-  });
-
-  // Photo requirements state
-  const [showPhotoRequirements, setShowPhotoRequirements] = useState(false);
-
-  // URL management for object URLs to prevent memory leaks
-  const objectUrlsRef = useRef<Map<string, string>>(new Map());
-  
-  // Cleanup all object URLs when component unmounts
-  useEffect(() => {
-    return () => {
-      objectUrlsRef.current.forEach((url) => {
-        URL.revokeObjectURL(url);
-      });
-      objectUrlsRef.current.clear();
-    };
-  }, []);
-
-  // Create and manage object URLs with automatic cleanup
-  const createManagedImageUrl = useCallback((file: File): string => {
-    const fileKey = `${file.name}-${file.size}-${file.lastModified}`;
-    
-    // Check if we already have a URL for this file
-    const existingUrl = objectUrlsRef.current.get(fileKey);
-    if (existingUrl) {
-      return existingUrl;
-    }
-    
-    // Create new URL and store it
-    const url = URL.createObjectURL(file);
-    objectUrlsRef.current.set(fileKey, url);
-    
-    return url;
-  }, []);
-
-  // Clean up specific file URL
-  const revokeManagedImageUrl = useCallback((file: File) => {
-    const fileKey = `${file.name}-${file.size}-${file.lastModified}`;
-    const url = objectUrlsRef.current.get(fileKey);
-    
-    if (url) {
-      URL.revokeObjectURL(url);
-      objectUrlsRef.current.delete(fileKey);
-    }
-  }, []);
-
   const {
+    // State
+    activeStep,
+    showAlert,
+    alertMessage,
+    alertSeverity,
+    alertConfig,
+    photoValidationState,
+    showPhotoRequirements,
+    steps,
+    
+    // Loading states are now handled by the global loading context
+    
+    // Form
     control,
     handleSubmit,
     watch,
-    formState: { errors, isSubmitting },
-    trigger,
-    setValue,
-  } = useForm<IDPFormData>({
-    resolver: yupResolver(validationSchema) as any,
-    defaultValues: {
-      isMember: false,
-      membershipNumber: "",
-      surname: "",
-      otherNames: "",
-      dateOfBirth: undefined,
-      placeOfBirth: "",
-      postalAddress: "",
-      emailAddress: "",
-      telephoneNumber: "",
-      mobileNumber: "",
-      residentialAddress: "",
-      streetRoadPlot: "",
-      passportNumber: "",
-      countryOfAcquiredVisa: "",
-      passportBioDataPage: undefined,
-      visaCopy: undefined,
-      passportPhoto: undefined,
-      ugandaDrivingPermitNumber: "",
-      expiryDateOfDrivingPermit: undefined,
-      classesOfDrivingPermit: [],
-      termsAccepted: false,
-      declarationAccepted: false,
-    },
-    mode: "onChange",
-  });
-
-  const watchedIsMember = watch("isMember");
-  const watchedFormData = watch();
-
-  const steps = [
-    "Membership & Personal Info",
-    "Contact Details",
-    "Passport & Visa Info",
-    "Document Upload",
-    "Driving License Details",
-    "Declaration & Submit",
-  ];
-
-  const showAlertMessage = (
-    message: string,
-    severity: "success" | "warning" | "error" = "success"
-  ) => {
-    setAlertMessage(message);
-    setAlertSeverity(severity);
-    setShowAlert(true);
-  };
-
-  const handleNext = async () => {
-    let fieldsToValidate: (keyof IDPFormData)[] = [];
-
-    switch (activeStep) {
-      case 0:
-        fieldsToValidate = [
-          "isMember",
-          "surname",
-          "otherNames",
-          "dateOfBirth",
-          "placeOfBirth",
-        ];
-        if (watchedIsMember) fieldsToValidate.push("membershipNumber");
-        break;
-      case 1:
-        fieldsToValidate = [
-          "postalAddress",
-          "emailAddress",
-          "telephoneNumber",
-          "mobileNumber",
-          "residentialAddress",
-          "streetRoadPlot",
-        ];
-        break;
-      case 2:
-        fieldsToValidate = ["passportNumber", "countryOfAcquiredVisa"];
-        break;
-      case 3:
-        fieldsToValidate = ["passportBioDataPage", "visaCopy", "passportPhoto"];
-        
-        // Additional check for passport photo validation
-        const passportPhoto = watch("passportPhoto") as File | undefined;
-        if (passportPhoto) {
-          // Check if we have a valid validation result for the current photo
-          if (!photoValidationState.isPhotoValid || photoValidationState.isValidating) {
-            showAlertMessage(
-              photoValidationState.isValidating 
-                ? "Please wait for photo validation to complete"
-                : "Please upload a valid passport photo that meets all requirements",
-              "warning"
-            );
-            return;
-          }
-          
-          // Additional safety check: ensure validation result exists
-          if (!photoValidationState.validationResult) {
-            showAlertMessage(
-              "Photo validation incomplete. Please re-upload your photo.",
-              "warning"
-            );
-            return;
-          }
-        }
-        break;
-      case 4:
-        fieldsToValidate = [
-          "ugandaDrivingPermitNumber",
-          "expiryDateOfDrivingPermit",
-          "classesOfDrivingPermit",
-        ];
-        break;
-      case 5:
-        fieldsToValidate = ["termsAccepted", "declarationAccepted"];
-        break;
-    }
-
-    const isStepValid = await trigger(fieldsToValidate);
-
-    if (!isStepValid) {
-      showAlertMessage(
-        "Please fill in all required fields correctly",
-        "warning"
-      );
-      return;
-    }
-
-    if (activeStep === steps.length - 1) {
-      handleFormSubmit(watchedFormData);
-    } else {
-      setActiveStep((prev) => prev + 1);
-    }
-  };
-
-  const handleBack = () => {
-    setActiveStep((prev) => prev - 1);
-  };
-
-  const handleFormSubmit = async (data: IDPFormData) => {
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      showAlertMessage(
-        "Application submitted successfully! You will receive a confirmation email shortly.",
-        "success"
-      );
-      console.log("Form submitted:", data);
-
-      // In a real app, you would submit to your backend here
-    } catch (error) {
-      showAlertMessage(
-        "Failed to submit application. Please try again.",
-        "error"
-      );
-    }
-  };
-
-  const applicationFee = watchedIsMember ? 250000 : 350000;
-
-  // File handling functions
-  const handleFileUpload = async (fieldName: keyof IDPFormData, file: File) => {
-    setValue(fieldName, file, { shouldValidate: true });
+    errors,
+    isSubmitting,
+    watchedIsMember,
     
-    // If it's a passport photo, validate it with content-based caching
-    if (fieldName === 'passportPhoto') {
-      // Start validation immediately (show loading state)
-      setPhotoValidationState(prev => ({
-        ...prev,
-        isValidating: true,
-        validationResult: null,
-        isPhotoValid: false,
-      }));
+    // Computed values
+    applicationFee,
+    
+    // Handlers
+    handleNext,
+    handleBack,
+    handleFormSubmit,
+    handleFileUpload,
+    handleFileRemove,
+    createImagePreviewUrl,
+    formatFileSize,
+    
+    // State setters
+    setActiveStep,
+    setShowAlert,
+    setShowPhotoRequirements,
+  } = useApplyForIdp();
+
+  // Enhanced keyboard navigation support
+  React.useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Allow keyboard navigation only when not typing in input fields
+      const activeElement = document.activeElement;
+      const isInputActive = activeElement?.tagName === 'INPUT' || 
+                           activeElement?.tagName === 'TEXTAREA' ||
+                           activeElement?.getAttribute('contenteditable') === 'true';
       
-      try {
-        // Generate file hash for accurate caching
-        const fileHash = await createFileHash(file);
-        
-        // Check cache with hash-based key
-        const cachedResult = photoValidationCache[fileHash];
-        const cacheValidityPeriod = 10 * 60 * 1000; // 10 minutes
-        const now = Date.now();
-        
-        // Verify cache entry is still valid and matches current file
-        if (cachedResult && 
-            (now - cachedResult.timestamp) < cacheValidityPeriod &&
-            cachedResult.fileSize === file.size) {
-          
-          // Use cached result
-          setPhotoValidationState({
-            isValidating: false,
-            validationResult: cachedResult.validationResult,
-            showValidationDetails: true,
-            isPhotoValid: cachedResult.validationResult.isValid,
-          });
-          
-          if (!cachedResult.validationResult.isValid) {
-            showAlertMessage(
-              `Photo validation failed: ${cachedResult.validationResult.errors[0] || 'Please check photo requirements'}`,
-              "warning"
-            );
-          } else {
-            showAlertMessage("Photo validation passed! (from cache)", "success");
-          }
-          return;
-        }
-        
-        // Perform fresh validation
-        const validationResult = await validatePassportPhoto(file);
-        
-        // Cache the result with file hash
-        setPhotoValidationCache(prev => {
-          // Clean up old cache entries (keep only last 10 entries to prevent memory issues)
-          const entries = Object.entries(prev);
-          const sortedEntries = entries.sort((a, b) => b[1].timestamp - a[1].timestamp);
-          const recentEntries = sortedEntries.slice(0, 9); // Keep 9, add 1 new = 10 total
-          
-          const cleanedCache = Object.fromEntries(recentEntries);
-          
-          return {
-            ...cleanedCache,
-            [fileHash]: {
-              validationResult,
-              timestamp: now,
-              fileName: file.name,
-              fileSize: file.size,
-            }
-          };
-        });
-        
-        setPhotoValidationState({
-          isValidating: false,
-          validationResult,
-          showValidationDetails: true,
-          isPhotoValid: validationResult.isValid,
-        });
-        
-        if (!validationResult.isValid) {
-          showAlertMessage(
-            `Photo validation failed: ${validationResult.errors[0] || 'Please check photo requirements'}`,
-            "warning"
-          );
-        } else {
-          showAlertMessage("Photo validation passed!", "success");
-        }
-      } catch (error) {
-        console.error('Photo validation error:', error);
-        setPhotoValidationState({
-          isValidating: false,
-          validationResult: null,
-          showValidationDetails: false,
-          isPhotoValid: false,
-        });
-        showAlertMessage("Failed to validate photo. Please try again.", "error");
+      if (isInputActive) return;
+
+      if (event.key === 'ArrowLeft' && activeStep > 0) {
+        event.preventDefault();
+        handleBack();
+      } else if (event.key === 'ArrowRight' && activeStep < steps.length - 1) {
+        event.preventDefault();
+        handleNext();
       }
-    }
-  };
+    };
 
-  const handleFileRemove = (fieldName: keyof IDPFormData) => {
-    // Get the current file before removing it to clean up its URL
-    const currentFile = watch(fieldName) as File | undefined;
-    if (currentFile) {
-      revokeManagedImageUrl(currentFile);
-    }
-    
-    setValue(fieldName, undefined, { shouldValidate: true });
-    
-    // Clear photo validation state when removing passport photo
-    if (fieldName === 'passportPhoto') {
-      setPhotoValidationState({
-        isValidating: false,
-        validationResult: null,
-        showValidationDetails: false,
-        isPhotoValid: false,
-      });
-      
-      // Optional: Clear relevant cache entries to prevent confusion
-      // Note: We don't clear the entire cache as other uploaded files might still be valid
-      // The cache will naturally expire or be cleaned up by the LRU mechanism
-    }
-  };
-
-  // Legacy function name kept for backward compatibility, now uses managed URLs
-  const createImagePreviewUrl = (file: File): string => {
-    return createManagedImageUrl(file);
-  };
-
-  const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return "0 Bytes";
-    const k = 1024;
-    const sizes = ["Bytes", "KB", "MB", "GB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-  };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeStep, steps.length, handleBack, handleNext]);
 
   // File Upload Component
   const FileUploadField: React.FC<{
@@ -857,6 +429,7 @@ const ApplyForIdp: React.FC = () => {
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Box>
         <SEO seoData={applyIdpSEO} />
+        
         {/* Page Header */}
         <HeaderContainer>
           <DecorativeBackground />
@@ -895,7 +468,61 @@ const ApplyForIdp: React.FC = () => {
           </ContentContainer>
         </HeaderContainer>
 
-       
+        {/* Membership Benefits Section */}
+        <Box sx={{ py: 6, backgroundColor: "grey.50" }}>
+          <Container maxWidth="lg">
+            <Box sx={{ textAlign: "center", mb: 4 }}>
+              <Heading variant="h3" align="center" gutterBottom>
+                Why Join AA Uganda?
+              </Heading>
+              <Typography variant="h6" color="text.secondary">
+                Enjoy exclusive benefits and significant savings as an AA member
+              </Typography>
+            </Box>
+
+            <Grid container spacing={3}>
+              {membershipBenefits.map((benefit, index) => {
+                // Render the appropriate icon based on the icon name
+                const IconComponent = 
+                  benefit.icon === "CardMembership" ? CardMembership :
+                  benefit.icon === "SpeedIcon" ? SpeedIcon :
+                  benefit.icon === "SecurityIcon" ? SecurityIcon :
+                  CardMembership; // fallback
+                
+                return (
+                  <Grid item xs={12} md={4} key={index}>
+                    <FeatureCard>
+                      <CardContent sx={{ textAlign: "center", p: 3 }}>
+                        <IconComponent sx={{ fontSize: 40, color: "primary.main" }} />
+                        <Typography
+                          variant="h6"
+                          sx={{ mt: 2, mb: 1, fontWeight: 600 }}
+                        >
+                          {benefit.title}
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ mb: 2 }}
+                        >
+                          {benefit.description}
+                        </Typography>
+                        {"savings" in benefit && (
+                          <Chip
+                            label={benefit.savings}
+                            color="secondary"
+                            variant="filled"
+                            sx={{ fontWeight: 600 }}
+                          />
+                        )}
+                      </CardContent>
+                    </FeatureCard>
+                  </Grid>
+                );
+              })}
+            </Grid>
+          </Container>
+        </Box>
 
         {/* Application Form Section */}
         <Box sx={{ py: 8 }}>
@@ -951,6 +578,37 @@ const ApplyForIdp: React.FC = () => {
               {/* Stepper */}
               <Grid item xs={12} md={4}>
                 <Paper sx={{ p: 3, position: "sticky", top: 120 }}>
+                  {/* Progress Bar */}
+                  <Box sx={{ mb: 3 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        Progress
+                      </Typography>
+                      <Typography variant="body2" color="primary.main" sx={{ fontWeight: 600 }}>
+                        {Math.round(((activeStep + 1) / steps.length) * 100)}%
+                      </Typography>
+                    </Box>
+                    <Box
+                      sx={{
+                        width: '100%',
+                        height: 8,
+                        backgroundColor: 'grey.200',
+                        borderRadius: 4,
+                        overflow: 'hidden',
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: `${((activeStep + 1) / steps.length) * 100}%`,
+                          height: '100%',
+                          background: 'linear-gradient(90deg, #1976d2, #42a5f5)',
+                          borderRadius: 4,
+                          transition: 'width 0.3s ease-in-out',
+                        }}
+                      />
+                    </Box>
+                  </Box>
+
                   <StyledStepper
                     activeStep={activeStep}
                     orientation="vertical"
@@ -960,8 +618,34 @@ const ApplyForIdp: React.FC = () => {
                   >
                     {steps.map((label, index) => (
                       <Step key={label}>
-                        <StepLabel>
-                          <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                        <StepLabel
+                          sx={{
+                            cursor: index < activeStep ? 'pointer' : 'default',
+                            '&:hover': index < activeStep ? {
+                              '& .MuiStepLabel-label': {
+                                color: 'primary.main',
+                              }
+                            } : {},
+                          }}
+                          onClick={() => {
+                            // Allow navigation to previous steps only
+                            if (index < activeStep) {
+                              setActiveStep(index);
+                            }
+                          }}
+                        >
+                          <Typography 
+                            variant="body2" 
+                            sx={{ 
+                              fontWeight: 500,
+                              color: index < activeStep ? 'text.primary' : 
+                                     index === activeStep ? 'primary.main' : 'text.secondary',
+                              '&:hover': index < activeStep ? {
+                                color: 'primary.main',
+                              } : {},
+                              transition: 'color 0.2s ease-in-out',
+                            }}
+                          >
                             {label}
                           </Typography>
                         </StepLabel>
@@ -970,7 +654,7 @@ const ApplyForIdp: React.FC = () => {
                             <Typography
                               variant="caption"
                               color="text.secondary"
-                              sx={{ mt: 1, display: "block" }}
+                              sx={{ mt: 1, display: "block", lineHeight: 1.4 }}
                             >
                               {index === 0 &&
                                 "Enter membership status and personal information"}
@@ -985,11 +669,37 @@ const ApplyForIdp: React.FC = () => {
                               {index === 5 &&
                                 "Review and confirm your application"}
                             </Typography>
+                            
+                            {/* Quick navigation buttons for current step */}
+                            <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
+                              {index > 0 && (
+                                <Button
+                                  size="small"
+                                  variant="text"
+                                  startIcon={<ArrowBack />}
+                                  onClick={handleBack}
+                                  sx={{ 
+                                    fontSize: '0.75rem',
+                                    minWidth: 'auto',
+                                    px: 1,
+                                  }}
+                                >
+                                  Back
+                                </Button>
+                              )}
+                            </Box>
                           </StepContent>
                         )}
                       </Step>
                     ))}
                   </StyledStepper>
+                  
+                  {/* Keyboard Navigation Hint */}
+                  <Alert severity="info" sx={{ mt: 2, fontSize: '0.75rem' }}>
+                    <Typography variant="caption">
+                      💡 <strong>Tip:</strong> Use keyboard ← → arrow keys for quick navigation, or click on previous steps to go back.
+                    </Typography>
+                  </Alert>
                 </Paper>
               </Grid>
 
@@ -997,6 +707,36 @@ const ApplyForIdp: React.FC = () => {
               <Grid item xs={12} md={8}>
                 <form onSubmit={handleSubmit(handleFormSubmit as any)}>
                   <FormPaper>
+                    {/* Mobile Back Button - Appears on all steps except first */}
+                    {activeStep > 0 && (
+                      <Box
+                        sx={{
+                          display: { xs: 'flex', md: 'none' },
+                          alignItems: 'center',
+                          mb: 3,
+                          pb: 2,
+                          borderBottom: 1,
+                          borderColor: 'divider',
+                        }}
+                      >
+                        <Button
+                          onClick={handleBack}
+                          variant="text"
+                          startIcon={<ArrowBack />}
+                          sx={{
+                            color: 'primary.main',
+                            '&:hover': {
+                              backgroundColor: 'primary.light',
+                              transform: 'translateX(-4px)',
+                            },
+                            transition: 'all 0.2s ease-in-out',
+                          }}
+                        >
+                          Back to {steps[activeStep - 1]}
+                        </Button>
+                      </Box>
+                    )}
+
                     {/* Step 1: Membership & Personal Info */}
                     {activeStep === 0 && (
                       <Box>
@@ -1081,7 +821,7 @@ const ApplyForIdp: React.FC = () => {
                                 <TextField
                                   {...field}
                                   fullWidth
-                                  label="Surname *"
+                                  label="First Name *"
                                   error={!!error}
                                   helperText={error?.message}
                                   InputProps={{
@@ -1104,7 +844,7 @@ const ApplyForIdp: React.FC = () => {
                                 <TextField
                                   {...field}
                                   fullWidth
-                                  label="Other Names *"
+                                  label="Last Name *"
                                   error={!!error}
                                   helperText={error?.message}
                                   InputProps={{
@@ -1361,30 +1101,6 @@ const ApplyForIdp: React.FC = () => {
                               )}
                             />
                           </Grid>
-
-                          <Grid item xs={12} sm={6}>
-                            <Controller
-                              name="countryOfAcquiredVisa"
-                              control={control}
-                              render={({ field, fieldState: { error } }) => (
-                                <TextField
-                                  {...field}
-                                  fullWidth
-                                  label="Country of Acquired Visa *"
-                                  error={!!error}
-                                  helperText={error?.message}
-                                  placeholder="e.g., Kenya, Tanzania, Rwanda"
-                                  InputProps={{
-                                    startAdornment: (
-                                      <PublicIcon
-                                        sx={{ mr: 1, color: "text.secondary" }}
-                                      />
-                                    ),
-                                  }}
-                                />
-                              )}
-                            />
-                          </Grid>
                         </Grid>
 
                         <Alert severity="info" sx={{ mt: 3 }}>
@@ -1431,7 +1147,7 @@ const ApplyForIdp: React.FC = () => {
                                   }}
                                 />
                               }
-                              maxSizeMB={5}
+                              maxSizeMB={FILE_SIZE_LIMITS.PDF_MAX_SIZE}
                               description="Upload a clear copy of your passport's bio-data page containing your photo and personal information"
                             />
                           </Grid>
@@ -1450,7 +1166,7 @@ const ApplyForIdp: React.FC = () => {
                                   }}
                                 />
                               }
-                              maxSizeMB={5}
+                              maxSizeMB={FILE_SIZE_LIMITS.PDF_MAX_SIZE}
                               description="Upload a copy of your visa for the country you intend to travel to"
                             />
                           </Grid>
@@ -1469,7 +1185,7 @@ const ApplyForIdp: React.FC = () => {
                                   }}
                                 />
                               }
-                              maxSizeMB={2}
+                              maxSizeMB={FILE_SIZE_LIMITS.IMAGE_MAX_SIZE}
                               description="Upload a recent passport-size photograph (white background preferred)"
                               showPreview={true}
                             />
@@ -1868,21 +1584,60 @@ const ApplyForIdp: React.FC = () => {
                       sx={{
                         display: "flex",
                         justifyContent: "space-between",
+                        alignItems: "center",
                         mt: 4,
                         pt: 3,
                         borderTop: 1,
                         borderColor: "divider",
+                        gap: 2,
                       }}
                     >
-                      <Button
+                      {/* Back Button with Enhanced Styling */}
+                      {activeStep > 0 && <Button
                         disabled={activeStep === 0}
                         onClick={handleBack}
                         variant="outlined"
                         size="large"
+                        startIcon={<ArrowBack />}
+                        sx={{
+                          minWidth: { xs: '120px', sm: '140px' },
+                          borderColor: activeStep === 0 ? 'grey.300' : 'primary.main',
+                          color: activeStep === 0 ? 'grey.400' : 'primary.main',
+                          '&:hover': {
+                            color: 'grey.50',
+                            border: 'none',
+                            backgroundColor: activeStep === 0 ? 'transparent' : 'primary.light',
+                            transform: activeStep === 0 ? 'none' : 'translateX(-2px)',
+                          },
+                          '&:disabled': {
+                            borderColor: 'grey.300',
+                            color: 'grey.400',
+                            backgroundColor: 'transparent',
+                          },
+                          transition: 'all 0.2s ease-in-out',
+                        }}
                       >
                         Back
-                      </Button>
+                      </Button>}
 
+                      {/* Step Counter */}
+                      <Box
+                        sx={{
+                          display: { xs: 'none', sm: 'flex' },
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          px: 2,
+                        }}
+                      >
+                        <Typography variant="caption" color="text.secondary">
+                          Step {activeStep + 1} of {steps.length}
+                        </Typography>
+                        <Typography variant="body2" color="primary.main" sx={{ fontWeight: 500 }}>
+                          {steps[activeStep]}
+                        </Typography>
+                      </Box>
+
+                      {/* Next/Submit Button */}
                       <Button
                         variant="contained"
                         onClick={handleNext}
@@ -1893,6 +1648,24 @@ const ApplyForIdp: React.FC = () => {
                             <Verified />
                           ) : undefined
                         }
+                        sx={{
+                          minWidth: { xs: '140px', sm: '180px' },
+                          background: activeStep === steps.length - 1 
+                            ? 'linear-gradient(45deg, #2e7d32, #43a047)' 
+                            : 'linear-gradient(45deg, #1976d2, #42a5f5)',
+                          '&:hover': {
+                            background: activeStep === steps.length - 1 
+                              ? 'linear-gradient(45deg, #1b5e20, #2e7d32)' 
+                              : 'linear-gradient(45deg, #1565c0, #1976d2)',
+                            transform: isSubmitting ? 'none' : 'scale(1.02)',
+                          },
+                          '&:disabled': {
+                            background: 'grey.400',
+                            color: 'grey.200',
+                          },
+                          transition: 'all 0.2s ease-in-out',
+                          fontWeight: 600,
+                        }}
                       >
                         {isSubmitting
                           ? "Submitting..."
@@ -1908,21 +1681,22 @@ const ApplyForIdp: React.FC = () => {
           </Container>
         </Box>
 
-        {/* Alert Snackbar */}
-        <Snackbar
+        {/* Enhanced Alert Notification - Top Right Positioning */}
+        <AlertNotification
           open={showAlert}
-          autoHideDuration={6000}
+          message={alertMessage}
+          severity={alertSeverity}
           onClose={() => setShowAlert(false)}
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        >
-          <Alert
-            onClose={() => setShowAlert(false)}
-            severity={alertSeverity}
-            sx={{ width: "100%" }}
-          >
-            {alertMessage}
-          </Alert>
-        </Snackbar>
+          autoHideDuration={alertConfig?.autoHideDuration || 6000}
+          position={
+            alertConfig?.anchorOrigin?.vertical === 'top' && alertConfig?.anchorOrigin?.horizontal === 'right' 
+              ? 'top-right'
+              : alertConfig?.anchorOrigin?.vertical === 'top' && alertConfig?.anchorOrigin?.horizontal === 'center'
+              ? 'top-center'
+              : 'bottom-center'
+          }
+          showCloseButton={alertConfig?.showCloseButton ?? true}
+        />
       </Box>
     </LocalizationProvider>
   );

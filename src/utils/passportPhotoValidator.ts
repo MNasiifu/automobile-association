@@ -1,7 +1,63 @@
 import * as faceapi from 'face-api.js';
+import '@tensorflow/tfjs-backend-webgl';
+import '@tensorflow/tfjs-backend-cpu';
 
 // Initialize face-api.js models
 let modelsLoaded = false;
+let backendInitialized = false;
+
+// Initialize TensorFlow.js backend
+const initializeTensorFlowBackend = async (): Promise<void> => {
+  if (backendInitialized) return;
+  
+  try {
+    
+    // Import TensorFlow.js with backends
+    const tf = await import('@tensorflow/tfjs');
+    await import('@tensorflow/tfjs-backend-webgl');
+    await import('@tensorflow/tfjs-backend-cpu');
+    
+    // Set backend preference (WebGL is faster, CPU is more compatible)
+    try {
+      await tf.setBackend('webgl');
+    } catch (webglError) {
+      console.warn('WebGL backend failed, falling back to CPU:', webglError);
+      await tf.setBackend('cpu');
+    }
+    
+    // Wait for backend to be ready
+    await tf.ready();
+    
+    backendInitialized = true;
+  } catch (error) {
+    console.error('Failed to initialize TensorFlow.js backend:', error);
+    throw new Error('Failed to initialize TensorFlow.js backend');
+  }
+};
+
+// Preload models function that can be called early in the app lifecycle
+export const preloadFaceApiModels = async (): Promise<void> => {
+  if (modelsLoaded) {
+    return;
+  }
+  
+  try {
+    await initializeTensorFlowBackend();
+    await loadFaceApiModels();
+  } catch (error) {
+    console.warn('⚠️ Failed to preload face-api models:', error);
+    // Don't throw error during preload - let it retry during actual validation
+  }
+};
+
+// Export function to check if models are loaded
+export const areModelsLoaded = (): boolean => modelsLoaded;
+
+// Validation score thresholds
+export const VALIDATION_THRESHOLDS = {
+  HIGH_QUALITY: 80, // Photos with 80+ score are considered valid regardless of minor issues
+  STANDARD: 70      // Original threshold for photos without any errors
+} as const;
 
 export interface PhotoValidationResult {
   isValid: boolean;
@@ -58,17 +114,39 @@ export const loadFaceApiModels = async (): Promise<void> => {
   if (modelsLoaded) return;
   
   try {
-    const MODEL_URL = '/models'; // Face-api models in public/models
+    // Ensure TensorFlow.js backend is initialized first
+    await initializeTensorFlowBackend();
     
+    // Use CDN as primary source since local models appear to be incomplete
+    const MODEL_URL = 'https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights';
+    
+    // Load models with proper error handling
     await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
-    await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
-    await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
-    await faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL);
     
+    await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+    
+    await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
+    
+    await faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL);
     modelsLoaded = true;
   } catch (error) {
     console.error('Failed to load face-api models:', error);
-    throw new Error('Failed to initialize face detection models');
+    modelsLoaded = false;
+    
+    // Provide more specific error information
+    if (error instanceof Error) {
+      if (error.message.includes('backend')) {
+        throw new Error('Failed to initialize face detection models: TensorFlow.js backend initialization failed.');
+      } else if (error.message.includes('fetch')) {
+        throw new Error('Failed to initialize face detection models: Network error. Please check your internet connection.');
+      } else if (error.message.includes('404')) {
+        throw new Error('Failed to initialize face detection models: Model files not found.');
+      } else {
+        throw new Error(`Failed to initialize face detection models: ${error.message}`);
+      }
+    } else {
+      throw new Error('Failed to initialize face detection models: Unknown error occurred.');
+    }
   }
 };
 
@@ -298,8 +376,28 @@ export const validatePassportPhoto = async (file: File): Promise<PhotoValidation
   };
   
   try {
-    // Ensure models are loaded
-    await loadFaceApiModels();
+    // Ensure TensorFlow.js backend and models are loaded with retry mechanism
+    let modelLoadAttempts = 0;
+    const maxAttempts = 2; // Reduced attempts since we have better error handling now
+    
+    while (!modelsLoaded && modelLoadAttempts < maxAttempts) {
+      try {
+        // Initialize backend and load models
+        await initializeTensorFlowBackend();
+        await loadFaceApiModels();
+        break;
+      } catch (loadError) {
+        modelLoadAttempts++;
+        console.warn(`Model loading attempt ${modelLoadAttempts} failed:`, loadError);
+        
+        if (modelLoadAttempts >= maxAttempts) {
+          throw loadError;
+        }
+        
+        // Wait briefly before retrying
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
+    }
     
     // Create image element
     const img = document.createElement('img');
@@ -470,28 +568,59 @@ export const validatePassportPhoto = async (file: File): Promise<PhotoValidation
       result.warnings.push('Background appears complex. Use a plain white background for best results.');
     }
     
-    // Calculate overall score
+    // Calculate overall score (updated for 80+ threshold)
     let score = 0;
     
-    // Face detection and positioning (40 points)
-    if (result.details.hasDetectedFace && result.details.faceCount === 1) score += 20;
-    if (result.details.facePosition.centered) score += 10;
+    // Face detection and positioning (50 points - increased weight for core requirements)
+    if (result.details.hasDetectedFace && result.details.faceCount === 1) score += 25;
+    if (result.details.facePosition.centered) score += 15;
     if (result.details.faceSize.appropriate) score += 10;
     
     // Facial features (30 points)
-    if (result.details.eyesDetected && result.details.eyesOpen) score += 10;
+    if (result.details.eyesDetected && result.details.eyesOpen) score += 15;
     if (result.details.facingCamera) score += 10;
-    if (result.details.expression.neutral) score += 10;
+    if (result.details.expression.neutral) score += 5; // Reduced weight as it's often subjective
     
-    // Image quality (20 points)
-    if (result.details.imageQuality.isHighQuality) score += 10;
-    if (result.details.imageQuality.isColor) score += 10;
+    // Image quality (15 points)
+    if (result.details.imageQuality.isColor) score += 10; // Essential requirement
+    if (result.details.imageQuality.isHighQuality) score += 5;
     
-    // Background (10 points)
-    if (result.details.backgroundAnalysis.isWhite) score += 10;
+    // Background and landmarks (5 points - reduced as these are often minor issues)
+    if (result.details.backgroundAnalysis.isWhite) score += 3;
+    if (result.details.landmarks.eyebrowsVisible) score += 2;
     
     result.score = score;
-    result.isValid = result.errors.length === 0 && score >= 70;
+    
+    // Updated validation logic: photo is valid if score is 80 or above
+    // This allows for some minor issues while ensuring overall quality
+    if (score >= VALIDATION_THRESHOLDS.HIGH_QUALITY) {
+      result.isValid = true;
+      
+      // Convert critical errors to warnings if score is high enough
+      const criticalErrors = result.errors.filter(error => 
+        error.includes('No face detected') ||
+        error.includes('Multiple faces detected') ||
+        error.includes('Color photo required')
+      );
+      
+      const nonCriticalErrors = result.errors.filter(error => 
+        !error.includes('No face detected') &&
+        !error.includes('Multiple faces detected') &&
+        !error.includes('Color photo required')
+      );
+      
+      // If there are critical errors, photo is still invalid regardless of score
+      if (criticalErrors.length > 0) {
+        result.isValid = false;
+      } else {
+        // Convert non-critical errors to warnings for high-scoring photos
+        result.warnings.push(...nonCriticalErrors);
+        result.errors = criticalErrors;
+      }
+    } else {
+      // Original validation logic for scores below 80
+      result.isValid = result.errors.length === 0 && score >= VALIDATION_THRESHOLDS.STANDARD;
+    }
     
     // Clean up
     URL.revokeObjectURL(img.src);

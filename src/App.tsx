@@ -1,4 +1,4 @@
-import React, { useState, Suspense } from 'react';
+import React, { useState, Suspense, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, Link } from 'react-router-dom';
 import { HelmetProvider } from '@dr.pogodin/react-helmet';
 import { 
@@ -18,6 +18,8 @@ import theme from './theme';
 import { Navigation } from './components/molecules';
 import { Footer } from './components/organisms';
 import { WhatsAppButton } from './components/atoms';
+import { ScrollToTop } from './components';
+import { GlobalLoadingProvider } from './contexts';
 import { 
   Home, 
   About, 
@@ -25,6 +27,7 @@ import {
   Contact,
   InternationalDrivingPermit,
   ApplyForIdp,
+  IdpApplicationSuccess,
   VerifyIdp,
   VehicleValuation,
   FleetManagement,
@@ -42,6 +45,7 @@ import {
 import { navigationItems } from './data/companyData';
 import * as Icons from '@mui/icons-material';
 import type { NavItem } from './types/navigation';
+import { preloadFaceApiModels } from './utils/passportPhotoValidator';
 
 // Mobile Menu Component
 const MobileMenu: React.FC<{ open: boolean; onClose: () => void }> = ({ open, onClose }) => {
@@ -196,6 +200,11 @@ const MobileMenu: React.FC<{ open: boolean; onClose: () => void }> = ({ open, on
 const App: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // Preload face-api models early in the app lifecycle
+  useEffect(() => {
+    preloadFaceApiModels();
+  }, []);
+
   const handleMobileMenuToggle = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
@@ -208,7 +217,17 @@ const App: React.FC = () => {
     <HelmetProvider context={{}}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Router>
+        <GlobalLoadingProvider
+          defaultConfig={{
+            color: 'primary',
+            height: 4,
+            zIndex: 1301
+          }}
+        >
+          <Router>
+            {/* Scroll to top on route changes */}
+            <ScrollToTop behavior="instant" />
+            
           <Box sx={{ 
               minHeight: '100vh', 
               width: '100%',
@@ -247,6 +266,7 @@ const App: React.FC = () => {
                 <Route path="/membership" element={<MembershipPage />} />
                 <Route path="/idp" element={<InternationalDrivingPermit />} />
                 <Route path="/idp/apply" element={<ApplyForIdp />} />
+                <Route path="/idp/apply-success" element={<IdpApplicationSuccess />} />
                 <Route path="/idp/verify" element={<VerifyIdp />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/driving-school/about" element={
@@ -259,6 +279,16 @@ const App: React.FC = () => {
                     {React.createElement(React.lazy(() => import('./pages/driving-school/Refresher')))}
                   </Suspense>
                 } />
+                <Route path="/demo/global-loading" element={
+                  <Suspense fallback={<Box sx={{ p: 4, textAlign: 'center' }}>Loading...</Box>}>
+                    {React.createElement(React.lazy(() => import('./pages/GlobalLoadingDemo')))}
+                  </Suspense>
+                } />
+                <Route path="/demo/scroll-to-top" element={
+                  <Suspense fallback={<Box sx={{ p: 4, textAlign: 'center' }}>Loading...</Box>}>
+                    {React.createElement(React.lazy(() => import('./pages/ScrollToTopDemo')))}
+                  </Suspense>
+                } />
               </Routes>
             </Box>
             
@@ -268,6 +298,7 @@ const App: React.FC = () => {
             <WhatsAppButton />
           </Box>
         </Router>
+      </GlobalLoadingProvider>
       </ThemeProvider>
     </HelmetProvider>
   );

@@ -23,3 +23,9 @@ export { default as CountUpAnimation } from './CountUpAnimation';
 
 // Social Media
 export { default as WhatsAppButton } from './WhatsAppButton';
+
+// Notifications
+export { default as AlertNotification } from './AlertNotification';
+
+// Loading Components
+export { default as LinearProgressLoader } from './LinearProgressLoader';
