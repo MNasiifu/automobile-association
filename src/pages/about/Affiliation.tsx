@@ -1,9 +1,9 @@
 import React from 'react';
 import { Box, Container, Typography, Grid } from '@mui/material';
-import { PageHeader } from '../components/molecules';
-import { SEO } from '../components/SEO';
-import { affiliationSEO } from '../data/seoData';
-import { affiliates } from '../data/companyData';
+import { PageHeader } from '../../components/molecules';
+import { SEO } from '../../components/SEO';
+import { affiliationSEO } from '../../data/seoData';
+import { affiliates } from '../../data/companyData';
 
 const Affiliation: React.FC = () => {
   return (

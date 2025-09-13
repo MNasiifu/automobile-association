@@ -1,5 +1,21 @@
-// Company information and static data for AA Uganda
+
 import fiaImage from '../assets/images/FIA.jpeg';
+import type {  NavItem } from '../types/navigation';
+import felixImg from '../assets/images/people/Felix.jpeg';
+import edirisaImg from '../assets/images/people/Idrisi-AAU.jpeg';
+import maureenImg from '../assets/images/people/Maureen.jpeg';
+import richardImg from '../assets/images/people/Richard.jpeg';
+import robinaImg from '../assets/images/people/Robina.jpeg';
+import margretImg from '../assets/images/people/Margret.jpeg';
+
+// Person type and management array
+export type Person = {
+  name: string;
+  role: string;
+  img?: string;
+  category?: string;
+};
+
 export const companyInfo = {
   name: "Automobile Association of Uganda",
   phrase: "Inspring Mobility",
@@ -20,7 +36,7 @@ export const companyInfo = {
     phone: "+256752760252 | +256776760252",
     emergency: {
       phone: "+256772366004",
-      name: "Mr. Richard"
+      name: "Mr. Richard Ssewagudde",
     },
     email: "odongkara@aau.co.ug",
     website: "www.aauganda.co.ug",
@@ -40,7 +56,46 @@ export const companyInfo = {
   ],
 };
 
-import type {  NavItem } from '../types/navigation';
+
+
+export const management: Person[] = [
+  {
+    name: 'FELIX ODONGKARA CANDIDA',
+    role: 'President',
+    img: felixImg,
+    category: 'executive',
+  },
+  {
+    name: 'HAJI EDIRISA NSUBUGA',
+    role: 'Secretary General',
+    img: edirisaImg,
+    category: 'executive',
+  },
+  {
+    name: 'MAUREEN BYARUGABA',
+    role: 'Accountant',
+    img: maureenImg,
+    category: 'senior-staff',
+  },
+  {
+    name: 'MAGRATE ISIKO ',
+    role: 'Manager Membership and Marketing',
+    img: margretImg,
+    category: 'staff',
+  },
+  {
+    name: 'RICHARD SSEWAGUDDE',
+    role: 'Rescue Manager',
+    img: richardImg,
+    category: 'staff',
+  },
+  {
+    name: 'Robiina Grace Namagembe ',
+    role: 'Front desk  officer',
+    img: robinaImg,
+    category: 'staff',
+  }
+];
 
 export const navigationItems: ReadonlyArray<NavItem> = [
   { label: 'Home', path: '/' },
@@ -108,7 +163,7 @@ export const heroContent = {
   title: "Your Trusted Partner on Uganda's Roads",
   subtitle: `For over ${new Date().getFullYear() - 1986} years, AA Uganda has been providing reliable motoring solutions, driving education, and rescue services across Uganda.`,
   ctaText: "Apply for IDP",
-  ctaLink: "/membership",
+  ctaLink: "/idp/apply",
   backgroundImage: "/images/hero-bg.jpg",
   features: [
     "24/7 Rescue Services",
@@ -117,26 +172,6 @@ export const heroContent = {
     "Expert Automotive Advice",
   ],
 };
-
-type Person = { name: string; role: string };
-
-export const board: Person[] = [
-  { name: 'Jane K.', role: 'Board Chair' },
-  { name: 'Michael O.', role: 'Vice Chair' },
-  { name: 'Grace A.', role: 'Board Member' },
-  { name: 'Peter N.', role: 'Board Member' },
-  { name: 'Ruth S.', role: 'Board Member' },
-  { name: 'Paul T.', role: 'Board Member' },
-];
-
-export const management: Person[] = [
-  { name: 'John M.', role: 'Chief Executive Officer' },
-  { name: 'Sarah N.', role: 'Head of Operations' },
-  { name: 'David B.', role: 'Head of Training' },
-  { name: 'Rita T.', role: 'Head of Finance' },
-  { name: 'Agnes K.', role: 'Head of ICT' },
-  { name: 'Tom W.', role: 'Head of Membership' },
-];
 
 export const milestones = [
   { year: 2023, text: 'Introduced enhanced inspection & advisory services.' },
@@ -150,7 +185,6 @@ export default {
   companyInfo,
   navigationItems,
   heroContent,
-  board,
   management,
   affiliates,
 };

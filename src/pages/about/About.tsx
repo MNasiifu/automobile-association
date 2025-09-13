@@ -23,30 +23,29 @@ import {
   Flag,
   Visibility,
 } from '@mui/icons-material';
-import { Heading, Card, CountUpAnimation, StripeDivider } from '../components/atoms';
-import { PageHeader } from '../components/molecules';
-import { SEO } from '../components/SEO';
+import { Heading, Card, CountUpAnimation, StripeDivider } from '../../components/atoms';
+import { PageHeader } from '../../components/molecules';
+import { SEO } from '../../components/SEO';
 import {
   companyInfo,
   affiliates,
-  board,
   management,
   milestones,
-} from '../data/companyData';
-import { aboutSEO } from '../data/seoData';
-import { useHashScroll } from '../hooks';
+} from '../../data/companyData';
+import { aboutSEO } from '../../data/seoData';
+import { useHashScroll } from '../../hooks';
 
-import stripeImg from '../assets/images/STRIPWEBSITE.png';
-import heroImg from '../assets/images/AA-rescue.jpg';
+import stripeImg from '../../assets/images/STRIPWEBSITE.png';
+import heroImg from '../../assets/images/AA-rescue.jpg';
 
-import g1 from '../assets/images/AA-rescue.jpg';
-import g2 from '../assets/images/rescue.jpg';
-import g3 from '../assets/images/car1.jpeg';
-import g4 from '../assets/images/defensive-driving.jpeg';
-import g5 from '../assets/images/driving-school.jpg';
-import g6 from '../assets/images/road.jpg';
-import g7 from '../assets/images/TOWINGANDRECOVERYFRESHCAR.jpeg';
-import fiaLogo from '../assets/images/FIA.jpeg';
+import g1 from '../../assets/images/AA-rescue.jpg';
+import g2 from '../../assets/images/rescue.jpg';
+import g3 from '../../assets/images/car1.jpeg';
+import g4 from '../../assets/images/defensive-driving.jpeg';
+import g5 from '../../assets/images/driving-school.jpg';
+import g6 from '../../assets/images/road.jpg';
+import g7 from '../../assets/images/TOWINGANDRECOVERYFRESHCAR.jpeg';
+import fiaLogo from '../../assets/images/FIA.jpeg';
 
 const animationKeyframes = {
   fadeIn: keyframes`
@@ -405,25 +404,6 @@ const About: React.FC = () => {
       </Section>
 
       <StripeDivider imageSrc={stripeImg} />
-
-      <Section id="board" aria-labelledby="board-heading">
-        <Container maxWidth="lg">
-          <Heading id="board-heading" variant="h3" gutterBottom>
-            Board of Directors
-          </Heading>
-          <Grid
-            container
-            spacing={{ xs: 2, sm: 3, md: 3.5, lg: 4 }}
-            sx={{ justifyContent: 'center' }}
-          >
-            {board.map((p) => (
-              <Grid key={p.name} xs={12} sm={6} md={4} lg={3}>
-                <PersonCard name={p.name} role={p.role} />
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
-      </Section>
 
       <Section id="management" aria-labelledby="management-heading">
         <Container maxWidth="lg">
