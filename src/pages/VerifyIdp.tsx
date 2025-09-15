@@ -284,7 +284,7 @@ const VerifyIdp: React.FC = () => {
                 Suite 8
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Phone: +256-414-255917 • Email: aauganda@aau.co.ug
+                Phone: {config.company.contactNumber} • Email: {config.company.email}
               </Typography>
             </Box>
 

@@ -40,3 +40,27 @@ export interface CreateMemberResponse {
   data: Member | null;
   error: string | null;
 }
+
+export interface IdpVerificationResult {
+  status: "valid" | "invalid" | "expired" | "pending" | "not_found" | "no_application";
+  idpNumber: number;
+  holderName?: string;
+  issueDate?: string;
+  expiryDate?: string;
+  licenseNumber?: string;
+  licenseClasses?: string;
+  applicationStatus?: string;
+  membershipType?: string;
+  validityStatus?: string;
+  type?: string;
+  issuingAuthority?: string;
+  contactEmail?: string;
+  contactMobile?: string;
+  dateOfBirth?: string;
+  message?: string;
+}
+
+export interface IdpVerificationResponse {
+  data: IdpVerificationResult | null;
+  error: string | null;
+}
