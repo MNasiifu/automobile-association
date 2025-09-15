@@ -4,6 +4,7 @@ import { MockIdpVerificationService } from "../utils/mockIdpDatabase";
 import { config } from "../utils/config/config";
 import { verifyIdp } from "../api";
 import type { verifyIdpResultProp } from "../types";
+import { useGlobalLoading } from "../contexts";
 
 export interface VerificationResult {
   status: "valid" | "invalid" | "expired" | "suspended";
@@ -27,6 +28,9 @@ export const useVerifyIdp = () => {
   const [alertMessage, setAlertMessage] = useState("");
   const navigate = useNavigate();
 
+  // Loading management hook
+  const globalLoading = useGlobalLoading();
+
   const features = [
     {
       icon: "SecurityIcon",
@@ -49,6 +53,9 @@ export const useVerifyIdp = () => {
   ];
 
   const handleSearch = async (idpNumber?: string) => {
+    // Start loading state
+    globalLoading.startLoading('verifyIdpFormSubmission');
+
     const value = idpNumber ?? searchValue;
     setResult(null);
     if (!value.trim()) {
@@ -79,6 +86,8 @@ export const useVerifyIdp = () => {
       setAlertMessage("An error occurred while verifying the IDP. Please try again.");
       setShowAlert(true);
     } finally {
+      // Always stop loading state
+      globalLoading.stopLoading('verifyIdpFormSubmission');
       setLoading(false);
     }
   };

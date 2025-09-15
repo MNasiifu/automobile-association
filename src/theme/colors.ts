@@ -29,6 +29,7 @@ export const colors = {
   success: {
     main: '#4CAF50',
     light: '#81C784',
+    lightest: '#e1f6e2',
     dark: '#388E3C',
     contrastText: '#ffffff',
   },
