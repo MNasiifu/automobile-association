@@ -5,6 +5,7 @@ import type {
   IdpDocument,
   PendingIdpData,
   IdpVerificationResponse,
+  verifyIdpResultProp,
 } from "../types/member";
 
 /**
@@ -35,8 +36,6 @@ export const callSupabaseEdgeFunction = async (
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
       "apikey": API_CONFIG.supabaseKey,
-      // Explicitly set origin for CORS compliance
-      "Origin": window.location.origin,
     };
 
     if (accessToken) {
@@ -47,8 +46,11 @@ export const callSupabaseEdgeFunction = async (
       method: "POST",
       headers,
       body: JSON.stringify(requestBody),
-      // Ensure credentials are only sent when necessary
-      credentials: 'omit', // Don't send cookies/credentials unless explicitly needed
+      // Use 'same-origin' to ensure proper CORS headers are sent
+      // This will make the browser include the Origin header automatically
+      credentials: 'same-origin',
+      // Explicitly set mode to 'cors' to trigger CORS preflight when needed
+      mode: 'cors',
     });
 
     secureLog.info(`${functionName} response status:`, response.status);
@@ -168,18 +170,15 @@ export const verifyIdp = async (idpNumber: number): Promise<IdpVerificationRespo
       idpNumber,
     };
 
-    const {data, error} = await callSupabaseEdgeFunction(
+    const response: verifyIdpResultProp = await callSupabaseEdgeFunction(
       "verify-idp",
       requestBody,
       accessToken
     );
 
-    console.log("::debug verify idp error:", error);
-    console.log("::debug verify idp data:", data);
-
     return {
-      data: data,
-      error: error,
+      data: response,
+      error: null
     };
 
   } catch (error) {

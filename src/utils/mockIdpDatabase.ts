@@ -128,9 +128,47 @@ const mockDatabase: Record<string, MockIdpRecord> = {
     status: "valid",
     holderName: "AA Member Demo",
     issueDate: "2024-01-01",
-    expiryDate: "2024-12-31",
+    expiryDate: "2025-12-31",
     licenseNumber: "UG/DL/MEMBER/2023",
     membershipType: "AA Member",
+    validityStatus: "Active and Valid",
+    type: "1968 Vienna Convention IDP",
+    issuingAuthority: "Automobile Association of Uganda",
+    countries: [
+      "Kenya", "Tanzania", "Rwanda", "South Sudan", "Congo DR", "Burundi",
+      "South Africa", "Nigeria", "Ghana", "Egypt", "Morocco", "Tunisia",
+      "Germany", "France", "United Kingdom", "Italy", "Spain", "Netherlands"
+    ]
+  },
+  "EXPIRING123": {
+    idpNumber: "EXPIRING123",
+    status: "valid",
+    holderName: "Expires Soon Demo",
+    issueDate: "2024-10-01",
+    expiryDate: (() => {
+      const date = new Date();
+      date.setDate(date.getDate() + 15); // Expires in 15 days
+      return date.toISOString().split('T')[0];
+    })(),
+    licenseNumber: "UG/DL/EXPIRING/2023",
+    membershipType: "AA Member",
+    validityStatus: "Active and Valid",
+    type: "1968 Vienna Convention IDP",
+    issuingAuthority: "Automobile Association of Uganda",
+    countries: [
+      "Kenya", "Tanzania", "Rwanda", "South Sudan", "Congo DR", "Burundi",
+      "South Africa", "Nigeria", "Ghana", "Egypt", "Morocco", "Tunisia",
+      "Germany", "France", "United Kingdom", "Italy", "Spain", "Netherlands"
+    ]
+  },
+  "TODAYEXP123": {
+    idpNumber: "TODAYEXP123",
+    status: "valid",
+    holderName: "Expires Today Demo",
+    issueDate: "2024-09-15",
+    expiryDate: new Date().toISOString().split('T')[0], // Expires today
+    licenseNumber: "UG/DL/TODAYEXP/2023",
+    membershipType: "Non-Member",
     validityStatus: "Active and Valid",
     type: "1968 Vienna Convention IDP",
     issuingAuthority: "Automobile Association of Uganda",
@@ -272,6 +310,8 @@ export class MockIdpVerificationService {
     return [
       { description: "Valid AA Member IDP", idpNumber: "UG2024001234", expectedStatus: "valid" },
       { description: "Valid Non-Member IDP", idpNumber: "UG2024005678", expectedStatus: "valid" },
+      { description: "Expires in 15 Days", idpNumber: "EXPIRING123", expectedStatus: "expires-soon" },
+      { description: "Expires Today", idpNumber: "TODAYEXP123", expectedStatus: "expires-today" },
       { description: "Expired IDP", idpNumber: "UG2022001111", expectedStatus: "expired" },
       { description: "Suspended IDP", idpNumber: "UG2024002222", expectedStatus: "suspended" },
       { description: "Demo: AA Member", idpNumber: "MEMBER123", expectedStatus: "valid" },

@@ -42,7 +42,6 @@ export interface CreateMemberResponse {
 }
 
 export interface IdpVerificationResult {
-  status: "valid" | "invalid" | "expired" | "pending" | "not_found" | "no_application";
   idpNumber: number;
   holderName?: string;
   issueDate?: string;
@@ -60,7 +59,13 @@ export interface IdpVerificationResult {
   message?: string;
 }
 
+export interface verifyIdpResultProp extends Member {
+  idp_available: boolean;
+  issuedate: string;
+  expirydate: string;
+}
+
 export interface IdpVerificationResponse {
-  data: IdpVerificationResult | null;
+  data: verifyIdpResultProp | null;
   error: string | null;
 }
