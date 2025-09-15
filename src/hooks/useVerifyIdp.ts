@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { MockIdpVerificationService } from "../utils/mockIdpDatabase";
 import { config } from "../utils/config/config";
 import { verifyIdp } from "../api";
 import type { verifyIdpResultProp } from "../types";
@@ -92,8 +91,6 @@ export const useVerifyIdp = () => {
     }
   };
 
-  const getTestCases = () => MockIdpVerificationService.getTestCases();
-
   return {
     searchValue,
     setSearchValue,
@@ -105,7 +102,6 @@ export const useVerifyIdp = () => {
     setAlertMessage,
     handleSearch,
     features,
-    getTestCases,
     navigate,
     config,
   };

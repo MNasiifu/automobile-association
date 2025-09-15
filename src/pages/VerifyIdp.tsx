@@ -189,7 +189,6 @@ const VerifyIdp: React.FC = () => {
     alertMessage,
     handleSearch,
     features,
-    getTestCases,
     navigate,
     config,
   } = useVerifyIdp();
