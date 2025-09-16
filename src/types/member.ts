@@ -40,3 +40,32 @@ export interface CreateMemberResponse {
   data: Member | null;
   error: string | null;
 }
+
+export interface IdpVerificationResult {
+  idpNumber: number;
+  holderName?: string;
+  issueDate?: string;
+  expiryDate?: string;
+  licenseNumber?: string;
+  licenseClasses?: string;
+  applicationStatus?: string;
+  membershipType?: string;
+  validityStatus?: string;
+  type?: string;
+  issuingAuthority?: string;
+  contactEmail?: string;
+  contactMobile?: string;
+  dateOfBirth?: string;
+  message?: string;
+}
+
+export interface verifyIdpResultProp extends Member {
+  idp_available: boolean;
+  issuedate: string;
+  expirydate: string;
+}
+
+export interface IdpVerificationResponse {
+  data: verifyIdpResultProp | null;
+  error: string | null;
+}

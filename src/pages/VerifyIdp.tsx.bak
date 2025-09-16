@@ -14,8 +14,6 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  Snackbar,
-  Alert,
 } from "@mui/material";
 import {
   Search as SearchIcon,
@@ -26,11 +24,10 @@ import {
   Security as SecurityIcon,
   Public as PublicIcon,
   Schedule as ScheduleIcon,
+  Person as PersonIcon,
   DriveEta as DriveEtaIcon,
   VerifiedUser as VerifiedUserIcon,
   Language as LanguageIcon,
-  Download as DownloadIcon,
-  PictureAsPdf as PdfIcon,
 } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
 import { Button, Heading, AlertNotification } from "../components/atoms";
@@ -40,7 +37,6 @@ import { verifyIdpSEO } from "../data/seoData";
 import theme from "../theme";
 import { useForm } from "react-hook-form";
 import { useVerifyIdp } from "../hooks/useVerifyIdp";
-import { generateIDPVerificationPDF } from "../utils/pdfGenerator";
 
 const FeatureCard = styled(Card)(({ theme }) => ({
   height: "100%",
@@ -93,7 +89,7 @@ const iconMap = {
 const getStatusIcon = (status: string) => {
   switch (status) {
     case "valid":
-      return <CheckCircleIcon sx={{ color: "secondary.main", fontSize: 24 }} />;
+      return <CheckCircleIcon sx={{ color: "success.dark", fontSize: 24 }} />;
     case "invalid":
       return <CancelIcon sx={{ color: "error.main", fontSize: 24 }} />;
     case "expired":
@@ -109,7 +105,7 @@ const getStatusIcon = (status: string) => {
 
 const getStatusChip = (status: string) => {
   const configs = {
-    valid: { label: "Valid", color: "secondary" as const },
+    valid: { label: "Valid", color: "success" as const },
     invalid: { label: "Invalid", color: "error" as const },
     expired: { label: "Expired", color: "warning" as const },
     suspended: { label: "Suspended", color: "error" as const },
@@ -185,10 +181,10 @@ const VerifyIdp: React.FC = () => {
     result,
     showAlert,
     setShowAlert,
-    setAlertMessage,
     alertMessage,
     handleSearch,
     features,
+    getTestCases,
     navigate,
     config,
   } = useVerifyIdp();
@@ -200,11 +196,6 @@ const VerifyIdp: React.FC = () => {
   React.useEffect(() => {
     setValue("idpNumber", searchValue);
   }, [searchValue, setValue]);
-
-
-  // PDF Download states
-  const [downloadingPDF, setDownloadingPDF] = React.useState(false);
-  const [showDownloadSuccess, setShowDownloadSuccess] = React.useState(false);
 
   // Add keyframes animations for enhanced visual effects
   React.useEffect(() => {
@@ -258,37 +249,6 @@ const VerifyIdp: React.FC = () => {
     handleSearch(data.idpNumber);
   };
 
-  // PDF Download Handler
-  const handleDownloadPDF = async () => {
-    if (!result || !result.idp_available) return;
-    
-    setDownloadingPDF(true);
-    
-    try {
-      const expiryInfo = getExpiryStatus(result.expirydate);
-      const verificationTime = new Date().toLocaleString('en-GB');
-      
-      // Convert the result to match PDF generator interface
-      const pdfData = {
-        ...result,
-        id: String(searchValue), // Convert numeric ID to string
-      };
-      
-      await generateIDPVerificationPDF(pdfData, expiryInfo, verificationTime);
-      
-      // Show success notification
-      setShowDownloadSuccess(true);
-      
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      // Handle error - show error notification
-      setAlertMessage('Failed to download verification certificate. Please try again.');
-      setShowAlert(true);
-    } finally {
-      setDownloadingPDF(false);
-    }
-  };
-
   return (
     <Box>
       <SEO seoData={verifyIdpSEO} />
@@ -334,7 +294,6 @@ const VerifyIdp: React.FC = () => {
               </Typography>
             </Box>
 
-            <Grid item container justifyContent="center">
             <form onSubmit={handleSubmit(onSubmit)} style={{ display: "flex", gap: 16, marginBottom: 32, alignItems: "stretch" }}>
               <TextField
                 fullWidth
@@ -393,9 +352,6 @@ const VerifyIdp: React.FC = () => {
                 {loading ? "Verifying..." : "Verify IDP"}
               </Button>
             </form>
-            </Grid>
-
-            
 
             <Box
               sx={{
@@ -494,58 +450,7 @@ const VerifyIdp: React.FC = () => {
               })()}
 
               {result.idp_available && (
-                <CardContent sx={{ p: '0 !important' }}>
-
-                   {/* Download PDF Button Section */}
-                   <Box 
-                    sx={{ 
-                      p: { xs: 2, md: 3 }, 
-                      backgroundColor: 'grey.50',
-                      borderBottom: '1px solid',
-                      borderColor: 'grey.200',
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center'
-                    }}
-                  >
-                    <Button
-                      variant="contained"
-                      startIcon={downloadingPDF ? <CircularProgress size={20} color="inherit" /> : <PdfIcon />}
-                      endIcon={!downloadingPDF && <DownloadIcon />}
-                      onClick={handleDownloadPDF}
-                      disabled={downloadingPDF}
-                      sx={{
-                        background: downloadingPDF 
-                          ? 'linear-gradient(135deg, #9E9E9E 0%, #757575 100%)'
-                          : 'linear-gradient(135deg, #1976D2 0%, #1565C0 100%)',
-                        color: 'white',
-                        fontWeight: 600,
-                        fontSize: { xs: '0.9rem', md: '1rem' },
-                        px: { xs: 3, md: 4 },
-                        py: { xs: 1.5, md: 2 },
-                        borderRadius: 3,
-                        boxShadow: downloadingPDF 
-                          ? '0 2px 8px rgba(158, 158, 158, 0.2)'
-                          : '0 4px 16px rgba(25, 118, 210, 0.3)',
-                        textTransform: 'none',
-                        transition: 'all 0.3s ease-in-out',
-                        '&:hover': downloadingPDF ? {} : {
-                          background: 'linear-gradient(135deg, #1565C0 0%, #0D47A1 100%)',
-                          boxShadow: '0 6px 24px rgba(25, 118, 210, 0.4)',
-                          transform: 'translateY(-2px)',
-                        },
-                        '&:active': downloadingPDF ? {} : {
-                          transform: 'translateY(0px)',
-                        },
-                        '&.Mui-disabled': {
-                          color: 'white !important',
-                        }
-                      }}
-                    >
-                      {downloadingPDF ? 'Generating PDF...' : 'Download Verification Certificate'}
-                    </Button>
-                  </Box>
-
+                <CardContent sx={{ p: '0 !important' }} className="testingxxx">
                   {/* Main Content Section */}
                   <Box sx={{ p: { xs: 2, md: 3, lg: 4 }, pb: 0 }}>
                     <Grid container spacing={{ xs: 2, md: 3, lg: 4 }}>
@@ -686,7 +591,7 @@ const VerifyIdp: React.FC = () => {
                             }}
                           >
                             <SecurityIcon sx={{ fontSize: 18, mr: 1 }} />
-                            IDP #{searchValue}
+                            IDP #{result.id}
                           </Box>
                         </Box>
                       </Grid>
@@ -1209,7 +1114,7 @@ const VerifyIdp: React.FC = () => {
                                     ? 'error.50' 
                                     : isExpiringSoon 
                                       ? 'warning.50' 
-                                      : "#e8fbf2",
+                                      : theme.palette.success.lightest,
                                   borderRadius: 2,
                                   border: '2px solid',
                                   borderColor: isExpiredOrExpiring 
@@ -1370,6 +1275,83 @@ const VerifyIdp: React.FC = () => {
           </Grid>
         </Container>
       </Box>
+
+      {/* Test Cases Section for Development */}
+      {import.meta.env.DEV && (
+        <Box sx={{ py: { xs: 4, md: 6 }, backgroundColor: "warning.50" }}>
+          <Container maxWidth="xl">
+            <Box sx={{ textAlign: "center", mb: { xs: 3, md: 4 } }}>
+              <Heading variant="h3" align="center" gutterBottom>
+                🧪 Test Cases (Development Mode)
+              </Heading>
+              <Typography
+                variant="h6"
+                color="text.secondary"
+                sx={{ maxWidth: 600, mx: "auto" }}
+              >
+                Use these predefined IDP numbers to test different verification scenarios
+              </Typography>
+            </Box>
+
+            <Grid container spacing={3}>
+              {getTestCases().map((testCase, index) => (
+                <Grid item xs={12} sm={6} md={4} key={index}>
+                  <Card 
+                    sx={{ 
+                      cursor: 'pointer', 
+                      transition: 'all 0.2s',
+                      '&:hover': { 
+                        transform: 'translateY(-2px)',
+                        boxShadow: 3 
+                      }
+                    }}
+                    onClick={() => {
+                      setSearchValue(testCase.idpNumber);
+                      handleSearch(testCase.idpNumber);
+                    }}
+                  >
+                    <CardContent>
+                      <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                        {testCase.description}
+                      </Typography>
+                      <Typography 
+                        variant="body1" 
+                        sx={{ 
+                          fontFamily: 'monospace',
+                          backgroundColor: 'grey.100',
+                          p: 1,
+                          borderRadius: 1,
+                          mb: 1
+                        }}
+                      >
+                        {testCase.idpNumber}
+                      </Typography>
+                      <Chip 
+                        label={`Expected: ${testCase.expectedStatus}`}
+                        size="small"
+                        color={
+                          testCase.expectedStatus === 'valid' ? 'success' :
+                          testCase.expectedStatus === 'expired' ? 'warning' : 'error'
+                        }
+                      />
+                      <Typography variant="caption" display="block" sx={{ mt: 1, fontStyle: 'italic' }}>
+                        Click to test this case
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+
+            <Box sx={{ mt: 4, p: 3, backgroundColor: 'info.50', borderRadius: 2 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
+                <strong>Note:</strong> This section is only visible in development mode. 
+                The verification system also supports realistic fallback results for arbitrary valid Uganda IDP patterns (UG + year + numbers).
+              </Typography>
+            </Box>
+          </Container>
+        </Box>
+      )}
 
       {/* Information Section */}
       <Box sx={{ py: { xs: 6, md: 8 }, backgroundColor: "grey.50" }}>
@@ -1537,7 +1519,6 @@ const VerifyIdp: React.FC = () => {
                     <Button
                       variant="outlined"
                       size="large"
-                      onClick={() => navigate("/contact")}
                       sx={{
                         borderColor: "white",
                         color: "white",
@@ -1556,32 +1537,6 @@ const VerifyIdp: React.FC = () => {
           </Grid>
         </Container>
       </Box>
-
-      {/* PDF Download Success Notification */}
-      <Snackbar
-        open={showDownloadSuccess}
-        autoHideDuration={4000}
-        onClose={() => setShowDownloadSuccess(false)}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-        sx={{ mt: 0 }}
-      >
-        <Alert 
-          onClose={() => setShowDownloadSuccess(false)} 
-          severity="success"
-          variant="filled"
-          sx={{
-            width: '100%',
-            boxShadow: '0 4px 12px rgba(76, 175, 80, 0.3)',
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <PdfIcon />
-            <Typography variant="body2" sx={{ fontWeight: 600 }}>
-              Verification certificate downloaded successfully!
-            </Typography>
-          </Box>
-        </Alert>
-      </Snackbar>
 
       {/* Enhanced Alert Notification - Top Right Positioning */}
       <AlertNotification

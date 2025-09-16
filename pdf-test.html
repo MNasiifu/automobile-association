@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Generator Test</title>
+    <script src="https://unpkg.com/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+    <h1>PDF Generator Test</h1>
+    <button onclick="testPDFGeneration()">Test PDF Generation</button>
+    
+    <div id="test-content" style="margin-top: 20px; padding: 20px; border: 1px solid #ccc;">
+        <div class="certificate" style="width: 210mm; min-height: 297mm; padding: 20mm; background: white;">
+            <div class="header" style="background: linear-gradient(135deg, #024F33 0%, #2E7D57 100%); color: white; padding: 15mm 0; margin: -20mm -20mm 20mm -20mm;">
+                <div class="header-content" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                    <div class="logo-section" style="display: flex; align-items: center; padding-left: 20mm;">
+                        <div style="width: 60px; height: 60px; border-radius: 50%; border: 3px solid white; margin-right: 15mm; background: white; display: flex; align-items: center; justify-content: center; color: #024F33; font-weight: bold;">AAU</div>
+                    </div>
+                    <div class="header-text" style="flex: 1; padding-right: 20mm;">
+                        <h1 style="font-size: 28px; font-weight: bold; margin-bottom: 5px;">IDP VERIFICATION CERTIFICATE</h1>
+                        <div style="font-size: 14px; opacity: 0.9;">Official Verification Report</div>
+                        <div style="font-size: 14px; opacity: 0.9;">Automobile Association of Uganda</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="padding: 15px; text-align: center; color: white; font-size: 20px; font-weight: bold; margin: 20px 0; border-radius: 8px; background: #4CAF50;">
+                ✅ TEST CERTIFICATE
+            </div>
+            
+            <div style="margin: 20px 0; border: 1px solid #e0e0e0; border-radius: 8px;">
+                <div style="background: #f5f5f5; padding: 10px 15px; font-weight: bold; color: #024F33; border-bottom: 1px solid #e0e0e0;">
+                    TEST INFORMATION
+                </div>
+                <div style="padding: 20px;">
+                    <p>This is a test certificate to verify PDF generation is working correctly.</p>
+                    <p><strong>Test Date:</strong> <span id="test-date"></span></p>
+                    <p><strong>Status:</strong> Testing PDF Generation</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Set test date
+        document.getElementById('test-date').textContent = new Date().toLocaleDateString('en-GB');
+        
+        async function testPDFGeneration() {
+            try {
+                console.log('Starting PDF test...');
+                
+                const element = document.getElementById('test-content');
+                if (!element) {
+                    throw new Error('Test content element not found');
+                }
+                
+                const opt = {
+                    margin: [5, 5, 5, 5],
+                    filename: 'PDF_Test_' + new Date().toISOString().split('T')[0] + '.pdf',
+                    image: { type: 'jpeg', quality: 0.95 },
+                    html2canvas: { 
+                        scale: 1.5,
+                        useCORS: true,
+                        allowTaint: true,
+                        letterRendering: true,
+                        logging: true,
+                        backgroundColor: '#ffffff'
+                    },
+                    jsPDF: { 
+                        unit: 'mm', 
+                        format: 'a4', 
+                        orientation: 'portrait',
+                        compress: false
+                    }
+                };
+                
+                console.log('Generating PDF...');
+                await html2pdf().set(opt).from(element).save();
+                console.log('PDF generated successfully!');
+                
+            } catch (error) {
+                console.error('PDF generation failed:', error);
+                alert('PDF generation failed: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>

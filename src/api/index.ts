@@ -4,6 +4,8 @@ import type {
   CreateMemberData,
   IdpDocument,
   PendingIdpData,
+  IdpVerificationResponse,
+  verifyIdpResultProp,
 } from "../types/member";
 
 /**
@@ -34,8 +36,6 @@ export const callSupabaseEdgeFunction = async (
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
       "apikey": API_CONFIG.supabaseKey,
-      // Explicitly set origin for CORS compliance
-      "Origin": window.location.origin,
     };
 
     if (accessToken) {
@@ -46,8 +46,11 @@ export const callSupabaseEdgeFunction = async (
       method: "POST",
       headers,
       body: JSON.stringify(requestBody),
-      // Ensure credentials are only sent when necessary
-      credentials: 'omit', // Don't send cookies/credentials unless explicitly needed
+      // Use 'same-origin' to ensure proper CORS headers are sent
+      // This will make the browser include the Origin header automatically
+      credentials: 'same-origin',
+      // Explicitly set mode to 'cors' to trigger CORS preflight when needed
+      mode: 'cors',
     });
 
     secureLog.info(`${functionName} response status:`, response.status);
@@ -142,37 +145,49 @@ export const getAAUMemberByNumber = async (memberNumber: number) => {
 };
 
 /**
- * Test function to verify edge function connectivity and CORS
- * @returns Promise with test result
+ * Verifies an International Driving Permit (IDP) by its number
+ * @param idpNumber - The IDP number to verify (must be a number)
+ * @returns Promise containing IDP verification data or error
  */
-export const testEdgeFunction = async () => {
+export const verifyIdp = async (idpNumber: number): Promise<IdpVerificationResponse> => {
   try {
-    console.log("Testing edge function connectivity...");
+    // Validate input parameter
+    if (!idpNumber || typeof idpNumber !== 'number') {
+      return {
+        data: null,
+        error: "IDP number must be a valid number",
+      };
+    }
 
-    // Get access token for authenticated requests
+    // Log the verification attempt for security auditing
+    secureLog.info(`IDP verification request for number: ${idpNumber}`);
+
     const { data: sessionData } = await supabase.auth.getSession();
     const accessToken = sessionData?.session?.access_token ?? null;
 
-    const data = await callSupabaseEdgeFunction(
-      "upload-idp-docs",
-      {
-        test: true,
-        timestamp: new Date().toISOString(),
-      },
+    // Prepare the request body to match the edge function's expected structure
+    const requestBody = {
+      idpNumber,
+    };
+
+    const response: verifyIdpResultProp = await callSupabaseEdgeFunction(
+      "verify-idp",
+      requestBody,
       accessToken
     );
 
     return {
-      success: true,
-      data: data,
-      error: null,
+      data: response,
+      error: null
     };
+
   } catch (error) {
-    console.error("Edge function test failed:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+    secureLog.error(`IDP verification failed for number ${idpNumber}:`, error);
+    
     return {
-      success: false,
-      error: error instanceof Error ? error.message : "Unknown error",
-      details: error,
+      data: null,
+      error: `Error verifying IDP: ${errorMessage}`,
     };
   }
 };
