@@ -33,7 +33,6 @@ const createVerificationCertificateHTML = async (
   let aauLogoDataUrl: string;
   try {
     aauLogoDataUrl = await ImageUtils.loadAAULogo();
-    console.log('::debug AAU logo loaded, length:', aauLogoDataUrl.length);
   } catch (error) {
     console.warn('Failed to load AAU logo, using fallback:', error);
     aauLogoDataUrl = await ImageUtils.createFallbackLogo();
@@ -438,8 +437,6 @@ export const generateIDPVerificationPDF = async (
   try {
     // Generate the HTML content with loaded images
     const htmlContent = await createVerificationCertificateHTML(data, expiryInfo, verificationTime);
-
-    console.log('::debug htmlContent:', htmlContent);
     
     // Create a temporary container for the HTML - make it visible but off-screen
     const tempDiv = document.createElement('div');
@@ -531,7 +528,7 @@ export const generateIDPVerificationPDF = async (
         useCORS: true,
         allowTaint: true,
         letterRendering: true,
-        logging: true, // Enable logging for debugging
+        logging: process.env.NODE_ENV !== 'production', // Enable logging only in non-production environments, // Enable logging for debugging
         backgroundColor: '#ffffff',
         width: certificateElement.scrollWidth || 794, // A4 width in pixels at 96 DPI
         height: certificateElement.scrollHeight || 1123, // Let it auto-calculate height
@@ -544,12 +541,10 @@ export const generateIDPVerificationPDF = async (
         unit: 'mm', 
         format: 'a4', 
         orientation: 'portrait',
-        compress: false // Disable compression for debugging
+        compress: process.env.NODE_ENV === 'production' // Enable compression in production
       },
       pagebreak: { mode: 'avoid-all' }
     };
-    
-    console.log('::debug Starting PDF generation...');
     
     // Generate the PDF using the certificate element
     const pdfInstance = html2pdf().set(opt).from(certificateElement);

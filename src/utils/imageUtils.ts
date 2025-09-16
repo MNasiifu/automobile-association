@@ -1,3 +1,5 @@
+import { aauLogoBase64 } from "../constants/image";
+
 // Image utilities for PDF generation and processing
 export class ImageUtils {
   private static logoCache: string | null = null;
@@ -90,7 +92,7 @@ export class ImageUtils {
    */
   private static createSimpleFallbackLogo(): string {
     // Simple 1x1 pixel transparent PNG as absolute fallback
-    return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChAFyWce9vAAAAABJRU5ErkJggg==';
+    return aauLogoBase64;
   }
   
   /**

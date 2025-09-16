@@ -65,8 +65,6 @@ export const useVerifyIdp = () => {
     setLoading(true);
     try {
       const {data, error} = await verifyIdp(Number(value));
-      console.log("::debug data:",data);
-      console.log("::debug error:",error);
 
       if (error) {
         setShowAlert(true);

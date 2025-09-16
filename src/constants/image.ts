@@ -1,0 +1,1 @@
+export const aauLogoBase64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChAFyWce9vAAAAABJRU5ErkJggg==';
