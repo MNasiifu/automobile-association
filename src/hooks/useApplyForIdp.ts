@@ -157,6 +157,7 @@ const createFileHash = async (file: File): Promise<string> => {
 };
 
 // Validation schema based on idp.md requirements
+// Configured for onBlur validation - all validations trigger when user leaves the field
 const validationSchema = yup.object({
   // Membership info
   isMember: yup.boolean().required("Please specify if you are an AA member"),
@@ -342,6 +343,9 @@ const useApplyForIdp = () => {
     "success" | "warning" | "error"
   >("success");
 
+  // reCAPTCHA state
+  const [recaptchaValue, setRecaptchaValue] = useState<string | null>(null);
+
   // Enhanced alert configuration for better UX
   const [alertConfig, setAlertConfig] = useState<{
     autoHideDuration: number | null;
@@ -394,10 +398,15 @@ const useApplyForIdp = () => {
   // Debounce timer for membership number input
   const membershipDebounceRef = useRef<NodeJS.Timeout | null>(null);
 
+  // reCAPTCHA ref
+  const recaptchaRef = useRef<any>(null);
+
   // URL management for object URLs to prevent memory leaks
   const objectUrlsRef = useRef<Map<string, string>>(new Map());
 
-  // Form configuration
+  // Form configuration with onBlur validation
+  // All field validations will trigger when user leaves the field (onBlur event)
+  // This provides better UX by not showing errors while user is still typing
   const {
     control,
     handleSubmit,
@@ -431,7 +440,8 @@ const useApplyForIdp = () => {
       termsAccepted: false,
       declarationAccepted: false,
     },
-    mode: "onChange",
+    mode: "onBlur", // Validate when user leaves the field
+    reValidateMode: "onBlur", // Re-validate on blur after initial validation
   });
 
   const watchedIsMember = watch("isMember");
@@ -599,7 +609,16 @@ const useApplyForIdp = () => {
       return;
     }
 
+    // Additional reCAPTCHA validation for final step
     if (activeStep === steps.length - 1) {
+      if (!recaptchaValue) {
+        showAlertMessage(
+          "Please complete the reCAPTCHA verification before submitting",
+          "error",
+          { position: "top-right", autoHideDuration: 6000 }
+        );
+        return;
+      }
       handleFormSubmit(watchedFormData);
     } else {
       setActiveStep((prev) => prev + 1);
@@ -612,6 +631,16 @@ const useApplyForIdp = () => {
 
   // Form submission handler with loading management
   const handleFormSubmit = async (data: IDPFormData) => {
+    // Final reCAPTCHA validation check
+    if (!recaptchaValue) {
+      showAlertMessage(
+        "Please complete the reCAPTCHA verification",
+        "error",
+        { position: "top-right", autoHideDuration: 6000 }
+      );
+      return;
+    }
+
     try {
       setIsLoading(true);
       // Start loading state
@@ -714,6 +743,10 @@ const useApplyForIdp = () => {
       // Reset the form to initial state
       reset();
 
+      // Reset reCAPTCHA
+      setRecaptchaValue(null);
+      recaptchaRef.current?.reset();
+
       // Reset step to first step
       setActiveStep(0);
 
@@ -746,11 +779,26 @@ const useApplyForIdp = () => {
       }, 500);
     } catch (error: unknown) {
       console.error("::debug error:", error);
+      
+      let errorMessage = "Failed to submit application. Please try again.";
+
+      if (error instanceof Error) {
+        if (error.message.toLowerCase().includes("recaptcha")) {
+          errorMessage = "reCAPTCHA verification failed. Please try again.";
+        } else if (error.message.toLowerCase().includes("network")) {
+          errorMessage = "Network error. Please check your connection and try again.";
+        }
+      }
+
       showAlertMessage(
-        `${error || "Failed to submit application. Please try again."}`,
+        `${error || errorMessage}`,
         "error",
         { position: "top-right", autoHideDuration: 7000 }
       );
+
+      // Reset reCAPTCHA on error
+      setRecaptchaValue(null);
+      recaptchaRef.current?.reset();
     } finally {
       // Always stop loading state
       globalLoading.stopLoading("formSubmission");
@@ -760,7 +808,7 @@ const useApplyForIdp = () => {
 
   // File handling functions
   const handleFileUpload = async (fieldName: keyof IDPFormData, file: File) => {
-    setValue(fieldName, file, { shouldValidate: true });
+    setValue(fieldName, file, { shouldValidate: true, shouldTouch: true });
 
     // If it's a passport photo, validate it with content-based caching
     if (fieldName === "passportPhoto") {
@@ -885,7 +933,7 @@ const useApplyForIdp = () => {
       revokeManagedImageUrl(currentFile);
     }
 
-    setValue(fieldName, undefined, { shouldValidate: true });
+    setValue(fieldName, undefined, { shouldValidate: true, shouldTouch: true });
 
     // Clear photo validation state when removing passport photo
     if (fieldName === "passportPhoto") {
@@ -1011,17 +1059,23 @@ const useApplyForIdp = () => {
           // Auto-populate form fields with member data
           setValue("surname", result.data.fname || "", {
             shouldValidate: true,
+            shouldTouch: true,
           });
           setValue("otherNames", result.data.onames || "", {
             shouldValidate: true,
+            shouldTouch: true,
           });
           setValue("emailAddress", result.data.email || "", {
             shouldValidate: true,
+            shouldTouch: true,
           });
           // Format and validate phone numbers before setting them
           const formattedTel = formatPhoneNumberForForm(result.data.tel);
 
-          setValue("telephoneNumber", formattedTel, { shouldValidate: true });
+          setValue("telephoneNumber", formattedTel, { 
+            shouldValidate: true,
+            shouldTouch: true,
+          });
 
           showAlertMessage(
             `Member verified successfully! Welcome back, ${result.data.fname} ${result.data.onames}`,
@@ -1151,17 +1205,23 @@ const useApplyForIdp = () => {
   const applicationFee = watchedIsMember ? 250000 : 350000;
 
   // Phone number helper functions for use in form inputs
+  // Updated for onBlur validation - no immediate validation on change
   const handlePhoneNumberChange = useCallback(
     (fieldName: "telephoneNumber" | "mobileNumber", value: string) => {
-      // Set the value first
+      // Set the value without immediate validation (will validate onBlur)
+      // This prevents validation errors from showing while user is still typing
       setValue(fieldName, value, { shouldValidate: false });
-
-      // Trigger validation after a short delay to provide real-time feedback
-      setTimeout(() => {
-        trigger(fieldName);
-      }, 100);
     },
-    [setValue, trigger]
+    [setValue]
+  );
+
+  // Helper function for manual validation trigger when needed
+  // Useful for programmatic validation outside of normal onBlur flow
+  const triggerPhoneValidation = useCallback(
+    (fieldName: "telephoneNumber" | "mobileNumber") => {
+      trigger(fieldName);
+    },
+    [trigger]
   );
 
   const getPhoneNumberHelperText = useCallback(
@@ -1172,6 +1232,33 @@ const useApplyForIdp = () => {
     },
     [errors, watch]
   );
+
+  // reCAPTCHA handlers
+  const handleRecaptchaChange = useCallback((value: string | null) => {
+    setRecaptchaValue(value);
+    if (value) {
+      // Clear any error messages when reCAPTCHA is completed
+      setShowAlert(false);
+    }
+  }, []);
+
+  const handleRecaptchaError = useCallback(() => {
+    setRecaptchaValue(null);
+    showAlertMessage(
+      "reCAPTCHA error occurred. Please refresh the page and try again.",
+      "error",
+      { position: "top-right", autoHideDuration: 6000 }
+    );
+  }, [showAlertMessage]);
+
+  const handleRecaptchaExpired = useCallback(() => {
+    setRecaptchaValue(null);
+    showAlertMessage(
+      "reCAPTCHA has expired. Please verify again.",
+      "warning",
+      { position: "top-right", autoHideDuration: 6000 }
+    );
+  }, [showAlertMessage]);
 
   return {
     // State
@@ -1190,6 +1277,13 @@ const useApplyForIdp = () => {
     globalLoading,
     isFormSubmitting: globalLoading.isLoading("formSubmission"),
 
+    // reCAPTCHA
+    recaptchaValue,
+    recaptchaRef,
+    handleRecaptchaChange,
+    handleRecaptchaError,
+    handleRecaptchaExpired,
+
     // Form
     control,
     handleSubmit,
@@ -1207,6 +1301,7 @@ const useApplyForIdp = () => {
 
     // Phone number utilities
     handlePhoneNumberChange,
+    triggerPhoneValidation,
     getPhoneNumberHelperText,
     validateUgandaPhoneNumber,
 
