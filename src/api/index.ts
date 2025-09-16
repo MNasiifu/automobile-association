@@ -1,12 +1,22 @@
 import supabase from "../utils/superbaseClient";
 import { secureLog, validateOrigin, API_CONFIG } from "../utils/securityConfig";
+import { validateUgandaPhoneNumber } from "../utils/phoneValidation";
 import type {
   CreateMemberData,
   IdpDocument,
   PendingIdpData,
   IdpVerificationResponse,
   verifyIdpResultProp,
+  AauMember,
 } from "../types/member";
+
+/**
+ * Response interface for AAU member queries
+ */
+export interface AAUMemberResponse {
+  data: AauMember | null;
+  error: string | null;
+}
 
 /**
  * Enhanced fetch wrapper for Supabase Edge Functions that handles CORS properly
@@ -113,14 +123,19 @@ export const validateMemberData = (
     errors.push("Invalid photo date format");
   }
 
-  // Phone number validation (basic)
-  const phoneRegex = /^\+?[\d\s\-\(\)]+$/;
-  if (memberData.mobile && !phoneRegex.test(memberData.mobile)) {
-    errors.push("Invalid mobile number format");
+  // Phone number validation (Uganda format)
+  if (memberData.mobile) {
+    const mobileValidation = validateUgandaPhoneNumber(memberData.mobile);
+    if (!mobileValidation.isValid) {
+      errors.push(`Invalid mobile number: ${mobileValidation.error}`);
+    }
   }
 
-  if (memberData.tel && !phoneRegex.test(memberData.tel)) {
-    errors.push("Invalid telephone number format");
+  if (memberData.tel) {
+    const telValidation = validateUgandaPhoneNumber(memberData.tel);
+    if (!telValidation.isValid) {
+      errors.push(`Invalid telephone number: ${telValidation.error}`);
+    }
   }
 
   return {
@@ -129,18 +144,95 @@ export const validateMemberData = (
   };
 };
 
-export const getAAUMemberByNumber = async (memberNumber: number) => {
+// ===== AAU MEMBER MANAGEMENT FUNCTIONS =====
+
+/**
+ * Retrieves an AAU member by their membership number
+ * @param memberNumber - The AA membership number to search for
+ * @returns Promise containing member data or error
+ */
+export const getAAUMemberByNumber = async (memberNumber: number): Promise<AAUMemberResponse> => {
   try {
-    const response = await supabase
+    // Validate input parameter
+    if (!memberNumber || typeof memberNumber !== 'number' || memberNumber <= 0) {
+      return {
+        data: null,
+        error: "Member number must be a valid positive number",
+      };
+    }
+
+    // Log the member lookup attempt for security auditing
+    secureLog.info(`AAU member lookup request for number: ${memberNumber}`);
+
+    // Query the aau_member table
+    const { data, error } = await supabase
       .from("aau_member")
       .select("*")
       .eq("aa_member_no", memberNumber)
-      .limit(1)
-      .single(); // Use single() since we expect only one result
+      .maybeSingle(); // Use maybeSingle() to handle not found case gracefully
 
-    return response;
+    if (error) {
+      secureLog.error(`Database error fetching member ${memberNumber}:`, error);
+      return {
+        data: null,
+        error: `Database error: ${error.message}`,
+      };
+    }
+
+    if (!data) {
+      secureLog.info(`No member found with number: ${memberNumber}`);
+      return {
+        data: null,
+        error: `No member found with AA membership number: ${memberNumber}`,
+      };
+    }
+
+    secureLog.info(`Successfully retrieved member: ${memberNumber}`);
+    return {
+      data: data as AauMember,
+      error: null,
+    };
+
   } catch (error) {
-    throw new Error(`Error fetching member by number: ${error}`);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+    secureLog.error(`Unexpected error fetching member ${memberNumber}:`, error);
+    
+    return {
+      data: null,
+      error: `Error retrieving member: ${errorMessage}`,
+    };
+  }
+};
+
+/**
+ * Checks if a member exists by their membership number
+ * @param memberNumber - The AA membership number to check
+ * @returns Promise containing boolean result or error
+ */
+export const checkAAUMemberExists = async (memberNumber: number): Promise<{ exists: boolean; error: string | null }> => {
+  try {
+    const result = await getAAUMemberByNumber(memberNumber);
+    
+    if (result.error && !result.error.includes("No member found")) {
+      // If there's a database error, return the error
+      return {
+        exists: false,
+        error: result.error,
+      };
+    }
+    
+    return {
+      exists: result.data !== null,
+      error: null,
+    };
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+    secureLog.error(`Error checking member existence for ${memberNumber}:`, error);
+    
+    return {
+      exists: false,
+      error: `Error checking member existence: ${errorMessage}`,
+    };
   }
 };
 
@@ -231,17 +323,6 @@ export const applyForIdp = async (
       passport_pdf_base64: idpDocuments.passport_pdf_base64,
       passport_photo_base64: idpDocuments.passport_photo_base64,
     };
-
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    };
-
-    if (accessToken) {
-      headers["Authorization"] = `Bearer ${accessToken}`;
-    }
-
-    console.log("Final request headers:", headers);
 
     // Use enhanced fetch wrapper for CORS-compatible edge function calls
     try {

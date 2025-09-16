@@ -54,6 +54,9 @@ import {
   Info as InfoIcon,
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
+  Search as SearchIcon,
+  CheckCircleOutline as CheckCircleOutlineIcon,
+  PersonSearch as PersonSearchIcon,
 } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
 import {
@@ -77,8 +80,10 @@ import useApplyForIdp, {
   FILE_SIZE_LIMITS 
 } from "../hooks/useApplyForIdp";
 import theme from "../theme";
+import ReCAPTCHA from "react-google-recaptcha";
 
-
+// ---- reCAPTCHA key from environment variables ----
+const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY || "";
 
 const StyledStepper = styled(Stepper)(({ theme }) => ({
   "& .MuiStepLabel-root .Mui-completed": {
@@ -154,7 +159,9 @@ const ApplyForIdp: React.FC = () => {
     alertConfig,
     photoValidationState,
     showPhotoRequirements,
+    memberVerificationState,
     steps,
+    isLoading,
     
     // Loading states are now handled by the global loading context
     
@@ -163,7 +170,6 @@ const ApplyForIdp: React.FC = () => {
     handleSubmit,
     watch,
     errors,
-    isSubmitting,
     watchedIsMember,
     
     // Computed values
@@ -177,6 +183,7 @@ const ApplyForIdp: React.FC = () => {
     handleFileRemove,
     createImagePreviewUrl,
     formatFileSize,
+    handleManualMemberVerification,
     
     // State setters
     setActiveStep,
@@ -727,23 +734,138 @@ const ApplyForIdp: React.FC = () => {
                                 name="membershipNumber"
                                 control={control}
                                 render={({ field, fieldState: { error } }) => (
-                                  <TextField
-                                    {...field}
-                                    fullWidth
-                                    label="AA Membership Number *"
-                                    error={!!error}
-                                    helperText={error?.message}
-                                    InputProps={{
-                                      startAdornment: (
-                                        <CardMembership
+                                  <Box>
+                                    <TextField
+                                      {...field}
+                                      fullWidth
+                                      label="AA Membership Number *"
+                                      error={!!error}
+                                      helperText={error?.message}
+                                      placeholder="Enter your AA membership number"
+                                      InputProps={{
+                                        startAdornment: (
+                                          <CardMembership
+                                            sx={{
+                                              mr: 1,
+                                              color: "text.secondary",
+                                            }}
+                                          />
+                                        ),
+                                        endAdornment: memberVerificationState.isVerifying ? (
+                                          <CircularProgress size={20} />
+                                        ) : memberVerificationState.showVerificationButton ? (
+                                          <Tooltip title="Click to verify membership">
+                                            <IconButton
+                                              onClick={handleManualMemberVerification}
+                                              size="small"
+                                              color="primary"
+                                              sx={{
+                                                '&:hover': {
+                                                  backgroundColor: 'primary.main',
+                                                  color: "#ffffff"
+                                                }
+                                              }}
+                                            >
+                                              <PersonSearchIcon />
+                                            </IconButton>
+                                          </Tooltip>
+                                        ) : memberVerificationState.verifiedMember ? (
+                                          <Tooltip title="Member verified">
+                                            <CheckCircleOutlineIcon 
+                                              sx={{ 
+                                                color: 'success.main',
+                                                fontSize: 24 
+                                              }} 
+                                            />
+                                          </Tooltip>
+                                        ) : null,
+                                      }}
+                                      sx={{
+                                        '& .MuiOutlinedInput-root': {
+                                          '&.Mui-focused': {
+                                            '& .MuiOutlinedInput-notchedOutline': {
+                                              borderColor: memberVerificationState.verifiedMember 
+                                                ? 'success.main' 
+                                                : 'primary.main',
+                                            },
+                                          },
+                                        },
+                                      }}
+                                    />
+                                    
+                                    {/* Member Verification Status */}
+                                    {memberVerificationState.verificationError && (
+                                      <Alert 
+                                        severity="error" 
+                                        sx={{ mt: 1, fontSize: '0.875rem' }}
+                                        action={
+                                          <Button
+                                            color="error"
+                                            size="small"
+                                            variant="text"
+                                            startIcon={<SearchIcon />}
+                                            onClick={handleManualMemberVerification}
+                                            disabled={memberVerificationState.isVerifying}
+                                          >
+                                            Retry
+                                          </Button>
+                                        }
+                                      >
+                                        {memberVerificationState.verificationError}
+                                      </Alert>
+                                    )}
+                                    
+                                    {memberVerificationState.verifiedMember && (
+                                      <Alert 
+                                        severity="success" 
+                                        sx={{ mt: 1, fontSize: '0.875rem' }}
+                                        icon={<CheckCircleOutlineIcon />}
+                                      >
+                                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                          Member Verified: {memberVerificationState.verifiedMember.fname} {memberVerificationState.verifiedMember.onames}
+                                        </Typography>
+                                        <Typography variant="caption" color="text.secondary">
+                                          Member details have been automatically populated below.
+                                        </Typography>
+                                      </Alert>
+                                    )}
+                                    
+                                    {/* Manual Verification Button */}
+                                    {memberVerificationState.showVerificationButton && !memberVerificationState.isVerifying && (
+                                      <Box sx={{ mt: 2 }}>
+                                        <Button
+                                          variant="outlined"
+                                          size="small"
+                                          startIcon={<PersonSearchIcon />}
+                                          onClick={handleManualMemberVerification}
                                           sx={{
-                                            mr: 1,
-                                            color: "text.secondary",
+                                            borderColor: 'primary.main',
+                                            color: 'primary.main',
+                                            '&:hover': {
+                                              backgroundColor: 'primary.light',
+                                              borderColor: 'primary.main',
+                                              color: 'grey.100'
+                                            }
                                           }}
-                                        />
-                                      ),
-                                    }}
-                                  />
+                                        >
+                                          Verify Membership
+                                        </Button>
+                                        <Typography variant="caption" color="text.secondary" sx={{ ml: 2 }}>
+                                          Or wait 2 seconds for auto-verification
+                                        </Typography>
+                                      </Box>
+                                    )}
+                                    
+                                    {/* Loading State Message */}
+                                    {memberVerificationState.isVerifying && (
+                                      <Box sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <CircularProgress size={16} />
+                                        <Typography variant="caption" color="text.secondary">
+                                          Verifying membership number...
+                                        </Typography>
+                                      </Box>
+                                    )}
+                                  </Box>
                                 )}
                               />
                             </Grid>
@@ -758,15 +880,38 @@ const ApplyForIdp: React.FC = () => {
                                 <TextField
                                   {...field}
                                   fullWidth
-                                  label="First Name *"
+                                  label={`First Name *${memberVerificationState.verifiedMember ? ' (Auto-filled)' : ''}`}
                                   error={!!error}
-                                  helperText={error?.message}
+                                  helperText={
+                                    error?.message || 
+                                    (memberVerificationState.verifiedMember ? 
+                                      "This field was automatically filled from your membership record" : 
+                                      undefined
+                                    )
+                                  }
                                   InputProps={{
                                     startAdornment: (
                                       <AccountCircle
                                         sx={{ mr: 1, color: "text.secondary" }}
                                       />
                                     ),
+                                    endAdornment: memberVerificationState.verifiedMember && (
+                                      <Tooltip title="Auto-filled from membership record">
+                                        <CheckCircleOutlineIcon 
+                                          sx={{ 
+                                            color: 'success.main',
+                                            fontSize: 18,
+                                            opacity: 0.7
+                                          }} 
+                                        />
+                                      </Tooltip>
+                                    ),
+                                  }}
+                                  sx={{
+                                    '& .MuiFormHelperText-root': {
+                                      color: memberVerificationState.verifiedMember && !error ? 
+                                        'success.main' : undefined,
+                                    }
                                   }}
                                 />
                               )}
@@ -781,15 +926,38 @@ const ApplyForIdp: React.FC = () => {
                                 <TextField
                                   {...field}
                                   fullWidth
-                                  label="Last Name *"
+                                  label={`Last Name *${memberVerificationState.verifiedMember ? ' (Auto-filled)' : ''}`}
                                   error={!!error}
-                                  helperText={error?.message}
+                                  helperText={
+                                    error?.message || 
+                                    (memberVerificationState.verifiedMember ? 
+                                      "This field was automatically filled from your membership record" : 
+                                      undefined
+                                    )
+                                  }
                                   InputProps={{
                                     startAdornment: (
                                       <AccountCircle
                                         sx={{ mr: 1, color: "text.secondary" }}
                                       />
                                     ),
+                                    endAdornment: memberVerificationState.verifiedMember && (
+                                      <Tooltip title="Auto-filled from membership record">
+                                        <CheckCircleOutlineIcon 
+                                          sx={{ 
+                                            color: 'success.main',
+                                            fontSize: 18,
+                                            opacity: 0.7
+                                          }} 
+                                        />
+                                      </Tooltip>
+                                    ),
+                                  }}
+                                  sx={{
+                                    '& .MuiFormHelperText-root': {
+                                      color: memberVerificationState.verifiedMember && !error ? 
+                                        'success.main' : undefined,
+                                    }
                                   }}
                                 />
                               )}
@@ -901,16 +1069,39 @@ const ApplyForIdp: React.FC = () => {
                                 <TextField
                                   {...field}
                                   fullWidth
-                                  label="Email Address *"
+                                  label={`Email Address *${memberVerificationState.verifiedMember ? ' (Auto-filled)' : ''}`}
                                   type="email"
                                   error={!!error}
-                                  helperText={error?.message}
+                                  helperText={
+                                    error?.message || 
+                                    (memberVerificationState.verifiedMember ? 
+                                      "This field was automatically filled from your membership record" : 
+                                      undefined
+                                    )
+                                  }
                                   InputProps={{
                                     startAdornment: (
                                       <Email
                                         sx={{ mr: 1, color: "text.secondary" }}
                                       />
                                     ),
+                                    endAdornment: memberVerificationState.verifiedMember && (
+                                      <Tooltip title="Auto-filled from membership record">
+                                        <CheckCircleOutlineIcon 
+                                          sx={{ 
+                                            color: 'success.main',
+                                            fontSize: 18,
+                                            opacity: 0.7
+                                          }} 
+                                        />
+                                      </Tooltip>
+                                    ),
+                                  }}
+                                  sx={{
+                                    '& .MuiFormHelperText-root': {
+                                      color: memberVerificationState.verifiedMember && !error ? 
+                                        'success.main' : undefined,
+                                    }
                                   }}
                                 />
                               )}
@@ -925,9 +1116,15 @@ const ApplyForIdp: React.FC = () => {
                                 <TextField
                                   {...field}
                                   fullWidth
-                                  label="Telephone Number *"
+                                  label={`Telephone Number *${memberVerificationState.verifiedMember ? ' (Auto-filled)' : ''}`}
                                   error={!!error}
-                                  helperText={error?.message}
+                                  helperText={
+                                    error?.message || 
+                                    (memberVerificationState.verifiedMember ? 
+                                      "This field was automatically filled from your membership record" : 
+                                      undefined
+                                    )
+                                  }
                                   placeholder="+256-414-255917"
                                   InputProps={{
                                     startAdornment: (
@@ -935,6 +1132,23 @@ const ApplyForIdp: React.FC = () => {
                                         sx={{ mr: 1, color: "text.secondary" }}
                                       />
                                     ),
+                                    endAdornment: memberVerificationState.verifiedMember && (
+                                      <Tooltip title="Auto-filled from membership record">
+                                        <CheckCircleOutlineIcon 
+                                          sx={{ 
+                                            color: 'success.main',
+                                            fontSize: 18,
+                                            opacity: 0.7
+                                          }} 
+                                        />
+                                      </Tooltip>
+                                    ),
+                                  }}
+                                  sx={{
+                                    '& .MuiFormHelperText-root': {
+                                      color: memberVerificationState.verifiedMember && !error ? 
+                                        'success.main' : undefined,
+                                    }
                                   }}
                                 />
                               )}
@@ -1515,6 +1729,52 @@ const ApplyForIdp: React.FC = () => {
                         </Alert>
                       </Box>
                     )}
+{/* Google Recaptcha*/}
+        {/* <Grid item xs={12}>
+                      <Box sx={{ mb: 2 }}>
+                        {RECAPTCHA_SITE_KEY ? (
+                          <ReCAPTCHA
+                            ref={recaptchaRef}
+                            sitekey={RECAPTCHA_SITE_KEY}
+                            onChange={(value) => {
+                              setRecaptchaValue(value);
+                              if (value) {
+                                setSnackbar((prev) => ({
+                                  ...prev,
+                                  open: false,
+                                }));
+                              }
+                            }}
+                            onErrored={() => {
+                              setRecaptchaValue(null);
+                              setSnackbar({
+                                open: true,
+                                message:
+                                  "reCAPTCHA error occurred. Please refresh the page and try again.",
+                                severity: "error",
+                              });
+                            }}
+                            onExpired={() => {
+                              setRecaptchaValue(null);
+                              setSnackbar({
+                                open: true,
+                                message:
+                                  "reCAPTCHA has expired. Please verify again.",
+                                severity: "warning",
+                              });
+                            }}
+                            theme="light"
+                            size="normal"
+                            hl="en"
+                          />
+                        ) : (
+                          <Alert severity="warning">
+                            reCAPTCHA is not configured. Add your site key to
+                            environment variables.
+                          </Alert>
+                        )}
+                      </Box>
+                    </Grid> */}
 
                     {/* Navigation Buttons */}
                     <Box
@@ -1579,10 +1839,14 @@ const ApplyForIdp: React.FC = () => {
                         variant="contained"
                         onClick={handleNext}
                         size="large"
-                        disabled={isSubmitting}
+                        disabled={isLoading}
                         startIcon={
                           activeStep === steps.length - 1 ? (
-                            <Verified />
+                            <>
+                            {
+                              isLoading ? <CircularProgress color="secondary" size={20} /> : <Verified />
+                            }
+                            </>
                           ) : undefined
                         }
                         sx={{
@@ -1590,17 +1854,22 @@ const ApplyForIdp: React.FC = () => {
                           background: `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})`,
                           '&:hover': {
                             background: `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})`,
-                            transform: isSubmitting ? 'none' : 'scale(1.02)',
+                            transform: isLoading ? 'none' : 'scale(1.02)',
                           },
-                          '&:disabled': {
-                            background: 'grey.400',
-                            color: 'grey.200',
-                          },
+                          ...(isLoading && {
+                            "&.MuiButtonBase-root.MuiButton-root.Mui-disabled": {
+                              color: `${theme.palette.secondary.main} !important`,
+                            },
+                            "&.Mui-disabled": {
+                              color: `${theme.palette.secondary.main} !important`,
+                            },
+                            color: `${theme.palette.secondary.main} !important`,
+                          }),
                           transition: 'all 0.2s ease-in-out',
                           fontWeight: 600,
                         }}
                       >
-                        {isSubmitting
+                        {isLoading
                           ? "Submitting..."
                           : activeStep === steps.length - 1
                           ? "Submit Application"
