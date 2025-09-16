@@ -21,6 +21,7 @@ import emailjs from "@emailjs/browser";
 import ReCAPTCHA from "react-google-recaptcha";
 import { MuiTelInput } from "mui-tel-input";
 import type { MuiTelInputInfo } from "mui-tel-input";
+import theme from "../theme";
 
 // ---- reCAPTCHA key from environment variables ----
 const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY || "";
@@ -637,6 +638,12 @@ const Contact: React.FC = () => {
                               severity: "error",
                             });
                           }
+                        }}
+
+                        sx={{
+                          "&.MuiButtonBase-root.MuiButton-root.Mui-disabled": {
+                            color: `${theme.palette.grey[500]} !important`,
+                          },
                         }}
                       >
                         Send Message

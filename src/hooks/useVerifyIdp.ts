@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { config } from "../utils/config/config";
 import { verifyIdp } from "../api";
@@ -27,6 +27,10 @@ export const useVerifyIdp = () => {
   const [alertMessage, setAlertMessage] = useState("");
   const navigate = useNavigate();
 
+  // reCAPTCHA state
+  const [recaptchaValue, setRecaptchaValue] = useState<string | null>(null);
+  const recaptchaRef = useRef<any>(null);
+
   // Loading management hook
   const globalLoading = useGlobalLoading();
 
@@ -52,42 +56,89 @@ export const useVerifyIdp = () => {
   ];
 
   const handleSearch = async (idpNumber?: string) => {
-    // Start loading state
-    globalLoading.startLoading('verifyIdpFormSubmission');
-
     const value = idpNumber ?? searchValue;
     setResult(null);
+    
     if (!value.trim()) {
       setAlertMessage("Please enter an IDP number to verify");
       setShowAlert(true);
       return;
     }
+
+    // reCAPTCHA validation
+    if (!recaptchaValue) {
+      setAlertMessage("Please complete the reCAPTCHA verification before searching");
+      setShowAlert(true);
+      return;
+    }
+
+    // Start loading state
+    globalLoading.startLoading('verifyIdpFormSubmission');
     setLoading(true);
+    
     try {
       const {data, error} = await verifyIdp(Number(value));
 
       if (error) {
         setShowAlert(true);
         setAlertMessage(
-          `${error || "Failed to submit application. Please try again."}`,
+          `${error || "Failed to verify IDP. Please try again."}`,
         );
+        // Reset reCAPTCHA on error
+        setRecaptchaValue(null);
+        recaptchaRef.current?.reset();
         return;
       }
 
       if (data?.idp_available) {
         setResult(data);
       } else {
-        setResult(null);
+        setResult(data || null);
       }
     } catch (error) {
-      setAlertMessage("An error occurred while verifying the IDP. Please try again.");
+      let errorMessage = "An error occurred while verifying the IDP. Please try again.";
+      
+      if (error instanceof Error) {
+        if (error.message.toLowerCase().includes("recaptcha")) {
+          errorMessage = "reCAPTCHA verification failed. Please try again.";
+        } else if (error.message.toLowerCase().includes("network")) {
+          errorMessage = "Network error. Please check your connection and try again.";
+        }
+      }
+
+      setAlertMessage(errorMessage);
       setShowAlert(true);
+      
+      // Reset reCAPTCHA on error
+      setRecaptchaValue(null);
+      recaptchaRef.current?.reset();
     } finally {
       // Always stop loading state
       globalLoading.stopLoading('verifyIdpFormSubmission');
       setLoading(false);
     }
   };
+
+  // reCAPTCHA handlers
+  const handleRecaptchaChange = useCallback((value: string | null) => {
+    setRecaptchaValue(value);
+    if (value) {
+      // Clear any error messages when reCAPTCHA is completed
+      setShowAlert(false);
+    }
+  }, []);
+
+  const handleRecaptchaError = useCallback(() => {
+    setRecaptchaValue(null);
+    setAlertMessage("reCAPTCHA error occurred. Please refresh the page and try again.");
+    setShowAlert(true);
+  }, []);
+
+  const handleRecaptchaExpired = useCallback(() => {
+    setRecaptchaValue(null);
+    setAlertMessage("reCAPTCHA has expired. Please verify again.");
+    setShowAlert(true);
+  }, []);
 
   return {
     searchValue,
@@ -102,5 +153,11 @@ export const useVerifyIdp = () => {
     features,
     navigate,
     config,
+    // reCAPTCHA values and handlers
+    recaptchaValue,
+    recaptchaRef,
+    handleRecaptchaChange,
+    handleRecaptchaError,
+    handleRecaptchaExpired,
   };
 };

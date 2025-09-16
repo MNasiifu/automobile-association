@@ -2014,16 +2014,10 @@ const ApplyForIdp: React.FC = () => {
                             background: `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})`,
                             transform: isLoading ? "none" : "scale(1.02)",
                           },
-                          ...(isLoading && {
-                            "&.MuiButtonBase-root.MuiButton-root.Mui-disabled":
+                          "&.MuiButtonBase-root.MuiButton-root.Mui-disabled":
                               {
-                                color: `${theme.palette.secondary.main} !important`,
+                                color: isLoading ? `${theme.palette.secondary.main} !important` : `${theme.palette.grey[500]} !important`,
                               },
-                            "&.Mui-disabled": {
-                              color: `${theme.palette.secondary.main} !important`,
-                            },
-                            color: `${theme.palette.secondary.main} !important`,
-                          }),
                           transition: "all 0.2s ease-in-out",
                           fontWeight: 600,
                         }}

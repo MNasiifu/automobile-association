@@ -41,6 +41,10 @@ import theme from "../theme";
 import { useForm } from "react-hook-form";
 import { useVerifyIdp } from "../hooks/useVerifyIdp";
 import { generateIDPVerificationPDF } from "../utils/pdfGenerator";
+import ReCAPTCHA from "react-google-recaptcha";
+
+// ---- reCAPTCHA key from environment variables ----
+const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY || "";
 
 const FeatureCard = styled(Card)(({ theme }) => ({
   height: "100%",
@@ -85,9 +89,24 @@ const ResultCard = styled(Card)(({ theme }) => ({
 }));
 
 const iconMap = {
-  SecurityIcon: <SecurityIcon sx={{ fontSize: 40, color: "primary.main" }} className="feature-icon" />,
-  VerifiedUserIcon: <VerifiedUserIcon sx={{ fontSize: 40, color: "primary.main" }} className="feature-icon" />,
-  LanguageIcon: <LanguageIcon sx={{ fontSize: 40, color: "primary.main" }} className="feature-icon" />,
+  SecurityIcon: (
+    <SecurityIcon
+      sx={{ fontSize: 40, color: "primary.main" }}
+      className="feature-icon"
+    />
+  ),
+  VerifiedUserIcon: (
+    <VerifiedUserIcon
+      sx={{ fontSize: 40, color: "primary.main" }}
+      className="feature-icon"
+    />
+  ),
+  LanguageIcon: (
+    <LanguageIcon
+      sx={{ fontSize: 40, color: "primary.main" }}
+      className="feature-icon"
+    />
+  ),
 };
 
 const getStatusIcon = (status: string) => {
@@ -104,8 +123,6 @@ const getStatusIcon = (status: string) => {
       return <InfoIcon sx={{ color: "info.main", fontSize: 24 }} />;
   }
 };
-
-
 
 const getStatusChip = (status: string) => {
   const configs = {
@@ -133,46 +150,52 @@ const calculateDaysRemaining = (expiryDate: string): number => {
 // Helper function to get expiry status and styling
 const getExpiryStatus = (expiryDate: string) => {
   const daysRemaining = calculateDaysRemaining(expiryDate);
-  
+
   if (daysRemaining < 0) {
     return {
-      status: 'expired',
+      status: "expired",
       daysRemaining,
-      color: 'error',
-      bgColor: 'error.50',
-      borderColor: 'error.200',
+      color: "error",
+      bgColor: "error.50",
+      borderColor: "error.200",
       icon: <ErrorIcon color="error" sx={{ mr: 1, fontSize: 20 }} />,
-      message: `Expired ${Math.abs(daysRemaining)} day${Math.abs(daysRemaining) !== 1 ? 's' : ''} ago`
+      message: `Expired ${Math.abs(daysRemaining)} day${
+        Math.abs(daysRemaining) !== 1 ? "s" : ""
+      } ago`,
     };
   } else if (daysRemaining === 0) {
     return {
-      status: 'expires-today',
+      status: "expires-today",
       daysRemaining,
-      color: 'error',
-      bgColor: 'error.50',
-      borderColor: 'error.200',
+      color: "error",
+      bgColor: "error.50",
+      borderColor: "error.200",
       icon: <ErrorIcon color="error" sx={{ mr: 1, fontSize: 20 }} />,
-      message: 'Expires today'
+      message: "Expires today",
     };
   } else if (daysRemaining <= 30) {
     return {
-      status: 'expires-soon',
+      status: "expires-soon",
       daysRemaining,
-      color: 'warning',
-      bgColor: 'warning.50',
-      borderColor: 'warning.200',
+      color: "warning",
+      bgColor: "warning.50",
+      borderColor: "warning.200",
       icon: <ErrorIcon color="warning" sx={{ mr: 1, fontSize: 20 }} />,
-      message: `Expires in ${daysRemaining} day${daysRemaining !== 1 ? 's' : ''}`
+      message: `Expires in ${daysRemaining} day${
+        daysRemaining !== 1 ? "s" : ""
+      }`,
     };
   } else {
     return {
-      status: 'valid',
+      status: "valid",
       daysRemaining,
-      color: 'success',
-      bgColor: 'background.paper',
-      borderColor: 'grey.200',
+      color: "success",
+      bgColor: "background.paper",
+      borderColor: "grey.200",
       icon: <ScheduleIcon color="primary" sx={{ mr: 1, fontSize: 20 }} />,
-      message: `Valid for ${daysRemaining} more day${daysRemaining !== 1 ? 's' : ''}`
+      message: `Valid for ${daysRemaining} more day${
+        daysRemaining !== 1 ? "s" : ""
+      }`,
     };
   }
 };
@@ -191,6 +214,12 @@ const VerifyIdp: React.FC = () => {
     features,
     navigate,
     config,
+    // reCAPTCHA values and handlers
+    recaptchaValue,
+    recaptchaRef,
+    handleRecaptchaChange,
+    handleRecaptchaError,
+    handleRecaptchaExpired,
   } = useVerifyIdp();
   const { handleSubmit, register, setValue } = useForm<{ idpNumber: string }>({
     defaultValues: { idpNumber: searchValue },
@@ -201,14 +230,13 @@ const VerifyIdp: React.FC = () => {
     setValue("idpNumber", searchValue);
   }, [searchValue, setValue]);
 
-
   // PDF Download states
   const [downloadingPDF, setDownloadingPDF] = React.useState(false);
   const [showDownloadSuccess, setShowDownloadSuccess] = React.useState(false);
 
   // Add keyframes animations for enhanced visual effects
   React.useEffect(() => {
-    const styleElement = document.createElement('style');
+    const styleElement = document.createElement("style");
     styleElement.textContent = `
       @keyframes slideStripe {
         0% { background-position: 0% 0%; }
@@ -247,7 +275,7 @@ const VerifyIdp: React.FC = () => {
       }
     `;
     document.head.appendChild(styleElement);
-    
+
     return () => {
       document.head.removeChild(styleElement);
     };
@@ -261,28 +289,29 @@ const VerifyIdp: React.FC = () => {
   // PDF Download Handler
   const handleDownloadPDF = async () => {
     if (!result || !result.idp_available) return;
-    
+
     setDownloadingPDF(true);
-    
+
     try {
       const expiryInfo = getExpiryStatus(result.expirydate);
-      const verificationTime = new Date().toLocaleString('en-GB');
-      
+      const verificationTime = new Date().toLocaleString("en-GB");
+
       // Convert the result to match PDF generator interface
       const pdfData = {
         ...result,
         id: String(searchValue), // Convert numeric ID to string
       };
-      
+
       await generateIDPVerificationPDF(pdfData, expiryInfo, verificationTime);
-      
+
       // Show success notification
       setShowDownloadSuccess(true);
-      
     } catch (error) {
-      console.error('Error generating PDF:', error);
+      console.error("Error generating PDF:", error);
       // Handle error - show error notification
-      setAlertMessage('Failed to download verification certificate. Please try again.');
+      setAlertMessage(
+        "Failed to download verification certificate. Please try again."
+      );
       setShowAlert(true);
     } finally {
       setDownloadingPDF(false);
@@ -330,72 +359,157 @@ const VerifyIdp: React.FC = () => {
                 Suite 8
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Phone: {config.company.contactNumber} • Email: {config.company.email}
+                Phone: {config.company.contactNumber} • Email:{" "}
+                {config.company.email}
               </Typography>
             </Box>
 
             <Grid item container justifyContent="center">
-            <form onSubmit={handleSubmit(onSubmit)} style={{ display: "flex", gap: 16, marginBottom: 32, alignItems: "stretch" }}>
-              <TextField
-                fullWidth
-                label="Enter IDP Number"
-                placeholder="e.g., 00023"
-                {...register("idpNumber")}
-                type="number"
-                value={searchValue}
-                onChange={e => setSearchValue(e.target.value)}
-                variant="outlined"
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: 3,
-                    height: "60px",
-                    fontSize: "1.1rem",
-                    "&:hover .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "primary.main",
-                    },
-                  },
-                  "& .MuiInputLabel-root": {
-                    fontSize: "1.1rem",
-                  },
-                }}
-              />
-              <Button
-                variant="contained"
-                color="primary"
-                type="submit"
-                disabled={loading}
-                startIcon={
-                  loading ? <CircularProgress color="secondary" size={20} /> : <SearchIcon />
-                }
-                sx={{
-                  minWidth: 160,
-                  borderRadius: 3,
-                  height: "60px",
-                  fontSize: "1.1rem",
-                  fontWeight: 600,
-                  boxShadow: 3,
-                  "&:hover": {
-                    boxShadow: 6,
-                    transform: "translateY(-2px)",
-                  },
-                  ...(loading && {
-                    "&.MuiButtonBase-root.MuiButton-root.Mui-disabled": {
-                      color: `${theme.palette.secondary.main} !important`,
-                    },
-                    "&.Mui-disabled": {
-                      color: `${theme.palette.secondary.main} !important`,
-                    },
-                    color: `${theme.palette.secondary.main} !important`,
-                  }),
-                  transition: "all 0.3s ease-in-out",
+              <form
+                onSubmit={handleSubmit(onSubmit)}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 16,
+                  marginBottom: 32,
+                  alignItems: "center",
+                  width: "100%",
                 }}
               >
-                {loading ? "Verifying..." : "Verify IDP"}
-              </Button>
-            </form>
-            </Grid>
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: 2,
+                    alignItems: "stretch",
+                    width: "100%",
+                    maxWidth: 600,
+                  }}
+                >
+                  <TextField
+                    fullWidth
+                    label="Enter IDP Number"
+                    placeholder="e.g., 00023"
+                    {...register("idpNumber")}
+                    type="number"
+                    value={searchValue}
+                    onChange={(e) => setSearchValue(e.target.value)}
+                    variant="outlined"
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        borderRadius: 3,
+                        height: "60px",
+                        fontSize: "1.1rem",
+                        "&:hover .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "primary.main",
+                        },
+                      },
+                      "& .MuiInputLabel-root": {
+                        fontSize: "1.1rem",
+                      },
+                    }}
+                  />
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    type="submit"
+                    disabled={loading || !recaptchaValue}
+                    startIcon={
+                      loading ? (
+                        <CircularProgress color="secondary" size={20} />
+                      ) : (
+                        <SearchIcon />
+                      )
+                    }
+                    sx={{
+                      minWidth: 160,
+                      borderRadius: 3,
+                      height: "60px",
+                      fontSize: "1.1rem",
+                      fontWeight: 600,
+                      boxShadow: 3,
+                      "&:hover": {
+                        boxShadow: 6,
+                        transform: "translateY(-2px)",
+                      },
+                      "&.MuiButtonBase-root.MuiButton-root.Mui-disabled": {
+                        color: loading
+                          ? `${theme.palette.secondary.main} !important`
+                          : `${theme.palette.grey[500]} !important`,
+                      },
+                      transition: "all 0.3s ease-in-out",
+                    }}
+                  >
+                    {loading ? "Verifying..." : "Verify IDP"}
+                  </Button>
+                </Box>
 
-            
+                {/* reCAPTCHA Section */}
+                <Box
+                  sx={{
+                    mt: 2,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 1,
+                  }}
+                >
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: 1, textAlign: "center" }}
+                  >
+                    Please complete security verification to verify IDP
+                  </Typography>
+                  {RECAPTCHA_SITE_KEY ? (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: 1,
+                      }}
+                    >
+                      <ReCAPTCHA
+                        ref={recaptchaRef}
+                        sitekey={RECAPTCHA_SITE_KEY}
+                        onChange={handleRecaptchaChange}
+                        onErrored={handleRecaptchaError}
+                        onExpired={handleRecaptchaExpired}
+                        theme="light"
+                        size="normal"
+                        hl="en"
+                      />
+                      {recaptchaValue ? (
+                        <Typography
+                          variant="caption"
+                          color="success.main"
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 0.5,
+                          }}
+                        >
+                          ✓ Security verification completed
+                        </Typography>
+                      ) : (
+                        <Typography
+                          variant="caption"
+                          color="error"
+                          sx={{ textAlign: "center" }}
+                        >
+                          * Please complete the reCAPTCHA verification to search
+                        </Typography>
+                      )}
+                    </Box>
+                  ) : (
+                    <Alert severity="warning" sx={{ maxWidth: 400 }}>
+                      reCAPTCHA is not configured. Add your site key to
+                      environment variables.
+                    </Alert>
+                  )}
+                </Box>
+              </form>
+            </Grid>
 
             <Box
               sx={{
@@ -422,127 +536,155 @@ const VerifyIdp: React.FC = () => {
           {result && (
             <ResultCard
               className={result.idp_available ? "success" : "error"}
-              sx={{ 
-                mt: { xs: 3, md: 4 }, 
-                boxShadow: result.idp_available ? '0 8px 32px rgba(76, 175, 80, 0.15)' : '0 8px 32px rgba(211, 47, 47, 0.15)',
-                border: result.idp_available ? '2px solid rgba(76, 175, 80, 0.2)' : '2px solid rgba(211, 47, 47, 0.2)',
+              sx={{
+                mt: { xs: 3, md: 4 },
+                boxShadow: result.idp_available
+                  ? "0 8px 32px rgba(76, 175, 80, 0.15)"
+                  : "0 8px 32px rgba(211, 47, 47, 0.15)",
+                border: result.idp_available
+                  ? "2px solid rgba(76, 175, 80, 0.2)"
+                  : "2px solid rgba(211, 47, 47, 0.2)",
                 borderRadius: 3,
-                overflow: 'hidden',
-                maxWidth: '100%'
+                overflow: "hidden",
+                maxWidth: "100%",
               }}
             >
               {/* Header Section */}
               {(() => {
-                const expiryInfo = result.idp_available ? getExpiryStatus(result.expirydate) : null;
-                const isExpiredOrExpiring = expiryInfo && (expiryInfo.status === 'expired' || expiryInfo.status === 'expires-today');
-                
+                const expiryInfo = result.idp_available
+                  ? getExpiryStatus(result.expirydate)
+                  : null;
+                const isExpiredOrExpiring =
+                  expiryInfo &&
+                  (expiryInfo.status === "expired" ||
+                    expiryInfo.status === "expires-today");
+
                 return (
                   <Box
                     sx={{
-                      background: result.idp_available 
+                      background: result.idp_available
                         ? isExpiredOrExpiring
-                          ? 'linear-gradient(135deg, #D32F2F 0%, #EF5350 100%)'
-                          : expiryInfo?.status === 'expires-soon'
-                            ? 'linear-gradient(135deg, #FF9800 0%, #FFB74D 100%)'
-                            : 'linear-gradient(135deg, #4CAF50 0%, #81C784 100%)'
-                        : 'linear-gradient(135deg, #D32F2F 0%, #EF5350 100%)',
-                      color: 'white',
+                          ? "linear-gradient(135deg, #D32F2F 0%, #EF5350 100%)"
+                          : expiryInfo?.status === "expires-soon"
+                          ? "linear-gradient(135deg, #FF9800 0%, #FFB74D 100%)"
+                          : "linear-gradient(135deg, #4CAF50 0%, #81C784 100%)"
+                        : "linear-gradient(135deg, #D32F2F 0%, #EF5350 100%)",
+                      color: "white",
                       p: { xs: 2, md: 3 },
-                      textAlign: 'center'
+                      textAlign: "center",
                     }}
                   >
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
-                      {result.idp_available 
-                        ? isExpiredOrExpiring 
-                          ? getStatusIcon('expired')
-                          : expiryInfo?.status === 'expires-soon'
-                            ? getStatusIcon('expired')
-                            : getStatusIcon('valid')
-                        : getStatusIcon('invalid')
-                      }
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        mb: 2,
+                      }}
+                    >
+                      {result.idp_available
+                        ? isExpiredOrExpiring
+                          ? getStatusIcon("expired")
+                          : expiryInfo?.status === "expires-soon"
+                          ? getStatusIcon("expired")
+                          : getStatusIcon("valid")
+                        : getStatusIcon("invalid")}
                       <Typography variant="h5" sx={{ fontWeight: 700, ml: 2 }}>
-                        {result.idp_available 
+                        {result.idp_available
                           ? isExpiredOrExpiring
-                            ? 'IDP Found but Expired'
-                            : expiryInfo?.status === 'expires-soon'
-                              ? 'IDP Expires Soon'
-                              : 'IDP Verified Successfully'
-                          : 'IDP Not Found'
-                        }
+                            ? "IDP Found but Expired"
+                            : expiryInfo?.status === "expires-soon"
+                            ? "IDP Expires Soon"
+                            : "IDP Verified Successfully"
+                          : "IDP Not Found"}
                       </Typography>
                     </Box>
-                    {result.idp_available 
+                    {result.idp_available
                       ? isExpiredOrExpiring
-                        ? getStatusChip('expired')
-                        : expiryInfo?.status === 'expires-soon'
-                          ? getStatusChip('expired')
-                          : getStatusChip('valid')
-                      : getStatusChip('invalid')
-                    }
+                        ? getStatusChip("expired")
+                        : expiryInfo?.status === "expires-soon"
+                        ? getStatusChip("expired")
+                        : getStatusChip("valid")
+                      : getStatusChip("invalid")}
                     <Typography variant="body2" sx={{ mt: 2, opacity: 0.9 }}>
-                      {result.idp_available 
+                      {result.idp_available
                         ? isExpiredOrExpiring
-                          ? 'This International Driving Permit has expired and is no longer valid for international driving. Please renew at AA Uganda.'
-                          : expiryInfo?.status === 'expires-soon'
-                            ? `This International Driving Permit expires in ${expiryInfo.daysRemaining} day${expiryInfo.daysRemaining !== 1 ? 's' : ''}. Please consider renewing soon.`
-                            : 'This International Driving Permit is valid and authentic, issued by Automobile Association of Uganda.'
-                        : 'This IDP number is not found in the AA Uganda database. Please verify the number and try again.'
-                      }
+                          ? "This International Driving Permit has expired and is no longer valid for international driving. Please renew at AA Uganda."
+                          : expiryInfo?.status === "expires-soon"
+                          ? `This International Driving Permit expires in ${
+                              expiryInfo.daysRemaining
+                            } day${
+                              expiryInfo.daysRemaining !== 1 ? "s" : ""
+                            }. Please consider renewing soon.`
+                          : "This International Driving Permit is valid and authentic, issued by Automobile Association of Uganda."
+                        : "This IDP number is not found in the AA Uganda database. Please verify the number and try again."}
                     </Typography>
                   </Box>
                 );
               })()}
 
               {result.idp_available && (
-                <CardContent sx={{ p: '0 !important' }}>
-
-                   {/* Download PDF Button Section */}
-                   <Box 
-                    sx={{ 
-                      p: { xs: 2, md: 3 }, 
-                      backgroundColor: 'grey.50',
-                      borderBottom: '1px solid',
-                      borderColor: 'grey.200',
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center'
+                <CardContent sx={{ p: "0 !important" }}>
+                  {/* Download PDF Button Section */}
+                  <Box
+                    sx={{
+                      p: { xs: 2, md: 3 },
+                      backgroundColor: "grey.50",
+                      borderBottom: "1px solid",
+                      borderColor: "grey.200",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
                     }}
                   >
                     <Button
                       variant="contained"
-                      startIcon={downloadingPDF ? <CircularProgress size={20} color="inherit" /> : <PdfIcon />}
+                      startIcon={
+                        downloadingPDF ? (
+                          <CircularProgress size={20} color="inherit" />
+                        ) : (
+                          <PdfIcon />
+                        )
+                      }
                       endIcon={!downloadingPDF && <DownloadIcon />}
                       onClick={handleDownloadPDF}
                       disabled={downloadingPDF}
                       sx={{
-                        background: downloadingPDF 
-                          ? 'linear-gradient(135deg, #9E9E9E 0%, #757575 100%)'
-                          : 'linear-gradient(135deg, #1976D2 0%, #1565C0 100%)',
-                        color: 'white',
+                        background: downloadingPDF
+                          ? "linear-gradient(135deg, #9E9E9E 0%, #757575 100%)"
+                          : "linear-gradient(135deg, #1976D2 0%, #1565C0 100%)",
+                        color: "white",
                         fontWeight: 600,
-                        fontSize: { xs: '0.9rem', md: '1rem' },
+                        fontSize: { xs: "0.9rem", md: "1rem" },
                         px: { xs: 3, md: 4 },
                         py: { xs: 1.5, md: 2 },
                         borderRadius: 3,
-                        boxShadow: downloadingPDF 
-                          ? '0 2px 8px rgba(158, 158, 158, 0.2)'
-                          : '0 4px 16px rgba(25, 118, 210, 0.3)',
-                        textTransform: 'none',
-                        transition: 'all 0.3s ease-in-out',
-                        '&:hover': downloadingPDF ? {} : {
-                          background: 'linear-gradient(135deg, #1565C0 0%, #0D47A1 100%)',
-                          boxShadow: '0 6px 24px rgba(25, 118, 210, 0.4)',
-                          transform: 'translateY(-2px)',
+                        boxShadow: downloadingPDF
+                          ? "0 2px 8px rgba(158, 158, 158, 0.2)"
+                          : "0 4px 16px rgba(25, 118, 210, 0.3)",
+                        textTransform: "none",
+                        transition: "all 0.3s ease-in-out",
+                        "&:hover": downloadingPDF
+                          ? {}
+                          : {
+                              background:
+                                "linear-gradient(135deg, #1565C0 0%, #0D47A1 100%)",
+                              boxShadow: "0 6px 24px rgba(25, 118, 210, 0.4)",
+                              transform: "translateY(-2px)",
+                            },
+                        "&:active": downloadingPDF
+                          ? {}
+                          : {
+                              transform: "translateY(0px)",
+                            },
+                        "&.Mui-disabled": {
+                          color: "white !important",
                         },
-                        '&:active': downloadingPDF ? {} : {
-                          transform: 'translateY(0px)',
-                        },
-                        '&.Mui-disabled': {
-                          color: 'white !important',
-                        }
                       }}
                     >
-                      {downloadingPDF ? 'Generating PDF...' : 'Download Verification Certificate'}
+                      {downloadingPDF
+                        ? "Generating PDF..."
+                        : "Download Verification Certificate"}
                     </Button>
                   </Box>
 
@@ -553,13 +695,13 @@ const VerifyIdp: React.FC = () => {
                       <Grid item xs={12} lg={3} md={4}>
                         <Box
                           sx={{
-                            textAlign: 'center',
+                            textAlign: "center",
                             p: { xs: 2, md: 3 },
-                            backgroundColor: 'grey.50',
+                            backgroundColor: "grey.50",
                             borderRadius: 2,
-                            border: '1px solid',
-                            borderColor: 'grey.200',
-                            height: 'fit-content'
+                            border: "1px solid",
+                            borderColor: "grey.200",
+                            height: "fit-content",
                           }}
                         >
                           {/* Photo Section */}
@@ -567,18 +709,18 @@ const VerifyIdp: React.FC = () => {
                             sx={{
                               width: { xs: 120, md: 150 },
                               height: { xs: 120, md: 150 },
-                              mx: 'auto',
+                              mx: "auto",
                               mb: { xs: 2, md: 3 },
                               borderRadius: 2,
-                              overflow: 'hidden',
-                              border: '3px solid',
-                              borderColor: 'primary.main',
+                              overflow: "hidden",
+                              border: "3px solid",
+                              borderColor: "primary.main",
                               boxShadow: 3,
-                              backgroundColor: 'white',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              position: 'relative'
+                              backgroundColor: "white",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              position: "relative",
                             }}
                           >
                             {result.pp_photo ? (
@@ -587,16 +729,19 @@ const VerifyIdp: React.FC = () => {
                                   src={result.pp_photo}
                                   alt="Passport Photo"
                                   style={{
-                                    width: '100%',
-                                    height: '100%',
-                                    objectFit: 'cover'
+                                    width: "100%",
+                                    height: "100%",
+                                    objectFit: "cover",
                                   }}
                                   onError={(e) => {
                                     const target = e.target as HTMLImageElement;
-                                    target.style.display = 'none';
-                                    const initialsBox = target.parentElement?.querySelector('.initials-fallback') as HTMLElement;
+                                    target.style.display = "none";
+                                    const initialsBox =
+                                      target.parentElement?.querySelector(
+                                        ".initials-fallback"
+                                      ) as HTMLElement;
                                     if (initialsBox) {
-                                      initialsBox.style.display = 'flex';
+                                      initialsBox.style.display = "flex";
                                     }
                                   }}
                                 />
@@ -604,29 +749,32 @@ const VerifyIdp: React.FC = () => {
                                 <Box
                                   className="initials-fallback"
                                   sx={{
-                                    position: 'absolute',
+                                    position: "absolute",
                                     top: 0,
                                     left: 0,
                                     right: 0,
                                     bottom: 0,
-                                    display: 'none',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    backgroundColor: 'primary.50',
-                                    background: 'linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%)'
+                                    display: "none",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    backgroundColor: "primary.50",
+                                    background:
+                                      "linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%)",
                                   }}
                                 >
                                   <Typography
                                     variant="h3"
                                     sx={{
                                       fontWeight: 700,
-                                      color: 'primary.main',
-                                      fontSize: { xs: '2rem', md: '2.5rem' },
-                                      textTransform: 'uppercase',
-                                      letterSpacing: '2px'
+                                      color: "primary.main",
+                                      fontSize: { xs: "2rem", md: "2.5rem" },
+                                      textTransform: "uppercase",
+                                      letterSpacing: "2px",
                                     }}
                                   >
-                                    {`${result.onames.charAt(0)}${result.surname.charAt(0)}`}
+                                    {`${result.onames.charAt(
+                                      0
+                                    )}${result.surname.charAt(0)}`}
                                   </Typography>
                                 </Box>
                               </>
@@ -634,55 +782,58 @@ const VerifyIdp: React.FC = () => {
                               /* No photo available - Show initials directly */
                               <Box
                                 sx={{
-                                  width: '100%',
-                                  height: '100%',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  backgroundColor: 'primary.50',
-                                  background: 'linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%)'
+                                  width: "100%",
+                                  height: "100%",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  backgroundColor: "primary.50",
+                                  background:
+                                    "linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%)",
                                 }}
                               >
                                 <Typography
                                   variant="h3"
                                   sx={{
                                     fontWeight: 700,
-                                    color: 'primary.main',
-                                    fontSize: { xs: '2rem', md: '2.5rem' },
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '2px'
+                                    color: "primary.main",
+                                    fontSize: { xs: "2rem", md: "2.5rem" },
+                                    textTransform: "uppercase",
+                                    letterSpacing: "2px",
                                   }}
                                 >
-                                  {`${result.onames.charAt(0)}${result.surname.charAt(0)}`}
+                                  {`${result.onames.charAt(
+                                    0
+                                  )}${result.surname.charAt(0)}`}
                                 </Typography>
                               </Box>
                             )}
                           </Box>
-                          
+
                           {/* Name */}
-                          <Typography 
-                            variant="h6" 
-                            sx={{ 
-                              fontWeight: 700, 
-                              color: 'primary.main',
+                          <Typography
+                            variant="h6"
+                            sx={{
+                              fontWeight: 700,
+                              color: "primary.main",
                               mb: 1,
-                              textTransform: 'capitalize'
+                              textTransform: "capitalize",
                             }}
                           >
                             {`${result.onames.toLowerCase()} ${result.surname.toLowerCase()}`}
                           </Typography>
-                          
+
                           {/* IDP Number Badge */}
                           <Box
                             sx={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              backgroundColor: 'primary.main',
-                              color: 'white',
+                              display: "inline-flex",
+                              alignItems: "center",
+                              backgroundColor: "primary.main",
+                              color: "white",
                               px: 2,
                               py: 1,
                               borderRadius: 2,
-                              fontWeight: 600
+                              fontWeight: 600,
                             }}
                           >
                             <SecurityIcon sx={{ fontSize: 18, mr: 1 }} />
@@ -694,63 +845,100 @@ const VerifyIdp: React.FC = () => {
                       {/* Permit Details */}
                       <Grid item xs={12} lg={9} md={8}>
                         <Box sx={{ pl: { md: 1, lg: 2 } }}>
-                          <Typography variant="h6" sx={{ fontWeight: 700, mb: { xs: 2, md: 3 }, color: 'primary.main' }}>
+                          <Typography
+                            variant="h6"
+                            sx={{
+                              fontWeight: 700,
+                              mb: { xs: 2, md: 3 },
+                              color: "primary.main",
+                            }}
+                          >
                             Permit Details
                           </Typography>
-                          
-                          <Grid container spacing={{ xs: 2, md: 3 }} sx={{ alignItems: 'stretch' }}>
+
+                          <Grid
+                            container
+                            spacing={{ xs: 2, md: 3 }}
+                            sx={{ alignItems: "stretch" }}
+                          >
                             {/* Combined Permit Details Card - 6 Columns */}
                             <Grid item xs={12} md={6}>
                               <Box
                                 sx={{
                                   p: { xs: 2.5, md: 3 },
-                                  border: '1px solid',
-                                  borderColor: 'grey.200',
+                                  border: "1px solid",
+                                  borderColor: "grey.200",
                                   borderRadius: 3,
-                                  backgroundColor: 'background.paper',
-                                  height: '100%',
-                                  transition: 'all 0.3s ease-in-out',
-                                  '&:hover': {
-                                    boxShadow: '0 6px 20px rgba(0,0,0,0.1)',
-                                    transform: 'translateY(-2px)',
-                                    borderColor: 'primary.main'
-                                  }
+                                  backgroundColor: "background.paper",
+                                  height: "100%",
+                                  transition: "all 0.3s ease-in-out",
+                                  "&:hover": {
+                                    boxShadow: "0 6px 20px rgba(0,0,0,0.1)",
+                                    transform: "translateY(-2px)",
+                                    borderColor: "primary.main",
+                                  },
                                 }}
                               >
-                                <Typography 
-                                  variant="h6" 
-                                  sx={{ 
-                                    fontWeight: 700, 
-                                    mb: 3, 
-                                    color: 'primary.main',
-                                    fontSize: { xs: '1.1rem', md: '1.25rem' }
+                                <Typography
+                                  variant="h6"
+                                  sx={{
+                                    fontWeight: 700,
+                                    mb: 3,
+                                    color: "primary.main",
+                                    fontSize: { xs: "1.1rem", md: "1.25rem" },
                                   }}
                                 >
                                   Basic Information
                                 </Typography>
-                                
+
                                 <Grid container spacing={{ xs: 2, md: 3 }}>
                                   {/* Issue Date */}
                                   <Grid item xs={12} sm={4}>
-                                    <Box sx={{ textAlign: { xs: 'left', sm: 'center' } }}>
-                                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'flex-start', sm: 'center' }, mb: 1.5 }}>
-                                        <ScheduleIcon color="primary" sx={{ mr: 1, fontSize: 24 }} />
-                                        <Typography variant="subtitle2" color="text.secondary" sx={{ fontWeight: 600 }}>
+                                    <Box
+                                      sx={{
+                                        textAlign: { xs: "left", sm: "center" },
+                                      }}
+                                    >
+                                      <Box
+                                        sx={{
+                                          display: "flex",
+                                          alignItems: "center",
+                                          justifyContent: {
+                                            xs: "flex-start",
+                                            sm: "center",
+                                          },
+                                          mb: 1.5,
+                                        }}
+                                      >
+                                        <ScheduleIcon
+                                          color="primary"
+                                          sx={{ mr: 1, fontSize: 24 }}
+                                        />
+                                        <Typography
+                                          variant="subtitle2"
+                                          color="text.secondary"
+                                          sx={{ fontWeight: 600 }}
+                                        >
                                           Issue Date
                                         </Typography>
                                       </Box>
-                                      <Typography 
-                                        variant="body1" 
-                                        sx={{ 
+                                      <Typography
+                                        variant="body1"
+                                        sx={{
                                           fontWeight: 700,
-                                          color: 'text.primary',
-                                          fontSize: { xs: '0.95rem', md: '1rem' }
+                                          color: "text.primary",
+                                          fontSize: {
+                                            xs: "0.95rem",
+                                            md: "1rem",
+                                          },
                                         }}
                                       >
-                                        {new Date(result.issuedate).toLocaleDateString('en-GB', {
-                                          day: '2-digit',
-                                          month: 'short',
-                                          year: 'numeric'
+                                        {new Date(
+                                          result.issuedate
+                                        ).toLocaleDateString("en-GB", {
+                                          day: "2-digit",
+                                          month: "short",
+                                          year: "numeric",
                                         })}
                                       </Typography>
                                     </Box>
@@ -758,21 +946,45 @@ const VerifyIdp: React.FC = () => {
 
                                   {/* Passport Number */}
                                   <Grid item xs={12} sm={4}>
-                                    <Box sx={{ textAlign: { xs: 'left', sm: 'center' } }}>
-                                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'flex-start', sm: 'center' }, mb: 1.5 }}>
-                                        <PublicIcon color="primary" sx={{ mr: 1, fontSize: 24 }} />
-                                        <Typography variant="subtitle2" color="text.secondary" sx={{ fontWeight: 600 }}>
+                                    <Box
+                                      sx={{
+                                        textAlign: { xs: "left", sm: "center" },
+                                      }}
+                                    >
+                                      <Box
+                                        sx={{
+                                          display: "flex",
+                                          alignItems: "center",
+                                          justifyContent: {
+                                            xs: "flex-start",
+                                            sm: "center",
+                                          },
+                                          mb: 1.5,
+                                        }}
+                                      >
+                                        <PublicIcon
+                                          color="primary"
+                                          sx={{ mr: 1, fontSize: 24 }}
+                                        />
+                                        <Typography
+                                          variant="subtitle2"
+                                          color="text.secondary"
+                                          sx={{ fontWeight: 600 }}
+                                        >
                                           Passport
                                         </Typography>
                                       </Box>
-                                      <Typography 
-                                        variant="body1" 
-                                        sx={{ 
-                                          fontWeight: 700, 
-                                          fontFamily: 'monospace',
-                                          color: 'text.primary',
-                                          fontSize: { xs: '0.95rem', md: '1rem' },
-                                          letterSpacing: '1px'
+                                      <Typography
+                                        variant="body1"
+                                        sx={{
+                                          fontWeight: 700,
+                                          fontFamily: "monospace",
+                                          color: "text.primary",
+                                          fontSize: {
+                                            xs: "0.95rem",
+                                            md: "1rem",
+                                          },
+                                          letterSpacing: "1px",
                                         }}
                                       >
                                         {result.passport}
@@ -782,33 +994,67 @@ const VerifyIdp: React.FC = () => {
 
                                   {/* License Classes */}
                                   <Grid item xs={12} sm={4}>
-                                    <Box sx={{ textAlign: { xs: 'left', sm: 'center' } }}>
-                                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'flex-start', sm: 'center' }, mb: 1.5 }}>
-                                        <DriveEtaIcon color="primary" sx={{ mr: 1, fontSize: 24 }} />
-                                        <Typography variant="subtitle2" color="text.secondary" sx={{ fontWeight: 600 }}>
+                                    <Box
+                                      sx={{
+                                        textAlign: { xs: "left", sm: "center" },
+                                      }}
+                                    >
+                                      <Box
+                                        sx={{
+                                          display: "flex",
+                                          alignItems: "center",
+                                          justifyContent: {
+                                            xs: "flex-start",
+                                            sm: "center",
+                                          },
+                                          mb: 1.5,
+                                        }}
+                                      >
+                                        <DriveEtaIcon
+                                          color="primary"
+                                          sx={{ mr: 1, fontSize: 24 }}
+                                        />
+                                        <Typography
+                                          variant="subtitle2"
+                                          color="text.secondary"
+                                          sx={{ fontWeight: 600 }}
+                                        >
                                           Classes
                                         </Typography>
                                       </Box>
-                                      <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', justifyContent: { xs: 'flex-start', sm: 'center' } }}>
-                                        {result.classes.split(',').map((cls, index) => (
-                                          <Chip
-                                            key={index}
-                                            label={cls.trim()}
-                                            size="small"
-                                            color="primary"
-                                            variant="outlined"
-                                            sx={{ 
-                                              fontWeight: 700,
-                                              fontSize: '0.75rem',
-                                              height: 24,
-                                              '&:hover': {
-                                                backgroundColor: 'primary.50',
-                                                transform: 'scale(1.05)'
-                                              },
-                                              transition: 'all 0.2s ease-in-out'
-                                            }}
-                                          />
-                                        ))}
+                                      <Box
+                                        sx={{
+                                          display: "flex",
+                                          gap: 0.5,
+                                          flexWrap: "wrap",
+                                          justifyContent: {
+                                            xs: "flex-start",
+                                            sm: "center",
+                                          },
+                                        }}
+                                      >
+                                        {result.classes
+                                          .split(",")
+                                          .map((cls, index) => (
+                                            <Chip
+                                              key={index}
+                                              label={cls.trim()}
+                                              size="small"
+                                              color="primary"
+                                              variant="outlined"
+                                              sx={{
+                                                fontWeight: 700,
+                                                fontSize: "0.75rem",
+                                                height: 24,
+                                                "&:hover": {
+                                                  backgroundColor: "primary.50",
+                                                  transform: "scale(1.05)",
+                                                },
+                                                transition:
+                                                  "all 0.2s ease-in-out",
+                                              }}
+                                            />
+                                          ))}
                                       </Box>
                                     </Box>
                                   </Grid>
@@ -819,206 +1065,280 @@ const VerifyIdp: React.FC = () => {
                             {/* Expiry Date Card - 6 Columns */}
                             <Grid item xs={12} md={6}>
                               {(() => {
-                                const expiryInfo = getExpiryStatus(result.expirydate);
-                                const isExpiredOrCritical = expiryInfo.status === 'expired' || expiryInfo.status === 'expires-today';
-                                const isExpiringSoon = expiryInfo.status === 'expires-soon';
-                                
+                                const expiryInfo = getExpiryStatus(
+                                  result.expirydate
+                                );
+                                const isExpiredOrCritical =
+                                  expiryInfo.status === "expired" ||
+                                  expiryInfo.status === "expires-today";
+                                const isExpiringSoon =
+                                  expiryInfo.status === "expires-soon";
+
                                 return (
                                   <Box
                                     sx={{
                                       p: { xs: 2.5, md: 3 },
-                                      border: '2px solid',
+                                      border: "2px solid",
                                       borderColor: expiryInfo.borderColor,
                                       borderRadius: 3,
                                       backgroundColor: expiryInfo.bgColor,
-                                      position: 'relative',
-                                      overflow: 'hidden',
-                                      minHeight: { 
-                                        xs: isExpiredOrCritical ? '180px' : isExpiringSoon ? '160px' : '140px',
-                                        md: isExpiredOrCritical ? '200px' : isExpiringSoon ? '180px' : '160px'
+                                      position: "relative",
+                                      overflow: "hidden",
+                                      minHeight: {
+                                        xs: isExpiredOrCritical
+                                          ? "180px"
+                                          : isExpiringSoon
+                                          ? "160px"
+                                          : "140px",
+                                        md: isExpiredOrCritical
+                                          ? "200px"
+                                          : isExpiringSoon
+                                          ? "180px"
+                                          : "160px",
                                       },
-                                      display: 'flex',
-                                      flexDirection: isExpiredOrCritical ? 'row' : 'column',
-                                      transition: 'all 0.3s ease-in-out',
-                                      ...(expiryInfo.status !== 'valid' && {
-                                        boxShadow: isExpiredOrCritical 
+                                      display: "flex",
+                                      flexDirection: isExpiredOrCritical
+                                        ? "row"
+                                        : "column",
+                                      transition: "all 0.3s ease-in-out",
+                                      ...(expiryInfo.status !== "valid" && {
+                                        boxShadow: isExpiredOrCritical
                                           ? `0 8px 24px rgba(211, 47, 47, 0.25), 0 4px 12px rgba(211, 47, 47, 0.15)`
                                           : `0 6px 18px rgba(255, 152, 0, 0.2), 0 3px 9px rgba(255, 152, 0, 0.1)`,
-                                        transform: isExpiredOrCritical ? 'scale(1.03)' : 'scale(1.02)',
-                                        zIndex: isExpiredOrCritical ? 3 : 2
+                                        transform: isExpiredOrCritical
+                                          ? "scale(1.03)"
+                                          : "scale(1.02)",
+                                        zIndex: isExpiredOrCritical ? 3 : 2,
                                       }),
-                                      '&:hover': {
-                                        transform: expiryInfo.status !== 'valid' 
-                                          ? isExpiredOrCritical ? 'scale(1.04)' : 'scale(1.03)'
-                                          : 'scale(1.01)',
-                                        boxShadow: expiryInfo.status !== 'valid'
-                                          ? isExpiredOrCritical
-                                            ? `0 12px 32px rgba(211, 47, 47, 0.3), 0 6px 16px rgba(211, 47, 47, 0.2)`
-                                            : `0 8px 24px rgba(255, 152, 0, 0.25), 0 4px 12px rgba(255, 152, 0, 0.15)`
-                                          : `0 4px 12px rgba(0,0,0,0.1)`
-                                      }
+                                      "&:hover": {
+                                        transform:
+                                          expiryInfo.status !== "valid"
+                                            ? isExpiredOrCritical
+                                              ? "scale(1.04)"
+                                              : "scale(1.03)"
+                                            : "scale(1.01)",
+                                        boxShadow:
+                                          expiryInfo.status !== "valid"
+                                            ? isExpiredOrCritical
+                                              ? `0 12px 32px rgba(211, 47, 47, 0.3), 0 6px 16px rgba(211, 47, 47, 0.2)`
+                                              : `0 8px 24px rgba(255, 152, 0, 0.25), 0 4px 12px rgba(255, 152, 0, 0.15)`
+                                            : `0 4px 12px rgba(0,0,0,0.1)`,
+                                      },
                                     }}
                                   >
                                     {/* Animated warning stripe for expired/expiring soon */}
-                                    {(isExpiredOrCritical || isExpiringSoon) && (
+                                    {(isExpiredOrCritical ||
+                                      isExpiringSoon) && (
                                       <Box
                                         sx={{
-                                          position: 'absolute',
+                                          position: "absolute",
                                           top: 0,
                                           left: 0,
                                           right: 0,
-                                          height: isExpiredOrCritical ? '6px' : '4px',
+                                          height: isExpiredOrCritical
+                                            ? "6px"
+                                            : "4px",
                                           background: isExpiredOrCritical
-                                            ? 'linear-gradient(90deg, #D32F2F 0%, #EF5350 25%, #FF5722 50%, #EF5350 75%, #D32F2F 100%)'
-                                            : 'linear-gradient(90deg, #FF9800 0%, #FFB74D 25%, #FFC107 50%, #FFB74D 75%, #FF9800 100%)',
-                                          backgroundSize: '300% 100%',
-                                          animation: `slideStripe ${isExpiredOrCritical ? '1.5s' : '2s'} linear infinite`,
-                                          '&::after': isExpiredOrCritical ? {
-                                            content: '""',
-                                            position: 'absolute',
-                                            top: 0,
-                                            left: 0,
-                                            right: 0,
-                                            bottom: 0,
-                                            background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%)',
-                                            animation: 'slideStripe 3s linear infinite reverse'
-                                          } : {}
+                                            ? "linear-gradient(90deg, #D32F2F 0%, #EF5350 25%, #FF5722 50%, #EF5350 75%, #D32F2F 100%)"
+                                            : "linear-gradient(90deg, #FF9800 0%, #FFB74D 25%, #FFC107 50%, #FFB74D 75%, #FF9800 100%)",
+                                          backgroundSize: "300% 100%",
+                                          animation: `slideStripe ${
+                                            isExpiredOrCritical ? "1.5s" : "2s"
+                                          } linear infinite`,
+                                          "&::after": isExpiredOrCritical
+                                            ? {
+                                                content: '""',
+                                                position: "absolute",
+                                                top: 0,
+                                                left: 0,
+                                                right: 0,
+                                                bottom: 0,
+                                                background:
+                                                  "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%)",
+                                                animation:
+                                                  "slideStripe 3s linear infinite reverse",
+                                              }
+                                            : {},
                                         }}
                                       />
                                     )}
-                                    
                                     {isExpiredOrCritical ? (
                                       // Enhanced layout for expired permits using full 6-column space
                                       <>
                                         {/* Main Content Area */}
-                                        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', pr: { xs: 2, md: 3 } }}>
+                                        <Box
+                                          sx={{
+                                            flex: 1,
+                                            display: "flex",
+                                            flexDirection: "column",
+                                            pr: { xs: 2, md: 3 },
+                                          }}
+                                        >
                                           {/* Header with Status */}
-                                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, flexShrink: 0 }}>
-                                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                          <Box
+                                            sx={{
+                                              display: "flex",
+                                              alignItems: "center",
+                                              justifyContent: "space-between",
+                                              mb: 2,
+                                              flexShrink: 0,
+                                            }}
+                                          >
+                                            <Box
+                                              sx={{
+                                                display: "flex",
+                                                alignItems: "center",
+                                              }}
+                                            >
                                               {expiryInfo.icon}
-                                              <Typography 
-                                                variant="h6" 
-                                                sx={{ 
+                                              <Typography
+                                                variant="h6"
+                                                sx={{
                                                   color: `${expiryInfo.color}.dark`,
                                                   fontWeight: 700,
-                                                  fontSize: { xs: '1rem', md: '1.1rem' },
-                                                  ml: 1
+                                                  fontSize: {
+                                                    xs: "1rem",
+                                                    md: "1.1rem",
+                                                  },
+                                                  ml: 1,
                                                 }}
                                               >
                                                 Expiry Status
                                               </Typography>
                                             </Box>
-                                            
+
                                             {/* Status Chip */}
-                                            <Chip 
-                                              label="EXPIRED" 
-                                              size="medium" 
-                                              color="error" 
-                                              sx={{ 
-                                                fontSize: '0.7rem', 
+                                            <Chip
+                                              label="EXPIRED"
+                                              size="medium"
+                                              color="error"
+                                              sx={{
+                                                fontSize: "0.7rem",
                                                 fontWeight: 800,
                                                 height: 28,
-                                                '& .MuiChip-label': {
-                                                  px: 2
+                                                "& .MuiChip-label": {
+                                                  px: 2,
                                                 },
-                                                animation: 'pulse 2s infinite'
+                                                animation: "pulse 2s infinite",
                                               }}
                                             />
                                           </Box>
-                                          
+
                                           {/* Date Display */}
-                                          <Typography 
+                                          <Typography
                                             variant="h5"
-                                            sx={{ 
+                                            sx={{
                                               fontWeight: 700,
                                               color: `${expiryInfo.color}.dark`,
                                               mb: 1.5,
-                                              fontSize: { xs: '1.2rem', md: '1.4rem' }
+                                              fontSize: {
+                                                xs: "1.2rem",
+                                                md: "1.4rem",
+                                              },
                                             }}
                                           >
-                                            {new Date(result.expirydate).toLocaleDateString('en-GB', {
-                                              day: '2-digit',
-                                              month: 'long',
-                                              year: 'numeric'
+                                            {new Date(
+                                              result.expirydate
+                                            ).toLocaleDateString("en-GB", {
+                                              day: "2-digit",
+                                              month: "long",
+                                              year: "numeric",
                                             })}
                                           </Typography>
-                                          
+
                                           {/* Status Message */}
-                                          <Typography 
-                                            variant="body2" 
-                                            sx={{ 
+                                          <Typography
+                                            variant="body2"
+                                            sx={{
                                               color: `${expiryInfo.color}.dark`,
                                               fontWeight: 600,
-                                              fontSize: { xs: '0.85rem', md: '0.9rem' },
+                                              fontSize: {
+                                                xs: "0.85rem",
+                                                md: "0.9rem",
+                                              },
                                               lineHeight: 1.4,
                                               flex: 1,
-                                              mb: 2
+                                              mb: 2,
                                             }}
                                           >
                                             {expiryInfo.message}
                                           </Typography>
-                                          
+
                                           {/* Quick Action Button */}
-                                          <Box sx={{ mt: 'auto' }}>
-                                            <Typography 
-                                              variant="caption" 
-                                              sx={{ 
-                                                fontSize: '0.75rem',
+                                          <Box sx={{ mt: "auto" }}>
+                                            <Typography
+                                              variant="caption"
+                                              sx={{
+                                                fontSize: "0.75rem",
                                                 fontWeight: 600,
-                                                color: 'error.dark',
-                                                display: 'block',
-                                                mb: 0.5
+                                                color: "error.dark",
+                                                display: "block",
+                                                mb: 0.5,
                                               }}
                                             >
-                                              📍 Renewal Required - Contact AA Uganda
+                                              📍 Renewal Required - Contact AA
+                                              Uganda
                                             </Typography>
                                           </Box>
                                         </Box>
-                                        
+
                                         {/* Right side - Enhanced Urgent indicator */}
-                                        <Box 
-                                          sx={{ 
-                                            display: 'flex', 
-                                            alignItems: 'center', 
-                                            justifyContent: 'center',
-                                            minWidth: { xs: '80px', md: '100px' },
-                                            borderLeft: '3px solid',
-                                            borderColor: 'error.300',
+                                        <Box
+                                          sx={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            minWidth: {
+                                              xs: "80px",
+                                              md: "100px",
+                                            },
+                                            borderLeft: "3px solid",
+                                            borderColor: "error.300",
                                             pl: { xs: 2, md: 3 },
-                                            animation: 'glow 2s infinite'
+                                            animation: "glow 2s infinite",
                                           }}
                                         >
-                                          <Box sx={{ textAlign: 'center' }}>
-                                            <Typography 
-                                              sx={{ 
-                                                fontSize: { xs: '2.5rem', md: '3rem' },
-                                                animation: 'pulse 1.5s infinite',
-                                                mb: 1
+                                          <Box sx={{ textAlign: "center" }}>
+                                            <Typography
+                                              sx={{
+                                                fontSize: {
+                                                  xs: "2.5rem",
+                                                  md: "3rem",
+                                                },
+                                                animation:
+                                                  "pulse 1.5s infinite",
+                                                mb: 1,
                                               }}
                                             >
                                               🚨
                                             </Typography>
-                                            <Typography 
-                                              variant="caption" 
-                                              sx={{ 
-                                                fontSize: { xs: '0.65rem', md: '0.7rem' },
+                                            <Typography
+                                              variant="caption"
+                                              sx={{
+                                                fontSize: {
+                                                  xs: "0.65rem",
+                                                  md: "0.7rem",
+                                                },
                                                 fontWeight: 800,
-                                                color: 'error.dark',
-                                                display: 'block',
-                                                textTransform: 'uppercase',
-                                                letterSpacing: '1px'
+                                                color: "error.dark",
+                                                display: "block",
+                                                textTransform: "uppercase",
+                                                letterSpacing: "1px",
                                               }}
                                             >
                                               Urgent
                                             </Typography>
-                                            <Typography 
-                                              variant="caption" 
-                                              sx={{ 
-                                                fontSize: { xs: '0.6rem', md: '0.65rem' },
+                                            <Typography
+                                              variant="caption"
+                                              sx={{
+                                                fontSize: {
+                                                  xs: "0.6rem",
+                                                  md: "0.65rem",
+                                                },
                                                 fontWeight: 600,
-                                                color: 'error.main',
-                                                display: 'block',
-                                                mt: 0.5
+                                                color: "error.main",
+                                                display: "block",
+                                                mt: 0.5,
                                               }}
                                             >
                                               Renewal
@@ -1030,107 +1350,147 @@ const VerifyIdp: React.FC = () => {
                                       // Enhanced layout for valid/expiring permits using full 6-column space
                                       <>
                                         {/* Header Section with Status */}
-                                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3, flexShrink: 0 }}>
-                                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <Box
+                                          sx={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "space-between",
+                                            mb: 3,
+                                            flexShrink: 0,
+                                          }}
+                                        >
+                                          <Box
+                                            sx={{
+                                              display: "flex",
+                                              alignItems: "center",
+                                            }}
+                                          >
                                             {expiryInfo.icon}
-                                            <Typography 
-                                              variant="h6" 
-                                              sx={{ 
-                                                color: expiryInfo.status !== 'valid' ? `${expiryInfo.color}.dark` : 'primary.main',
+                                            <Typography
+                                              variant="h6"
+                                              sx={{
+                                                color:
+                                                  expiryInfo.status !== "valid"
+                                                    ? `${expiryInfo.color}.dark`
+                                                    : "primary.main",
                                                 fontWeight: 700,
-                                                fontSize: { xs: '1rem', md: '1.1rem' },
-                                                ml: 1
+                                                fontSize: {
+                                                  xs: "1rem",
+                                                  md: "1.1rem",
+                                                },
+                                                ml: 1,
                                               }}
                                             >
                                               Expiry Status
                                             </Typography>
                                           </Box>
-                                          
+
                                           {/* Status Chips */}
                                           {isExpiringSoon ? (
-                                            <Chip 
-                                              label="EXPIRES SOON" 
-                                              size="medium" 
-                                              color="warning" 
-                                              sx={{ 
-                                                fontSize: '0.7rem', 
+                                            <Chip
+                                              label="EXPIRES SOON"
+                                              size="medium"
+                                              color="warning"
+                                              sx={{
+                                                fontSize: "0.7rem",
                                                 fontWeight: 700,
                                                 height: 28,
-                                                '& .MuiChip-label': {
-                                                  px: 2
-                                                }
+                                                "& .MuiChip-label": {
+                                                  px: 2,
+                                                },
                                               }}
                                             />
                                           ) : (
-                                            <Chip 
-                                              label="VALID" 
-                                              size="medium" 
-                                              color="success" 
-                                              sx={{ 
-                                                fontSize: '0.7rem', 
+                                            <Chip
+                                              label="VALID"
+                                              size="medium"
+                                              color="success"
+                                              sx={{
+                                                fontSize: "0.7rem",
                                                 fontWeight: 700,
                                                 height: 28,
-                                                '& .MuiChip-label': {
-                                                  px: 2
-                                                }
+                                                "& .MuiChip-label": {
+                                                  px: 2,
+                                                },
                                               }}
                                             />
                                           )}
                                         </Box>
-                                        
+
                                         {/* Date Display */}
-                                        <Typography 
+                                        <Typography
                                           variant="h5"
-                                          sx={{ 
+                                          sx={{
                                             fontWeight: 700,
-                                            color: expiryInfo.status !== 'valid' ? `${expiryInfo.color}.dark` : 'success.dark',
+                                            color:
+                                              expiryInfo.status !== "valid"
+                                                ? `${expiryInfo.color}.dark`
+                                                : "success.dark",
                                             mb: 2,
-                                            fontSize: { xs: '1.2rem', md: '1.4rem' }
+                                            fontSize: {
+                                              xs: "1.2rem",
+                                              md: "1.4rem",
+                                            },
                                           }}
                                         >
-                                          {new Date(result.expirydate).toLocaleDateString('en-GB', {
-                                            day: '2-digit',
-                                            month: 'long',
-                                            year: 'numeric'
+                                          {new Date(
+                                            result.expirydate
+                                          ).toLocaleDateString("en-GB", {
+                                            day: "2-digit",
+                                            month: "long",
+                                            year: "numeric",
                                           })}
                                         </Typography>
-                                        
+
                                         {/* Status Message */}
-                                        <Typography 
-                                          variant="body2" 
-                                          sx={{ 
-                                            color: expiryInfo.status !== 'valid' ? `${expiryInfo.color}.dark` : 'text.secondary',
-                                            fontWeight: expiryInfo.status !== 'valid' ? 600 : 500,
-                                            fontSize: { 
-                                              xs: '0.85rem',
-                                              md: '0.9rem'
+                                        <Typography
+                                          variant="body2"
+                                          sx={{
+                                            color:
+                                              expiryInfo.status !== "valid"
+                                                ? `${expiryInfo.color}.dark`
+                                                : "text.secondary",
+                                            fontWeight:
+                                              expiryInfo.status !== "valid"
+                                                ? 600
+                                                : 500,
+                                            fontSize: {
+                                              xs: "0.85rem",
+                                              md: "0.9rem",
                                             },
                                             lineHeight: 1.5,
-                                            flexGrow: 1
+                                            flexGrow: 1,
                                           }}
                                         >
                                           {expiryInfo.message}
                                         </Typography>
-                                        
+
                                         {/* Valid Status Indicator */}
                                         {!isExpiringSoon && (
-                                          <Box sx={{ mt: 'auto', pt: 2 }}>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-                                              <Typography 
-                                                sx={{ 
-                                                  fontSize: '1.5rem'
+                                          <Box sx={{ mt: "auto", pt: 2 }}>
+                                            <Box
+                                              sx={{
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                gap: 1,
+                                              }}
+                                            >
+                                              <Typography
+                                                sx={{
+                                                  fontSize: "1.5rem",
                                                 }}
                                               >
                                                 ✅
                                               </Typography>
-                                              <Typography 
-                                                variant="caption" 
-                                                sx={{ 
-                                                  fontSize: '0.75rem',
+                                              <Typography
+                                                variant="caption"
+                                                sx={{
+                                                  fontSize: "0.75rem",
                                                   fontWeight: 700,
-                                                  color: 'success.dark',
-                                                  textTransform: 'uppercase',
-                                                  letterSpacing: '1px'
+                                                  color: "success.dark",
+                                                  textTransform: "uppercase",
+                                                  letterSpacing: "1px",
                                                 }}
                                               >
                                                 Valid for International Use
@@ -1139,151 +1499,223 @@ const VerifyIdp: React.FC = () => {
                                           </Box>
                                         )}
                                       </>
-                                    )}                                    {/* Enhanced Renewal Section for Expired/Critical - Only for non-expired layout */}
+                                    )}{" "}
+                                    {/* Enhanced Renewal Section for Expired/Critical - Only for non-expired layout */}
                                     {!isExpiredOrCritical && isExpiringSoon && (
                                       <Box
                                         sx={{
-                                          mt: 'auto',
+                                          mt: "auto",
                                           p: { xs: 1.5, md: 1.5 },
-                                          background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,252,245,0.9) 100%)',
+                                          background:
+                                            "linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,252,245,0.9) 100%)",
                                           borderRadius: 2,
-                                          border: '2px solid',
-                                          borderColor: 'warning.300',
-                                          boxShadow: 'inset 0 2px 8px rgba(255, 152, 0, 0.1)',
-                                          position: 'relative',
-                                          overflow: 'hidden'
+                                          border: "2px solid",
+                                          borderColor: "warning.300",
+                                          boxShadow:
+                                            "inset 0 2px 8px rgba(255, 152, 0, 0.1)",
+                                          position: "relative",
+                                          overflow: "hidden",
                                         }}
                                       >
-                                        <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1.5 }}>
-                                          <Typography 
-                                            variant="body2" 
-                                            sx={{ 
-                                              fontSize: '0.8rem',
+                                        <Box
+                                          sx={{
+                                            display: "flex",
+                                            alignItems: "flex-start",
+                                            mb: 1.5,
+                                          }}
+                                        >
+                                          <Typography
+                                            variant="body2"
+                                            sx={{
+                                              fontSize: "0.8rem",
                                               fontWeight: 700,
-                                              color: 'warning.dark',
-                                              display: 'flex',
-                                              alignItems: 'center',
-                                              gap: 1
+                                              color: "warning.dark",
+                                              display: "flex",
+                                              alignItems: "center",
+                                              gap: 1,
                                             }}
                                           >
                                             ⚠️ Renewal Recommended
                                           </Typography>
                                         </Box>
-                                        
-                                        <Typography 
-                                          variant="caption" 
-                                          sx={{ 
-                                            fontSize: '0.7rem',
+
+                                        <Typography
+                                          variant="caption"
+                                          sx={{
+                                            fontSize: "0.7rem",
                                             fontWeight: 500,
-                                            color: 'text.primary',
-                                            display: 'block',
+                                            color: "text.primary",
+                                            display: "block",
                                             lineHeight: 1.4,
-                                            mb: 1
+                                            mb: 1,
                                           }}
                                         >
-                                          IDPs are valid for exactly 1 year. Consider renewing soon to avoid travel disruptions.
+                                          IDPs are valid for exactly 1 year.
+                                          Consider renewing soon to avoid travel
+                                          disruptions.
                                         </Typography>
-                                        
-
                                       </Box>
                                     )}
                                   </Box>
                                 );
                               })()}
                             </Grid>
-
                           </Grid>
 
                           {/* Validity Status */}
                           {(() => {
-                            const expiryInfo = getExpiryStatus(result.expirydate);
-                            const isExpiredOrExpiring = expiryInfo.status === 'expired' || expiryInfo.status === 'expires-today';
-                            const isExpiringSoon = expiryInfo.status === 'expires-soon';
-                            
+                            const expiryInfo = getExpiryStatus(
+                              result.expirydate
+                            );
+                            const isExpiredOrExpiring =
+                              expiryInfo.status === "expired" ||
+                              expiryInfo.status === "expires-today";
+                            const isExpiringSoon =
+                              expiryInfo.status === "expires-soon";
+
                             return (
                               <Box
                                 sx={{
                                   mt: { xs: 2, md: 3 },
                                   p: { xs: 2, md: 3 },
-                                  backgroundColor: isExpiredOrExpiring 
-                                    ? 'error.50' 
-                                    : isExpiringSoon 
-                                      ? 'warning.50' 
-                                      : "#e8fbf2",
+                                  backgroundColor: isExpiredOrExpiring
+                                    ? "error.50"
+                                    : isExpiringSoon
+                                    ? "warning.50"
+                                    : "#e8fbf2",
                                   borderRadius: 2,
-                                  border: '2px solid',
-                                  borderColor: isExpiredOrExpiring 
-                                    ? 'error.200' 
-                                    : isExpiringSoon 
-                                      ? 'warning.200' 
-                                      : theme.palette.success.light
+                                  border: "2px solid",
+                                  borderColor: isExpiredOrExpiring
+                                    ? "error.200"
+                                    : isExpiringSoon
+                                    ? "warning.200"
+                                    : theme.palette.success.light,
                                 }}
                               >
-                                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    mb: 2,
+                                  }}
+                                >
                                   {isExpiredOrExpiring ? (
                                     <ErrorIcon color="error" sx={{ mr: 1 }} />
                                   ) : isExpiringSoon ? (
                                     <ErrorIcon color="warning" sx={{ mr: 1 }} />
                                   ) : (
-                                    <VerifiedUserIcon color="success" sx={{ mr: 1 }} />
+                                    <VerifiedUserIcon
+                                      color="success"
+                                      sx={{ mr: 1 }}
+                                    />
                                   )}
-                                  <Typography 
-                                    variant="h6" 
-                                    sx={{ 
-                                      fontWeight: 600, 
-                                      color: isExpiredOrExpiring 
-                                        ? 'error.dark' 
-                                        : isExpiringSoon 
-                                          ? 'warning.dark' 
-                                          : 'success.dark' 
+                                  <Typography
+                                    variant="h6"
+                                    sx={{
+                                      fontWeight: 600,
+                                      color: isExpiredOrExpiring
+                                        ? "error.dark"
+                                        : isExpiringSoon
+                                        ? "warning.dark"
+                                        : "success.dark",
                                     }}
                                   >
-                                    {isExpiredOrExpiring 
-                                      ? 'Expired IDP - Renewal Required'
-                                      : isExpiringSoon 
-                                        ? 'Expires Soon - Consider Renewal'
-                                        : 'Official Verification'
-                                    }
+                                    {isExpiredOrExpiring
+                                      ? "Expired IDP - Renewal Required"
+                                      : isExpiringSoon
+                                      ? "Expires Soon - Consider Renewal"
+                                      : "Official Verification"}
                                   </Typography>
                                 </Box>
-                                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                                  {isExpiredOrExpiring 
-                                    ? 'This IDP has expired and is no longer valid for international driving. You must renew your IDP at AA Uganda before traveling internationally.'
-                                    : isExpiringSoon 
-                                      ? `This IDP expires in ${expiryInfo.daysRemaining} day${expiryInfo.daysRemaining !== 1 ? 's' : ''}. We recommend renewing your IDP soon to avoid travel disruptions.`
-                                      : 'This IDP has been verified against the official AA Uganda database. It is valid for international driving in 150+ countries under the 1968 Vienna Convention.'
-                                  }
+                                <Typography
+                                  variant="body2"
+                                  color="text.secondary"
+                                  sx={{ mb: 2 }}
+                                >
+                                  {isExpiredOrExpiring
+                                    ? "This IDP has expired and is no longer valid for international driving. You must renew your IDP at AA Uganda before traveling internationally."
+                                    : isExpiringSoon
+                                    ? `This IDP expires in ${
+                                        expiryInfo.daysRemaining
+                                      } day${
+                                        expiryInfo.daysRemaining !== 1
+                                          ? "s"
+                                          : ""
+                                      }. We recommend renewing your IDP soon to avoid travel disruptions.`
+                                    : "This IDP has been verified against the official AA Uganda database. It is valid for international driving in 150+ countries under the 1968 Vienna Convention."}
                                 </Typography>
-                                
+
                                 {(isExpiredOrExpiring || isExpiringSoon) && (
                                   <Box
                                     sx={{
                                       p: { xs: 1.5, md: 2 },
-                                      backgroundColor: 'rgba(255,255,255,0.8)',
+                                      backgroundColor: "rgba(255,255,255,0.8)",
                                       borderRadius: 1,
-                                      border: '1px dashed',
-                                      borderColor: isExpiredOrExpiring ? 'error.300' : 'warning.300'
+                                      border: "1px dashed",
+                                      borderColor: isExpiredOrExpiring
+                                        ? "error.300"
+                                        : "warning.300",
                                     }}
                                   >
-                                    <Typography 
-                                      variant="body2" 
-                                      sx={{ 
+                                    <Typography
+                                      variant="body2"
+                                      sx={{
                                         fontWeight: 600,
-                                        fontSize: { xs: '0.8rem', md: '0.875rem' },
-                                        color: isExpiredOrExpiring ? 'error.dark' : 'warning.dark',
-                                        mb: 1
+                                        fontSize: {
+                                          xs: "0.8rem",
+                                          md: "0.875rem",
+                                        },
+                                        color: isExpiredOrExpiring
+                                          ? "error.dark"
+                                          : "warning.dark",
+                                        mb: 1,
                                       }}
                                     >
                                       📍 Renewal Information:
                                     </Typography>
-                                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5, fontSize: { xs: '0.7rem', md: '0.75rem' } }}>
-                                      • IDPs are valid for exactly 1 year from issue date
+                                    <Typography
+                                      variant="caption"
+                                      color="text.secondary"
+                                      sx={{
+                                        display: "block",
+                                        mb: 0.5,
+                                        fontSize: {
+                                          xs: "0.7rem",
+                                          md: "0.75rem",
+                                        },
+                                      }}
+                                    >
+                                      • IDPs are valid for exactly 1 year from
+                                      issue date
                                     </Typography>
-                                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5, fontSize: { xs: '0.7rem', md: '0.75rem' } }}>
-                                      • Visit AA Uganda at Plot 4 Old Portbell Road Suite 8, Kampala
+                                    <Typography
+                                      variant="caption"
+                                      color="text.secondary"
+                                      sx={{
+                                        display: "block",
+                                        mb: 0.5,
+                                        fontSize: {
+                                          xs: "0.7rem",
+                                          md: "0.75rem",
+                                        },
+                                      }}
+                                    >
+                                      • Visit AA Uganda at Plot 4 Old Portbell
+                                      Road Suite 8, Kampala
                                     </Typography>
-                                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: { xs: '0.7rem', md: '0.75rem' } }}>
-                                      • Contact: {config.company.contactNumber} or {config.company.email}
+                                    <Typography
+                                      variant="caption"
+                                      color="text.secondary"
+                                      sx={{
+                                        display: "block",
+                                        fontSize: {
+                                          xs: "0.7rem",
+                                          md: "0.75rem",
+                                        },
+                                      }}
+                                    >
+                                      • Contact: {config.company.contactNumber}{" "}
+                                      or {config.company.email}
                                     </Typography>
                                   </Box>
                                 )}
@@ -1298,10 +1730,10 @@ const VerifyIdp: React.FC = () => {
                   {/* Footer Section */}
                   <Box
                     sx={{
-                      backgroundColor: 'grey.100',
+                      backgroundColor: "grey.100",
                       p: { xs: 2, md: 3 },
-                      borderTop: '1px solid',
-                      borderColor: 'grey.200'
+                      borderTop: "1px solid",
+                      borderColor: "grey.200",
                     }}
                   >
                     <Grid container spacing={2} alignItems="center">
@@ -1313,9 +1745,15 @@ const VerifyIdp: React.FC = () => {
                           Automobile Association of Uganda
                         </Typography>
                       </Grid>
-                      <Grid item xs={12} sm={6} sx={{ textAlign: { sm: 'right' } }}>
+                      <Grid
+                        item
+                        xs={12}
+                        sm={6}
+                        sx={{ textAlign: { sm: "right" } }}
+                      >
                         <Typography variant="caption" color="text.secondary">
-                          Verification Time: {new Date().toLocaleString('en-GB')}
+                          Verification Time:{" "}
+                          {new Date().toLocaleString("en-GB")}
                         </Typography>
                       </Grid>
                     </Grid>
@@ -1510,8 +1948,8 @@ const VerifyIdp: React.FC = () => {
                     sx={{ mb: 4, maxWidth: 800, mx: "auto", lineHeight: 1.8 }}
                   >
                     Located at Plot 4 Old Portbell Road Suite 8, Kampala.
-                    Contact us at {config.company.contactNumber} or email {config.company.email} 
-                    {" "}for IDP applications and inquiries.
+                    Contact us at {config.company.contactNumber} or email{" "}
+                    {config.company.email} for IDP applications and inquiries.
                   </Typography>
                   <Box
                     sx={{
@@ -1562,19 +2000,19 @@ const VerifyIdp: React.FC = () => {
         open={showDownloadSuccess}
         autoHideDuration={4000}
         onClose={() => setShowDownloadSuccess(false)}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
         sx={{ mt: 0 }}
       >
-        <Alert 
-          onClose={() => setShowDownloadSuccess(false)} 
+        <Alert
+          onClose={() => setShowDownloadSuccess(false)}
           severity="success"
           variant="filled"
           sx={{
-            width: '100%',
-            boxShadow: '0 4px 12px rgba(76, 175, 80, 0.3)',
+            width: "100%",
+            boxShadow: "0 4px 12px rgba(76, 175, 80, 0.3)",
           }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <PdfIcon />
             <Typography variant="body2" sx={{ fontWeight: 600 }}>
               Verification certificate downloaded successfully!
