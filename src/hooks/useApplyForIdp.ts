@@ -808,7 +808,7 @@ const useApplyForIdp = () => {
 
   // File handling functions
   const handleFileUpload = async (fieldName: keyof IDPFormData, file: File) => {
-    setValue(fieldName, file, { shouldValidate: true, shouldTouch: true });
+    setFormField(fieldName, file);
 
     // If it's a passport photo, validate it with content-based caching
     if (fieldName === "passportPhoto") {
@@ -933,7 +933,7 @@ const useApplyForIdp = () => {
       revokeManagedImageUrl(currentFile);
     }
 
-    setValue(fieldName, undefined, { shouldValidate: true, shouldTouch: true });
+    setFormField(fieldName, undefined);
 
     // Clear photo validation state when removing passport photo
     if (fieldName === "passportPhoto") {
@@ -970,11 +970,29 @@ const useApplyForIdp = () => {
     return formatUgandaPhoneNumber(phoneNumber);
   };
 
+  // Helper function to set form field with consistent validation options
+  const setFormField = useCallback(
+    (fieldName: string, value: any, options: { shouldValidate?: boolean; shouldTouch?: boolean } = {}) => {
+      const defaultOptions = { shouldValidate: true, shouldTouch: true };
+      setValue(fieldName as any, value, { ...defaultOptions, ...options });
+    },
+    [setValue]
+  );
+
+  // Helper function specifically for formatted phone fields
+  const setFormattedPhoneField = useCallback(
+    (fieldName: "telephoneNumber" | "mobileNumber", value: string | null | undefined) => {
+      const formattedValue = formatPhoneNumberForForm(value);
+      setFormField(fieldName, formattedValue);
+    },
+    [setFormField]
+  );
+
   const handleResetPopulatedData = () => {
-    setValue("surname", "");
-    setValue("otherNames", "");
-    setValue("emailAddress", "");
-    setValue("telephoneNumber", "");
+    setFormField("surname", "", { shouldValidate: false });
+    setFormField("otherNames", "", { shouldValidate: false });
+    setFormField("emailAddress", "", { shouldValidate: false });
+    setFormField("telephoneNumber", "", { shouldValidate: false });
   };
 
   // Stable auto-verification function that doesn't cause re-renders
@@ -1057,25 +1075,11 @@ const useApplyForIdp = () => {
           }));
 
           // Auto-populate form fields with member data
-          setValue("surname", result.data.fname || "", {
-            shouldValidate: true,
-            shouldTouch: true,
-          });
-          setValue("otherNames", result.data.onames || "", {
-            shouldValidate: true,
-            shouldTouch: true,
-          });
-          setValue("emailAddress", result.data.email || "", {
-            shouldValidate: true,
-            shouldTouch: true,
-          });
+          setFormField("surname", result.data.fname || "");
+          setFormField("otherNames", result.data.onames || "");
+          setFormField("emailAddress", result.data.email || "");
           // Format and validate phone numbers before setting them
-          const formattedTel = formatPhoneNumberForForm(result.data.tel);
-
-          setValue("telephoneNumber", formattedTel, { 
-            shouldValidate: true,
-            shouldTouch: true,
-          });
+          setFormattedPhoneField("telephoneNumber", result.data.tel);
 
           showAlertMessage(
             `Member verified successfully! Welcome back, ${result.data.fname} ${result.data.onames}`,
@@ -1304,6 +1308,10 @@ const useApplyForIdp = () => {
     triggerPhoneValidation,
     getPhoneNumberHelperText,
     validateUgandaPhoneNumber,
+    setFormattedPhoneField,
+
+    // Form field utilities
+    setFormField,
 
     // Handlers
     handleNext,

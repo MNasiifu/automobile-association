@@ -221,6 +221,13 @@ const VerifyIdp: React.FC = () => {
     handleRecaptchaError,
     handleRecaptchaExpired,
   } = useVerifyIdp();
+
+  // Helper function to determine disabled button color based on loading state
+  const getDisabledButtonColor = (loading: boolean) => {
+    return loading
+      ? `${theme.palette.secondary.main} !important`
+      : `${theme.palette.grey[500]} !important`;
+  };
   const { handleSubmit, register, setValue } = useForm<{ idpNumber: string }>({
     defaultValues: { idpNumber: searchValue },
   });
@@ -432,9 +439,7 @@ const VerifyIdp: React.FC = () => {
                         transform: "translateY(-2px)",
                       },
                       "&.MuiButtonBase-root.MuiButton-root.Mui-disabled": {
-                        color: loading
-                          ? `${theme.palette.secondary.main} !important`
-                          : `${theme.palette.grey[500]} !important`,
+                        color: getDisabledButtonColor(loading),
                       },
                       transition: "all 0.3s ease-in-out",
                     }}

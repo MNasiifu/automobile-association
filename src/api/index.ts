@@ -153,11 +153,11 @@ export const validateMemberData = (
  */
 export const getAAUMemberByNumber = async (memberNumber: number): Promise<AAUMemberResponse> => {
   try {
-    // Validate input parameter
-    if (!memberNumber || typeof memberNumber !== 'number' || memberNumber <= 0) {
+    // Validate input parameter with robust number validation
+    if (!Number.isFinite(memberNumber) || !Number.isInteger(memberNumber) || memberNumber <= 0) {
       return {
         data: null,
-        error: "Member number must be a valid positive number",
+        error: "Member number must be a valid positive integer",
       };
     }
 
