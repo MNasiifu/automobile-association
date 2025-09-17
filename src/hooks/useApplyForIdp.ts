@@ -5,12 +5,20 @@ import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import { validatePassportPhoto } from "../utils/passportPhotoValidator";
 import type { PhotoValidationResult } from "../utils/passportPhotoValidator";
-import { applyForIdp } from "../api";
-import type { CreateMemberData, IdpDocument, PendingIdpData } from "../types";
+import { applyForIdp, getAAUMemberByNumber } from "../api";
+import type {
+  CreateMemberData,
+  IdpDocument,
+  PendingIdpData,
+  AauMember,
+} from "../types";
 import {
   concatenateWithCommas,
   formatDateToYYYYMMDD,
   getCurrentDateFormatted,
+  validateUgandaPhoneNumber,
+  formatUgandaPhoneNumber,
+  getPhoneNumberHelperText as getPhoneHelperText,
 } from "../utils";
 import { fileToDataUrl } from "../utils/fileUtils";
 import { useGlobalLoading } from "../contexts";
@@ -47,15 +55,17 @@ export interface FileValidationResult {
 // Helper function to get user-friendly file type descriptions
 const getFileTypeDescription = (mimeType: string): string => {
   const typeMap: Record<string, string> = {
-    'application/pdf': 'PDF',
-    'image/jpeg': 'JPEG',
-    'image/jpg': 'JPG', 
-    'image/png': 'PNG',
-    'image/gif': 'GIF',
-    'image/webp': 'WebP'
+    "application/pdf": "PDF",
+    "image/jpeg": "JPEG",
+    "image/jpg": "JPG",
+    "image/png": "PNG",
+    "image/gif": "GIF",
+    "image/webp": "WebP",
   };
-  
-  return typeMap[mimeType] || mimeType.split('/')[1]?.toUpperCase() || 'Unknown';
+
+  return (
+    typeMap[mimeType] || mimeType.split("/")[1]?.toUpperCase() || "Unknown"
+  );
 };
 
 // File validation helpers
@@ -70,16 +80,16 @@ const validateFile = (
 
   // Check for empty file
   if (file.size === 0) {
-    return { 
-      isValid: false, 
+    return {
+      isValid: false,
       error: "File is empty. Please select a valid file",
       details: {
         fileName: file.name,
         fileSize: file.size,
         fileType: file.type,
         maxSizeMB,
-        allowedTypes
-      }
+        allowedTypes,
+      },
     };
   }
 
@@ -92,46 +102,46 @@ const validateFile = (
 
   // Check file type
   if (!allowedMimeTypes.includes(file.type)) {
-    const typeNames = allowedTypes.map(type => type.toUpperCase()).join(", ");
+    const typeNames = allowedTypes.map((type) => type.toUpperCase()).join(", ");
     const actualTypeDescription = getFileTypeDescription(file.type);
-    return { 
-      isValid: false, 
+    return {
+      isValid: false,
       error: `Invalid file type "${actualTypeDescription}". Only ${typeNames} files are allowed`,
       details: {
         fileName: file.name,
         fileSize: file.size,
         fileType: file.type,
         maxSizeMB,
-        allowedTypes
-      }
+        allowedTypes,
+      },
     };
   }
 
   // Check file size
   if (file.size > maxSizeMB * 1024 * 1024) {
     const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
-    return { 
-      isValid: false, 
+    return {
+      isValid: false,
       error: `File size (${fileSizeMB}MB) exceeds the maximum allowed size of ${maxSizeMB}MB`,
       details: {
         fileName: file.name,
         fileSize: file.size,
         fileType: file.type,
         maxSizeMB,
-        allowedTypes
-      }
+        allowedTypes,
+      },
     };
   }
 
-  return { 
+  return {
     isValid: true,
     details: {
       fileName: file.name,
       fileSize: file.size,
       fileType: file.type,
       maxSizeMB,
-      allowedTypes
-    }
+      allowedTypes,
+    },
   };
 };
 
@@ -147,6 +157,7 @@ const createFileHash = async (file: File): Promise<string> => {
 };
 
 // Validation schema based on idp.md requirements
+// Configured for onBlur validation - all validations trigger when user leaves the field
 const validationSchema = yup.object({
   // Membership info
   isMember: yup.boolean().required("Please specify if you are an AA member"),
@@ -173,8 +184,38 @@ const validationSchema = yup.object({
     .string()
     .email("Invalid email format")
     .required("Email address is required"),
-  telephoneNumber: yup.string().required("Telephone number is required"),
-  mobileNumber: yup.string().required("Mobile number is required"),
+  telephoneNumber: yup
+    .string()
+    .required("Telephone number is required")
+    .test(
+      "ugandaPhoneValidation",
+      "Invalid Uganda phone number format",
+      function (value) {
+        if (!value) return false;
+
+        const validation = validateUgandaPhoneNumber(value);
+        if (!validation.isValid) {
+          return this.createError({ message: validation.error });
+        }
+        return true;
+      }
+    ),
+  mobileNumber: yup
+    .string()
+    .required("Mobile number is required")
+    .test(
+      "ugandaPhoneValidation",
+      "Invalid Uganda phone number format",
+      function (value) {
+        if (!value) return false;
+
+        const validation = validateUgandaPhoneNumber(value);
+        if (!validation.isValid) {
+          return this.createError({ message: validation.error });
+        }
+        return true;
+      }
+    ),
   residentialAddress: yup.string().required("Residential address is required"),
   streetRoadPlot: yup.string().required("Street/Road/Plot is required"),
 
@@ -185,10 +226,14 @@ const validationSchema = yup.object({
   passportBioDataPage: yup
     .mixed<File>()
     .required("Passport bio-data page is required")
-    .test("fileValidation", "File validation failed", function(value) {
+    .test("fileValidation", "File validation failed", function (value) {
       if (!value) return false;
-      
-      const validation = validateFile(value as File, ["pdf"], FILE_SIZE_LIMITS.PDF_MAX_SIZE);
+
+      const validation = validateFile(
+        value as File,
+        ["pdf"],
+        FILE_SIZE_LIMITS.PDF_MAX_SIZE
+      );
       if (!validation.isValid) {
         return this.createError({ message: validation.error });
       }
@@ -198,10 +243,14 @@ const validationSchema = yup.object({
   visaCopy: yup
     .mixed<File>()
     .required("Visa copy is required")
-    .test("fileValidation", "File validation failed", function(value) {
+    .test("fileValidation", "File validation failed", function (value) {
       if (!value) return false;
-      
-      const validation = validateFile(value as File, ["pdf"], FILE_SIZE_LIMITS.PDF_MAX_SIZE);
+
+      const validation = validateFile(
+        value as File,
+        ["pdf"],
+        FILE_SIZE_LIMITS.PDF_MAX_SIZE
+      );
       if (!validation.isValid) {
         return this.createError({ message: validation.error });
       }
@@ -211,10 +260,14 @@ const validationSchema = yup.object({
   passportPhoto: yup
     .mixed<File>()
     .required("Passport photo is required")
-    .test("fileValidation", "File validation failed", function(value) {
+    .test("fileValidation", "File validation failed", function (value) {
       if (!value) return false;
-      
-      const validation = validateFile(value as File, ["png", "jpg", "jpeg"], FILE_SIZE_LIMITS.IMAGE_MAX_SIZE);
+
+      const validation = validateFile(
+        value as File,
+        ["png", "jpg", "jpeg"],
+        FILE_SIZE_LIMITS.IMAGE_MAX_SIZE
+      );
       if (!validation.isValid) {
         return this.createError({ message: validation.error });
       }
@@ -284,10 +337,14 @@ const useApplyForIdp = () => {
   // State management
   const [activeStep, setActiveStep] = useState(0);
   const [showAlert, setShowAlert] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertSeverity, setAlertSeverity] = useState<
     "success" | "warning" | "error"
   >("success");
+
+  // reCAPTCHA state
+  const [recaptchaValue, setRecaptchaValue] = useState<string | null>(null);
 
   // Enhanced alert configuration for better UX
   const [alertConfig, setAlertConfig] = useState<{
@@ -323,10 +380,33 @@ const useApplyForIdp = () => {
   // Photo requirements state
   const [showPhotoRequirements, setShowPhotoRequirements] = useState(false);
 
+  // Member verification state
+  const [memberVerificationState, setMemberVerificationState] = useState<{
+    isVerifying: boolean;
+    verifiedMember: AauMember | null;
+    verificationError: string | null;
+    lastVerifiedNumber: string | null;
+    showVerificationButton: boolean;
+  }>({
+    isVerifying: false,
+    verifiedMember: null,
+    verificationError: null,
+    lastVerifiedNumber: null,
+    showVerificationButton: false,
+  });
+
+  // Debounce timer for membership number input
+  const membershipDebounceRef = useRef<NodeJS.Timeout | null>(null);
+
+  // reCAPTCHA ref
+  const recaptchaRef = useRef<any>(null);
+
   // URL management for object URLs to prevent memory leaks
   const objectUrlsRef = useRef<Map<string, string>>(new Map());
 
-  // Form configuration
+  // Form configuration with onBlur validation
+  // All field validations will trigger when user leaves the field (onBlur event)
+  // This provides better UX by not showing errors while user is still typing
   const {
     control,
     handleSubmit,
@@ -360,7 +440,8 @@ const useApplyForIdp = () => {
       termsAccepted: false,
       declarationAccepted: false,
     },
-    mode: "onChange",
+    mode: "onBlur", // Validate when user leaves the field
+    reValidateMode: "onBlur", // Re-validate on blur after initial validation
   });
 
   const watchedIsMember = watch("isMember");
@@ -528,7 +609,16 @@ const useApplyForIdp = () => {
       return;
     }
 
+    // Additional reCAPTCHA validation for final step
     if (activeStep === steps.length - 1) {
+      if (!recaptchaValue) {
+        showAlertMessage(
+          "Please complete the reCAPTCHA verification before submitting",
+          "error",
+          { position: "top-right", autoHideDuration: 6000 }
+        );
+        return;
+      }
       handleFormSubmit(watchedFormData);
     } else {
       setActiveStep((prev) => prev + 1);
@@ -541,9 +631,20 @@ const useApplyForIdp = () => {
 
   // Form submission handler with loading management
   const handleFormSubmit = async (data: IDPFormData) => {
+    // Final reCAPTCHA validation check
+    if (!recaptchaValue) {
+      showAlertMessage(
+        "Please complete the reCAPTCHA verification",
+        "error",
+        { position: "top-right", autoHideDuration: 6000 }
+      );
+      return;
+    }
+
     try {
+      setIsLoading(true);
       // Start loading state
-      globalLoading.startLoading('formSubmission');
+      globalLoading.startLoading("formSubmission");
 
       const currentDate = getCurrentDateFormatted();
 
@@ -575,6 +676,13 @@ const useApplyForIdp = () => {
       );
       const currentDateTimeStamp = new Date().getTime();
 
+      const generatedMemberNumber = memberVerificationState.verifiedMember
+        ? Number(membershipNumber)
+        : null;
+      const getApplicantMembership = memberVerificationState.verifiedMember
+        ? true
+        : false;
+
       // File processing
       let visaPdfBase64: string;
       let passportBioDataPdfBase64: string;
@@ -585,12 +693,13 @@ const useApplyForIdp = () => {
       passportPhotoBase64 = await fileToDataUrl(passportPhoto);
 
       const memberPostData: CreateMemberData = {
-        aa_member_no: membershipNumber ? Number(membershipNumber) : null,
+        aa_member_no: generatedMemberNumber,
         surname: surname,
         onames: otherNames,
         paddress: postalAddress,
         email: emailAddress,
         tel: telephoneNumber,
+        isMember: getApplicantMembership,
         mobile: mobileNumber,
         passport: passportNumber,
         raddress: residentialAddress,
@@ -616,7 +725,11 @@ const useApplyForIdp = () => {
         passport_photo_base64: passportPhotoBase64,
       };
 
-      const { error } = await applyForIdp(memberPostData, pendingIdpPostData, idpDocuments);
+      const { error } = await applyForIdp(
+        memberPostData,
+        pendingIdpPostData,
+        idpDocuments
+      );
 
       if (error) {
         showAlertMessage(
@@ -629,6 +742,10 @@ const useApplyForIdp = () => {
 
       // Reset the form to initial state
       reset();
+
+      // Reset reCAPTCHA
+      setRecaptchaValue(null);
+      recaptchaRef.current?.reset();
 
       // Reset step to first step
       setActiveStep(0);
@@ -662,20 +779,36 @@ const useApplyForIdp = () => {
       }, 500);
     } catch (error: unknown) {
       console.error("::debug error:", error);
+      
+      let errorMessage = "Failed to submit application. Please try again.";
+
+      if (error instanceof Error) {
+        if (error.message.toLowerCase().includes("recaptcha")) {
+          errorMessage = "reCAPTCHA verification failed. Please try again.";
+        } else if (error.message.toLowerCase().includes("network")) {
+          errorMessage = "Network error. Please check your connection and try again.";
+        }
+      }
+
       showAlertMessage(
-        `${error || "Failed to submit application. Please try again."}`,
+        `${error || errorMessage}`,
         "error",
         { position: "top-right", autoHideDuration: 7000 }
       );
+
+      // Reset reCAPTCHA on error
+      setRecaptchaValue(null);
+      recaptchaRef.current?.reset();
     } finally {
       // Always stop loading state
-      globalLoading.stopLoading('formSubmission');
+      globalLoading.stopLoading("formSubmission");
+      setIsLoading(false);
     }
   };
 
   // File handling functions
   const handleFileUpload = async (fieldName: keyof IDPFormData, file: File) => {
-    setValue(fieldName, file, { shouldValidate: true });
+    setFormField(fieldName, file);
 
     // If it's a passport photo, validate it with content-based caching
     if (fieldName === "passportPhoto") {
@@ -800,7 +933,7 @@ const useApplyForIdp = () => {
       revokeManagedImageUrl(currentFile);
     }
 
-    setValue(fieldName, undefined, { shouldValidate: true });
+    setFormField(fieldName, undefined);
 
     // Clear photo validation state when removing passport photo
     if (fieldName === "passportPhoto") {
@@ -830,8 +963,306 @@ const useApplyForIdp = () => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
+  // Helper function to format and validate phone numbers during form population
+  const formatPhoneNumberForForm = (
+    phoneNumber: string | null | undefined
+  ): string => {
+    return formatUgandaPhoneNumber(phoneNumber);
+  };
+
+  // Helper function to set form field with consistent validation options
+  const setFormField = useCallback(
+    (fieldName: string, value: any, options: { shouldValidate?: boolean; shouldTouch?: boolean } = {}) => {
+      const defaultOptions = { shouldValidate: true, shouldTouch: true };
+      setValue(fieldName as any, value, { ...defaultOptions, ...options });
+    },
+    [setValue]
+  );
+
+  // Helper function specifically for formatted phone fields
+  const setFormattedPhoneField = useCallback(
+    (fieldName: "telephoneNumber" | "mobileNumber", value: string | null | undefined) => {
+      const formattedValue = formatPhoneNumberForForm(value);
+      setFormField(fieldName, formattedValue);
+    },
+    [setFormField]
+  );
+
+  const handleResetPopulatedData = () => {
+    setFormField("surname", "", { shouldValidate: false });
+    setFormField("otherNames", "", { shouldValidate: false });
+    setFormField("emailAddress", "", { shouldValidate: false });
+    setFormField("telephoneNumber", "", { shouldValidate: false });
+  };
+
+  // Stable auto-verification function that doesn't cause re-renders
+  const autoVerifyMembership = useCallback(
+    async (membershipNumber: string) => {
+      if (!membershipNumber.trim()) {
+        setMemberVerificationState((prev) => ({
+          ...prev,
+          verifiedMember: null,
+          verificationError: null,
+          lastVerifiedNumber: null,
+          showVerificationButton: false,
+        }));
+        return;
+      }
+
+      const memberNumber = parseInt(membershipNumber.trim());
+
+      // Validate the number format
+      if (isNaN(memberNumber) || memberNumber <= 0) {
+        setMemberVerificationState((prev) => ({
+          ...prev,
+          verifiedMember: null,
+          verificationError: "Please enter a valid membership number",
+          showVerificationButton: false,
+          lastVerifiedNumber: null,
+        }));
+        return;
+      }
+
+      // Check if we already verified this number
+      setMemberVerificationState((prev) => {
+        if (prev.lastVerifiedNumber === membershipNumber) {
+          console.log(
+            "::debug Already verified this number:",
+            membershipNumber
+          );
+          return prev;
+        }
+
+        console.log("::debug Starting verification for:", membershipNumber);
+        return {
+          ...prev,
+          isVerifying: true,
+          verificationError: null,
+        };
+      });
+
+      try {
+        const result = await getAAUMemberByNumber(memberNumber);
+        console.log("::debug Verification result:", result);
+
+        if (result.error) {
+          setMemberVerificationState((prev) => ({
+            ...prev,
+            isVerifying: false,
+            verifiedMember: null,
+            verificationError: result.error,
+            lastVerifiedNumber: membershipNumber,
+            showVerificationButton: false,
+          }));
+
+          showAlertMessage(
+            `Member verification failed: ${result.error}`,
+            "error",
+            { position: "top-right", autoHideDuration: 6000 }
+          );
+          return;
+        }
+
+        if (result.data) {
+          // Successfully found member
+          setMemberVerificationState((prev) => ({
+            ...prev,
+            isVerifying: false,
+            verifiedMember: result.data,
+            verificationError: null,
+            lastVerifiedNumber: membershipNumber,
+            showVerificationButton: false,
+          }));
+
+          // Auto-populate form fields with member data
+          setFormField("surname", result.data.fname || "");
+          setFormField("otherNames", result.data.onames || "");
+          setFormField("emailAddress", result.data.email || "");
+          // Format and validate phone numbers before setting them
+          setFormattedPhoneField("telephoneNumber", result.data.tel);
+
+          showAlertMessage(
+            `Member verified successfully! Welcome back, ${result.data.fname} ${result.data.onames}`,
+            "success",
+            { position: "top-right", autoHideDuration: 6000 }
+          );
+        }
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : "Unknown error occurred";
+        setMemberVerificationState((prev) => ({
+          ...prev,
+          isVerifying: false,
+          verifiedMember: null,
+          verificationError: errorMessage,
+          lastVerifiedNumber: membershipNumber,
+          showVerificationButton: false,
+        }));
+
+        showAlertMessage(
+          `Member verification failed: ${errorMessage}`,
+          "error",
+          { position: "top-right", autoHideDuration: 6000 }
+        );
+      }
+    },
+    [setValue, showAlertMessage]
+  );
+
+  // Watch membership number for changes
+  const watchedMembershipNumber = watch("membershipNumber");
+
+  // Handle auto-verification with proper debouncing
+  useEffect(() => {
+    console.log(
+      "::debug useEffect triggered - isMember:",
+      watchedIsMember,
+      "membershipNumber:",
+      watchedMembershipNumber
+    );
+
+    // Clear existing timer
+    if (membershipDebounceRef.current) {
+      clearTimeout(membershipDebounceRef.current);
+      membershipDebounceRef.current = null;
+    }
+
+    if (!watchedIsMember) {
+      // Reset member verification state if not a member
+      setMemberVerificationState((prev) => ({
+        ...prev,
+        verifiedMember: null,
+        verificationError: null,
+        lastVerifiedNumber: null,
+        showVerificationButton: false,
+      }));
+      return;
+    }
+
+    if (!watchedMembershipNumber?.trim()) {
+      // Clear member data if membership number is cleared
+      setMemberVerificationState((prev) => ({
+        ...prev,
+        verifiedMember: null,
+        verificationError: null,
+        lastVerifiedNumber: null,
+        showVerificationButton: false,
+      }));
+      return;
+    }
+
+    // Update verification button state
+    setMemberVerificationState((prev) => {
+      const shouldShowButton = Boolean(
+        watchedMembershipNumber?.trim() &&
+          watchedMembershipNumber !== prev.lastVerifiedNumber
+      );
+
+      return {
+        ...prev,
+        showVerificationButton: shouldShowButton,
+      };
+    });
+
+    // Set up debounced verification (auto-trigger after 2 seconds of no typing)
+    membershipDebounceRef.current = setTimeout(() => {
+      autoVerifyMembership(watchedMembershipNumber);
+    }, 2000);
+
+    // Cleanup function
+    return () => {
+      if (membershipDebounceRef.current) {
+        clearTimeout(membershipDebounceRef.current);
+        membershipDebounceRef.current = null;
+      }
+    };
+  }, [watchedMembershipNumber, watchedIsMember]);
+
+  // Manual member verification (triggered by button click)
+  const handleManualMemberVerification = useCallback(async () => {
+    const membershipNumber = watch("membershipNumber");
+    if (membershipNumber) {
+      // Clear any pending auto-verification timer
+      if (membershipDebounceRef.current) {
+        clearTimeout(membershipDebounceRef.current);
+        membershipDebounceRef.current = null;
+      }
+
+      // Reset populated data before verification
+      handleResetPopulatedData();
+
+      // Perform manual verification
+      await autoVerifyMembership(membershipNumber);
+    }
+  }, [autoVerifyMembership, watch]);
+
+  // Cleanup debounce timer
+  useEffect(() => {
+    return () => {
+      if (membershipDebounceRef.current) {
+        clearTimeout(membershipDebounceRef.current);
+      }
+    };
+  }, []);
+
   // Computed values
   const applicationFee = watchedIsMember ? 250000 : 350000;
+
+  // Phone number helper functions for use in form inputs
+  // Updated for onBlur validation - no immediate validation on change
+  const handlePhoneNumberChange = useCallback(
+    (fieldName: "telephoneNumber" | "mobileNumber", value: string) => {
+      // Set the value without immediate validation (will validate onBlur)
+      // This prevents validation errors from showing while user is still typing
+      setValue(fieldName, value, { shouldValidate: false });
+    },
+    [setValue]
+  );
+
+  // Helper function for manual validation trigger when needed
+  // Useful for programmatic validation outside of normal onBlur flow
+  const triggerPhoneValidation = useCallback(
+    (fieldName: "telephoneNumber" | "mobileNumber") => {
+      trigger(fieldName);
+    },
+    [trigger]
+  );
+
+  const getPhoneNumberHelperText = useCallback(
+    (fieldName: "telephoneNumber" | "mobileNumber") => {
+      const error = errors[fieldName];
+      const value = watch(fieldName);
+      return getPhoneHelperText(value || "", error?.message);
+    },
+    [errors, watch]
+  );
+
+  // reCAPTCHA handlers
+  const handleRecaptchaChange = useCallback((value: string | null) => {
+    setRecaptchaValue(value);
+    if (value) {
+      // Clear any error messages when reCAPTCHA is completed
+      setShowAlert(false);
+    }
+  }, []);
+
+  const handleRecaptchaError = useCallback(() => {
+    setRecaptchaValue(null);
+    showAlertMessage(
+      "reCAPTCHA error occurred. Please refresh the page and try again.",
+      "error",
+      { position: "top-right", autoHideDuration: 6000 }
+    );
+  }, [showAlertMessage]);
+
+  const handleRecaptchaExpired = useCallback(() => {
+    setRecaptchaValue(null);
+    showAlertMessage(
+      "reCAPTCHA has expired. Please verify again.",
+      "warning",
+      { position: "top-right", autoHideDuration: 6000 }
+    );
+  }, [showAlertMessage]);
 
   return {
     // State
@@ -842,11 +1273,20 @@ const useApplyForIdp = () => {
     alertConfig,
     photoValidationState,
     showPhotoRequirements,
+    memberVerificationState,
     steps,
+    isLoading,
 
     // Loading states
     globalLoading,
-    isFormSubmitting: globalLoading.isLoading('formSubmission'),
+    isFormSubmitting: globalLoading.isLoading("formSubmission"),
+
+    // reCAPTCHA
+    recaptchaValue,
+    recaptchaRef,
+    handleRecaptchaChange,
+    handleRecaptchaError,
+    handleRecaptchaExpired,
 
     // Form
     control,
@@ -863,6 +1303,16 @@ const useApplyForIdp = () => {
     // Computed values
     applicationFee,
 
+    // Phone number utilities
+    handlePhoneNumberChange,
+    triggerPhoneValidation,
+    getPhoneNumberHelperText,
+    validateUgandaPhoneNumber,
+    setFormattedPhoneField,
+
+    // Form field utilities
+    setFormField,
+
     // Handlers
     handleNext,
     handleBack,
@@ -872,6 +1322,8 @@ const useApplyForIdp = () => {
     showAlertMessage,
     createImagePreviewUrl,
     formatFileSize,
+    handleManualMemberVerification,
+    autoVerifyMembership,
 
     // State setters
     setActiveStep,

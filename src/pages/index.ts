@@ -8,7 +8,7 @@ export { default as PageHeaderDemo } from './PageHeaderDemo';
 
 // About section pages
 export { default as Team } from './about/Team';
-export { default as Contact } from './about/Contact';
+export { default as Contact } from './Contact';
 export { default as WhoWeAre } from './about/WhoWeAre';
 export { default as Careers } from './about/Careers';
 export { default as Affiliation } from './about/Affiliation';

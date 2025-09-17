@@ -5,3 +5,4 @@ export * from './stringUtils';
 export * from './securityConfig';
 export * from './pdfGenerator';
 export * from './imageUtils';
+export * from './phoneValidation';

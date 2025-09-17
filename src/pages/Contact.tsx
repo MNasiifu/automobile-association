@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef } from "react";
 import {
   Box,
   Container,
@@ -8,26 +8,28 @@ import {
   Paper,
   Snackbar,
   Alert,
-} from '@mui/material';
-import { parsePhoneNumber } from 'libphonenumber-js';
-import { Phone, Email, LocationOn } from '@mui/icons-material';
-import { styled } from '@mui/material/styles';
-import { Heading, Button, Card } from '../../components/atoms';
-import { PageHeader } from '../../components/molecules';
-import { SEO } from '../../components/SEO';
-import { companyInfo } from '../../data/companyData';
-import { contactSEO } from '../../data/seoData';
-import emailjs from '@emailjs/browser';
-import ReCAPTCHA from 'react-google-recaptcha';
-import { MuiTelInput } from 'mui-tel-input';
-import type { MuiTelInputInfo } from 'mui-tel-input';
+} from "@mui/material";
+import { parsePhoneNumber } from "libphonenumber-js";
+import { Phone, Email, LocationOn } from "@mui/icons-material";
+import { styled } from "@mui/material/styles";
+import { Heading, Button, Card } from "../components/atoms";
+import { PageHeader } from "../components/molecules";
+import { SEO } from "../components/SEO";
+import { companyInfo } from "../data/companyData";
+import { contactSEO } from "../data/seoData";
+import emailjs from "@emailjs/browser";
+import ReCAPTCHA from "react-google-recaptcha";
+import { MuiTelInput } from "mui-tel-input";
+import type { MuiTelInputInfo } from "mui-tel-input";
+import theme from "../theme";
 
 // ---- reCAPTCHA key from environment variables ----
-const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY || '';
+const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY || "";
 
 // ---- Intl helper for country display name in emails ----
-const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
-const countryNameOf = (iso2?: string) => (iso2 ? regionNames.of(iso2) ?? '' : '');
+const regionNames = new Intl.DisplayNames(["en"], { type: "region" });
+const countryNameOf = (iso2?: string) =>
+  iso2 ? regionNames.of(iso2) ?? "" : "";
 
 // ---- Styled sections ----
 const ContactSection = styled(Box)(({ theme }) => ({
@@ -40,12 +42,12 @@ const MapSection = styled(Box)(({ theme }) => ({
 }));
 
 const ContactCard = styled(Card)(({ theme }) => ({
-  height: '100%',
-  textAlign: 'center',
+  height: "100%",
+  textAlign: "center",
   padding: theme.spacing(4),
-  transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
-  '&:hover': {
-    transform: 'translateY(-8px)',
+  transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
+  "&:hover": {
+    transform: "translateY(-8px)",
     boxShadow: theme.shadows[8],
   },
 }));
@@ -53,50 +55,50 @@ const ContactCard = styled(Card)(({ theme }) => ({
 const IconWrapper = styled(Box)(({ theme }) => ({
   width: 60,
   height: 60,
-  borderRadius: '50%',
+  borderRadius: "50%",
   background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  margin: '0 auto 16px auto',
-  position: 'relative',
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  margin: "0 auto 16px auto",
+  position: "relative",
   boxShadow: `0 8px 24px ${theme.palette.primary.main}30`,
-  transition: 'all 0.3s ease',
-  cursor: 'pointer',
-  border: '3px solid white',
-  '& .MuiSvgIcon-root': {
-    color: 'white',
-    fontSize: '2rem',
-    transition: 'transform 0.3s ease',
+  transition: "all 0.3s ease",
+  cursor: "pointer",
+  border: "3px solid white",
+  "& .MuiSvgIcon-root": {
+    color: "white",
+    fontSize: "2rem",
+    transition: "transform 0.3s ease",
   },
-  '& .icon': {
-    transition: 'transform 0.3s ease',
+  "& .icon": {
+    transition: "transform 0.3s ease",
   },
 }));
 
 const FormSection = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(4),
-  height: '100%',
+  height: "100%",
 }));
 
 const Contact: React.FC = () => {
   const [formState, setFormState] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
+    firstName: "",
+    lastName: "",
+    email: "",
     // phone fields
-    phoneFull: '', // e.g. +256712345678
-    phoneCountry: 'UG', // ISO2 (default Uganda)
-    phoneDialCode: '+256',
-    phoneNational: '',
-    subject: '',
-    message: '',
+    phoneFull: "", // e.g. +256712345678
+    phoneCountry: "UG", // ISO2 (default Uganda)
+    phoneDialCode: "+256",
+    phoneNational: "",
+    subject: "",
+    message: "",
   });
 
   const [snackbar, setSnackbar] = useState({
     open: false,
-    message: '',
-    severity: 'success' as 'success' | 'error' | 'warning' | 'info',
+    message: "",
+    severity: "success" as "success" | "error" | "warning" | "info",
   });
 
   const [recaptchaValue, setRecaptchaValue] = useState<string | null>(null);
@@ -105,16 +107,16 @@ const Contact: React.FC = () => {
   const validatePhoneNumber = (phoneNumber: string, countryCode?: string) => {
     try {
       // Remove any spaces or special characters
-      const cleanNumber = phoneNumber.replace(/\s+/g, '');
-      
+      const cleanNumber = phoneNumber.replace(/\s+/g, "");
+
       // Try to parse with provided country code first
       if (countryCode) {
         const parsed = parsePhoneNumber(cleanNumber, countryCode as any);
-        
+
         if (!parsed) {
-          return { 
-            isValid: false, 
-            error: 'Invalid phone number format' 
+          return {
+            isValid: false,
+            error: "Invalid phone number format",
           };
         }
 
@@ -122,15 +124,17 @@ const Contact: React.FC = () => {
         if (!parsed.isValid()) {
           return {
             isValid: false,
-            error: `Invalid phone number format for ${countryNameOf(countryCode)}`
+            error: `Invalid phone number format for ${countryNameOf(
+              countryCode
+            )}`,
           };
         }
 
         // Check if the number starts with 0 after country code (common user error)
-        if (parsed.nationalNumber?.startsWith('0')) {
+        if (parsed.nationalNumber?.startsWith("0")) {
           return {
             isValid: false,
-            error: `Do not include 0 after country code +${parsed.countryCallingCode}`
+            error: `Do not include 0 after country code +${parsed.countryCallingCode}`,
           };
         }
 
@@ -139,10 +143,10 @@ const Contact: React.FC = () => {
           formattedNumber: parsed.formatInternational(),
           type: parsed.getType(),
           countryCallingCode: parsed.countryCallingCode,
-          nationalNumber: parsed.nationalNumber
+          nationalNumber: parsed.nationalNumber,
         };
       }
-      
+
       // If no country code provided, try to parse and validate the number
       const parsed = parsePhoneNumber(cleanNumber);
       if (parsed?.isValid()) {
@@ -151,23 +155,23 @@ const Contact: React.FC = () => {
           formattedNumber: parsed.formatInternational(),
           type: parsed.getType(),
           countryCallingCode: parsed.countryCallingCode,
-          nationalNumber: parsed.nationalNumber
+          nationalNumber: parsed.nationalNumber,
         };
       }
-      
-      return { 
-        isValid: false, 
-        error: 'Please enter a valid phone number with country code' 
+
+      return {
+        isValid: false,
+        error: "Please enter a valid phone number with country code",
       };
     } catch (error) {
-      return { 
-        isValid: false, 
-        error: 'Invalid phone number format. Please include country code.' 
+      return {
+        isValid: false,
+        error: "Invalid phone number format. Please include country code.",
       };
     }
   };
 
-const isFormValid = () =>
+  const isFormValid = () =>
     !!formState.firstName &&
     !!formState.lastName &&
     !!formState.email &&
@@ -180,26 +184,27 @@ const isFormValid = () =>
   const contactMethods = [
     {
       icon: <Phone sx={{ fontSize: 28 }} />,
-      title: 'Phone',
-      primary: companyInfo.contact.phone.replace(', ', ' | '),
-      secondary: 'Available 24/7 for emergency assistance',
-      href: `tel:${companyInfo.contact.phone.split(', ')[0]}`,
+      title: "Phone",
+      primary: companyInfo.contact.phone.replace(", ", " | "),
+      secondary: "Available 24/7 for emergency assistance",
+      href: `tel:${companyInfo.contact.phone.split(", ")[0]}`,
     },
     {
       icon: <Email sx={{ fontSize: 28 }} />,
-      title: 'Email',
+      title: "Email",
       primary: companyInfo.contact.email,
-      secondary: 'We respond within 24 hours',
+      secondary: "We respond within 24 hours",
       href: `mailto:${companyInfo.contact.email}`,
     },
     {
       icon: <LocationOn sx={{ fontSize: 28 }} />,
-      title: 'Address',
-      primary: 'Plot 4 Old Portbell Road Suite 8 | P.O. Box 1459 Kampala-Uganda',
+      title: "Address",
+      primary:
+        "Plot 4 Old Portbell Road Suite 8 | P.O. Box 1459 Kampala-Uganda",
       secondary:
-        'Business Hours: Mon - Fri: 8:00 AM - 6:00 PM • Sat: 9:00 AM - 4:00 PM',
+        "Business Hours: Mon - Fri: 8:00 AM - 6:00 PM • Sat: 9:00 AM - 4:00 PM",
       href: `https://maps.google.com/?q=${encodeURIComponent(
-        'Plot 4 Old Portbell Road Suite 8 Kampala Uganda'
+        "Plot 4 Old Portbell Road Suite 8 Kampala Uganda"
       )}`,
     },
   ];
@@ -207,12 +212,17 @@ const isFormValid = () =>
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    const phoneValidation = validatePhoneNumber(formState.phoneFull, formState.phoneCountry);
+    const phoneValidation = validatePhoneNumber(
+      formState.phoneFull,
+      formState.phoneCountry
+    );
     if (!phoneValidation.isValid) {
       setSnackbar({
         open: true,
-        message: phoneValidation.error || 'Please enter a valid phone number for the selected country.',
-        severity: 'error',
+        message:
+          phoneValidation.error ||
+          "Please enter a valid phone number for the selected country.",
+        severity: "error",
       });
       return;
     }
@@ -220,25 +230,25 @@ const isFormValid = () =>
     if (!recaptchaValue) {
       setSnackbar({
         open: true,
-        message: 'Please complete the reCAPTCHA verification',
-        severity: 'error',
+        message: "Please complete the reCAPTCHA verification",
+        severity: "error",
       });
       return;
     }
 
     try {
       // Initialize EmailJS with your public key (safe to call multiple times)
-      emailjs.init('3cddm8-Ni7ObSmjjE');
+      emailjs.init("3cddm8-Ni7ObSmjjE");
 
       // Construct a helpful subject line for your inbox
       const emailSubject =
-        `AAU Contact — ${formState.subject || 'No Subject'} — ` +
+        `AAU Contact — ${formState.subject || "No Subject"} — ` +
         `${formState.firstName} ${formState.lastName} ` +
         `(${formState.email} | ${formState.phoneFull})`;
 
-      await emailjs.send('service_lp5vo2i', 'template_8rvs5ee', {
+      await emailjs.send("service_lp5vo2i", "template_8rvs5ee", {
         // routing
-        to_email: 'hadijahaws@gmail.com', // odongkara@aau.co.ug
+        to_email: "hadijahaws@gmail.com", // odongkara@aau.co.ug
         reply_to: formState.email,
 
         // subject for template
@@ -260,49 +270,49 @@ const isFormValid = () =>
         // message meta
         subject: formState.subject,
         message: formState.message,
-        page_url: typeof window !== 'undefined' ? window.location.href : '',
+        page_url: typeof window !== "undefined" ? window.location.href : "",
 
         // reCAPTCHA
-        'g-recaptcha-response': recaptchaValue,
+        "g-recaptcha-response": recaptchaValue,
       });
 
       setSnackbar({
         open: true,
-        message: 'Message sent successfully!',
-        severity: 'success',
+        message: "Message sent successfully!",
+        severity: "success",
       });
 
       // Clear form and reset reCAPTCHA
       setFormState({
-        firstName: '',
-        lastName: '',
-        email: '',
-        phoneFull: '',
-        phoneCountry: 'UG',
-        phoneDialCode: '+256',
-        phoneNational: '',
-        subject: '',
-        message: '',
+        firstName: "",
+        lastName: "",
+        email: "",
+        phoneFull: "",
+        phoneCountry: "UG",
+        phoneDialCode: "+256",
+        phoneNational: "",
+        subject: "",
+        message: "",
       });
       setRecaptchaValue(null);
       recaptchaRef.current?.reset();
     } catch (error) {
-      console.error('Error sending email:', error);
-      let errorMessage = 'Failed to send message. Please try again.';
+      console.error("Error sending email:", error);
+      let errorMessage = "Failed to send message. Please try again.";
 
       if (error instanceof Error) {
-        if (error.message.toLowerCase().includes('recaptcha')) {
-          errorMessage = 'reCAPTCHA verification failed. Please try again.';
-        } else if (error.message.toLowerCase().includes('network')) {
+        if (error.message.toLowerCase().includes("recaptcha")) {
+          errorMessage = "reCAPTCHA verification failed. Please try again.";
+        } else if (error.message.toLowerCase().includes("network")) {
           errorMessage =
-            'Network error. Please check your connection and try again.';
+            "Network error. Please check your connection and try again.";
         }
       }
 
       setSnackbar({
         open: true,
         message: errorMessage,
-        severity: 'error',
+        severity: "error",
       });
 
       // Reset reCAPTCHA on error
@@ -328,28 +338,28 @@ const isFormValid = () =>
                   <Box
                     component="a"
                     href={method.href}
-                    target={method.title === 'Address' ? '_blank' : undefined}
+                    target={method.title === "Address" ? "_blank" : undefined}
                     rel={
-                      method.title === 'Address'
-                        ? 'noopener noreferrer'
+                      method.title === "Address"
+                        ? "noopener noreferrer"
                         : undefined
                     }
                     sx={{
-                      textDecoration: 'none',
-                      display: 'block',
-                      '&:hover': {
-                        '& .icon-wrapper': {
-                          transform: 'translateY(-5px)',
-                          boxShadow: '0 6px 16px rgba(2, 79, 49, 0.25)',
+                      textDecoration: "none",
+                      display: "block",
+                      "&:hover": {
+                        "& .icon-wrapper": {
+                          transform: "translateY(-5px)",
+                          boxShadow: "0 6px 16px rgba(2, 79, 49, 0.25)",
                         },
-                        '& .icon': {
-                          transform: 'scale(1.2)',
+                        "& .icon": {
+                          transform: "scale(1.2)",
                         },
                       },
                     }}
                   >
                     <IconWrapper className="icon-wrapper">
-                      {React.cloneElement(method.icon, { className: 'icon' })}
+                      {React.cloneElement(method.icon, { className: "icon" })}
                     </IconWrapper>
 
                     <Typography
@@ -357,9 +367,9 @@ const isFormValid = () =>
                       gutterBottom
                       sx={{
                         fontWeight: 700,
-                        color: 'primary.main',
+                        color: "primary.main",
                         mb: 2,
-                        fontSize: { xs: '1.1rem', md: '1.2rem' },
+                        fontSize: { xs: "1.1rem", md: "1.2rem" },
                       }}
                     >
                       {method.title}
@@ -369,36 +379,36 @@ const isFormValid = () =>
                   <Typography
                     component="a"
                     href={method.href}
-                    target={method.title === 'Address' ? '_blank' : undefined}
+                    target={method.title === "Address" ? "_blank" : undefined}
                     rel={
-                      method.title === 'Address'
-                        ? 'noopener noreferrer'
+                      method.title === "Address"
+                        ? "noopener noreferrer"
                         : undefined
                     }
                     sx={{
                       fontWeight: 500,
                       mb: 1,
-                      fontSize: { xs: '0.95rem', md: '1rem' },
+                      fontSize: { xs: "0.95rem", md: "1rem" },
                       lineHeight: 1.6,
-                      whiteSpace: 'pre-line',
-                      color: 'primary.main',
-                      textDecoration: 'none',
-                      display: 'block',
-                      '&:hover': {
-                        textDecoration: 'underline',
+                      whiteSpace: "pre-line",
+                      color: "primary.main",
+                      textDecoration: "none",
+                      display: "block",
+                      "&:hover": {
+                        textDecoration: "underline",
                       },
                     }}
                   >
-                    {method.title === 'Phone'
-                      ? method.primary.replace(', ', ' | ')
+                    {method.title === "Phone"
+                      ? method.primary.replace(", ", " | ")
                       : method.primary}
                   </Typography>
 
                   <Typography
                     variant="body2"
                     sx={{
-                      color: 'text.secondary',
-                      fontSize: { xs: '0.85rem', md: '0.9rem' },
+                      color: "text.secondary",
+                      fontSize: { xs: "0.85rem", md: "0.9rem" },
                       mt: 1,
                     }}
                   >
@@ -501,15 +511,16 @@ const isFormValid = () =>
                           setFormState((s) => ({
                             ...s,
                             phoneFull: value,
-                            phoneCountry:
-                              (info?.countryCode ?? s.phoneCountry)?.toUpperCase(),
+                            phoneCountry: (
+                              info?.countryCode ?? s.phoneCountry
+                            )?.toUpperCase(),
                             phoneDialCode: validation.isValid
                               ? `+${validation.countryCallingCode}`
                               : info?.countryCallingCode
                               ? `+${info.countryCallingCode}`
                               : s.phoneDialCode,
                             phoneNational: validation.isValid
-                              ? validation.nationalNumber ?? ''
+                              ? validation.nationalNumber ?? ""
                               : info?.nationalNumber ?? s.phoneNational,
                           }));
                         }}
@@ -525,8 +536,8 @@ const isFormValid = () =>
                             ? validatePhoneNumber(
                                 formState.phoneFull,
                                 formState.phoneCountry
-                              ).error || ' '
-                            : ' '
+                              ).error || " "
+                            : " "
                         }
                       />
                     </Grid>
@@ -574,7 +585,10 @@ const isFormValid = () =>
                             onChange={(value) => {
                               setRecaptchaValue(value);
                               if (value) {
-                                setSnackbar((prev) => ({ ...prev, open: false }));
+                                setSnackbar((prev) => ({
+                                  ...prev,
+                                  open: false,
+                                }));
                               }
                             }}
                             onErrored={() => {
@@ -582,8 +596,8 @@ const isFormValid = () =>
                               setSnackbar({
                                 open: true,
                                 message:
-                                  'reCAPTCHA error occurred. Please refresh the page and try again.',
-                                severity: 'error',
+                                  "reCAPTCHA error occurred. Please refresh the page and try again.",
+                                severity: "error",
                               });
                             }}
                             onExpired={() => {
@@ -591,8 +605,8 @@ const isFormValid = () =>
                               setSnackbar({
                                 open: true,
                                 message:
-                                  'reCAPTCHA has expired. Please verify again.',
-                                severity: 'warning',
+                                  "reCAPTCHA has expired. Please verify again.",
+                                severity: "warning",
                               });
                             }}
                             theme="light"
@@ -620,10 +634,16 @@ const isFormValid = () =>
                             setSnackbar({
                               open: true,
                               message:
-                                'Please complete all required fields and reCAPTCHA.',
-                              severity: 'error',
+                                "Please complete all required fields and reCAPTCHA.",
+                              severity: "error",
                             });
                           }
+                        }}
+
+                        sx={{
+                          "&.MuiButtonBase-root.MuiButton-root.Mui-disabled": {
+                            color: `${theme.palette.grey[500]} !important`,
+                          },
                         }}
                       >
                         Send Message
@@ -641,12 +661,12 @@ const isFormValid = () =>
                   Find Us Here
                 </Heading>
 
-                <Box sx={{ height: '600px', mb: 2 }}>
+                <Box sx={{ height: "600px", mb: 2 }}>
                   <iframe
                     src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d278.2569047471456!2d32.600749063051275!3d0.32037999967650627!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMMKwMTknMTMuNCJOIDMywrAzNicwMy4zIkU!5e1!3m2!1sen!2sus!4v1756761503824!5m2!1sen!2sus"
                     width="100%"
                     height="100%"
-                    style={{ border: 0, borderRadius: '8px' }}
+                    style={{ border: 0, borderRadius: "8px" }}
                     allowFullScreen
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
@@ -659,13 +679,13 @@ const isFormValid = () =>
                   target="_blank"
                   rel="noopener noreferrer"
                   sx={{
-                    display: 'flex',
-                    alignItems: 'center',
+                    display: "flex",
+                    alignItems: "center",
                     gap: 1,
-                    color: 'primary.main',
-                    textDecoration: 'none',
-                    '&:hover': {
-                      textDecoration: 'underline',
+                    color: "primary.main",
+                    textDecoration: "none",
+                    "&:hover": {
+                      textDecoration: "underline",
                     },
                   }}
                 >
@@ -680,10 +700,10 @@ const isFormValid = () =>
                   sx={{
                     mt: 3,
                     p: 4,
-                    backgroundColor: 'error.main',
-                    color: 'common.white',
+                    backgroundColor: "error.main",
+                    color: "common.white",
                     borderRadius: 2,
-                    boxShadow: '0 4px 12px rgba(211, 47, 47, 0.2)',
+                    boxShadow: "0 4px 12px rgba(211, 47, 47, 0.2)",
                   }}
                 >
                   <Typography
@@ -691,8 +711,8 @@ const isFormValid = () =>
                     gutterBottom
                     sx={{
                       fontWeight: 700,
-                      display: 'flex',
-                      alignItems: 'center',
+                      display: "flex",
+                      alignItems: "center",
                       gap: 1,
                     }}
                   >
@@ -704,20 +724,20 @@ const isFormValid = () =>
                     href={`tel:${companyInfo.contact.emergency.phone}`}
                     sx={{
                       fontWeight: 700,
-                      fontSize: { xs: '1rem', md: '1.15rem' },
+                      fontSize: { xs: "1rem", md: "1.15rem" },
                       mt: 1,
-                      color: 'inherit',
-                      textDecoration: 'none',
-                      display: 'block',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      '&:hover': {
-                        textDecoration: 'underline',
+                      color: "inherit",
+                      textDecoration: "none",
+                      display: "block",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      "&:hover": {
+                        textDecoration: "underline",
                       },
                     }}
                   >
-                    24/7 Hotline ({companyInfo.contact.emergency.name}):{' '}
+                    24/7 Hotline ({companyInfo.contact.emergency.name}):{" "}
                     {companyInfo.contact.emergency.phone}
                   </Typography>
 
@@ -738,7 +758,7 @@ const isFormValid = () =>
         open={snackbar.open}
         autoHideDuration={6000}
         onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
         <Alert
           onClose={() => setSnackbar({ ...snackbar, open: false })}
