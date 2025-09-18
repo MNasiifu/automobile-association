@@ -1,9 +1,11 @@
 import React from 'react';
 import { Box, Container, Typography, Grid } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import { useNavigate } from 'react-router-dom';
 import { Heading, Button } from '../atoms';
 import { ServiceCard } from '../molecules';
 import { services } from '../../data/servicesData';
+import theme from '../../theme';
 
 const ServicesSection = styled(Box)(({ theme }) => ({
   padding: theme.spacing(12, 0),
@@ -46,16 +48,22 @@ const ServicesOverview: React.FC<ServicesOverviewProps> = ({
   maxServices = 6, 
   showAll = false 
 }) => {
+  const navigate = useNavigate();
   const displayedServices = showAll ? services : services.slice(0, maxServices);
 
-  const handleServiceClick = (serviceId: string) => {
-    // Navigate to service detail or open modal
-    console.log('Navigate to service:', serviceId);
+  const handleServiceClick = (route: string) => {
+    // Navigate to service detail page using the route
+    navigate(route);
+  };
+
+  const handleReadMore = (route: string) => {
+    // Handle read more functionality - navigate to detailed service page
+    navigate(route);
   };
 
   return (
     <ServicesSection>
-      <Container maxWidth="lg">
+      <Container maxWidth="xl">
         <SectionHeader>
           <Heading 
             variant="h2" 
@@ -65,6 +73,7 @@ const ServicesOverview: React.FC<ServicesOverviewProps> = ({
               fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
               fontWeight: 700,
               mb: 2,
+              color: theme.palette.primary.main
             }}
           >
             Our Services
@@ -72,7 +81,6 @@ const ServicesOverview: React.FC<ServicesOverviewProps> = ({
           
           <Typography
             variant="h6"
-            color="text.secondary"
             align="center"
             sx={{ 
               maxWidth: 700, 
@@ -88,7 +96,6 @@ const ServicesOverview: React.FC<ServicesOverviewProps> = ({
           
           <Typography
             variant="body1"
-            color="primary"
             align="center"
             sx={{ 
               fontWeight: 600,
@@ -99,9 +106,9 @@ const ServicesOverview: React.FC<ServicesOverviewProps> = ({
           </Typography>
         </SectionHeader>
         
-        <ServicesGrid container spacing={4}>
+        <ServicesGrid container spacing={3}>
           {displayedServices.map((service, index) => (
-            <Grid item xs={12} sm={6} lg={4} key={service.id}>
+            <Grid item xs={12} sm={6} md={3} key={service.id}>
               <Box
                 sx={{
                   animation: `fadeInUp 0.6s ease-out ${index * 0.1}s both`,
@@ -122,7 +129,10 @@ const ServicesOverview: React.FC<ServicesOverviewProps> = ({
                   description={service.description}
                   icon={service.icon}
                   features={service.features}
-                  onClick={() => handleServiceClick(service.id)}
+                  onClick={() => handleServiceClick(service.route)}
+                  onReadMore={() => handleReadMore(service.route)}
+                  showReadMore={true}
+                  readMoreText="Learn More"
                 />
               </Box>
             </Grid>

@@ -18,15 +18,15 @@ const Home: React.FC = () => {
       
       {/* Hero Section - Enhanced with better visuals and animations */}
       <Hero />
+
+      {/* About Preview - Company overview with mission, vision, and team */}
+      <AboutPreview />
       
       {/* Statistics Section - Show company achievements and trust indicators */}
       <StatsSection />
       
       {/* Services Overview - Enhanced with better presentation */}
-      <ServicesOverview maxServices={6} />
-      
-      {/* About Preview - Company overview with mission, vision, and team */}
-      <AboutPreview />
+      <ServicesOverview showAll />
       
       {/* Testimonials - Social proof from satisfied customers */}
       <TestimonialsSection />

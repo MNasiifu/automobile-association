@@ -6,7 +6,7 @@ import { FormatQuote } from '@mui/icons-material';
 
 const TestimonialsSection = styled(Box)(({ theme }) => ({
   padding: theme.spacing(12, 0),
-  background: `linear-gradient(135deg, ${theme.palette.grey[50]} 0%, ${theme.palette.background.default} 100%)`,
+  background: `linear-gradient(135deg, ${theme.palette.grey[200]} 0%, ${theme.palette.background.default} 100%)`,
   position: 'relative',
   overflow: 'hidden',
   
@@ -141,6 +141,7 @@ const TestimonialsOverview: React.FC = () => {
         <Box sx={{ textAlign: 'center', mb: 8 }}>
           <Typography 
             variant="h2" 
+            color="primary"
             sx={{ 
               fontWeight: 700, 
               mb: 2,
@@ -151,7 +152,6 @@ const TestimonialsOverview: React.FC = () => {
           </Typography>
           <Typography 
             variant="h6" 
-            color="text.secondary"
             sx={{ 
               maxWidth: 600, 
               mx: 'auto',

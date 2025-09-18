@@ -10,10 +10,10 @@ import {
   Group,
   Timeline
 } from '@mui/icons-material';
+import theme from '../../../theme';
 
 const StatsSection = styled(Box)(({ theme }) => ({
-  background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-  color: theme.palette.primary.contrastText,
+  color: theme.palette.common.white,
   padding: theme.spacing(12, 0),
   position: 'relative',
   overflow: 'hidden',
@@ -25,46 +25,114 @@ const StatsSection = styled(Box)(({ theme }) => ({
     left: 0,
     right: 0,
     bottom: 0,
-    background: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.03"%3E%3Ccircle cx="30" cy="30" r="4"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
+    background: [
+      `radial-gradient(circle at 20% 20%, ${theme.palette.grey[700]}40 0%, transparent 50%)`,
+      `radial-gradient(circle at 80% 80%, ${theme.palette.grey[700]}40 0%, transparent 50%)`,
+      `radial-gradient(circle, ${theme.palette.secondary.main}70 3px, transparent 3px)`
+    ].join(', '),
+    backgroundSize: '100% 100%, 100% 100%, 50px 50px',
+    backgroundPosition: '0 0, 0 0, 0 0',
     zIndex: 1,
+  },
+  
+  '&::after': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 2,
   },
 }));
 
 const StatsContainer = styled(Container)(() => ({
   position: 'relative',
-  zIndex: 2,
+  zIndex: 3,
 }));
 
 const StatCard = styled(Box)(({ theme }) => ({
   textAlign: 'center',
-  padding: theme.spacing(3),
-  borderRadius: theme.spacing(2),
-  background: 'rgba(255, 255, 255, 0.08)',
-  backdropFilter: 'blur(10px)',
-  border: '1px solid rgba(255, 255, 255, 0.1)',
-  transition: 'all 0.3s ease-in-out',
+  padding: theme.spacing(4),
+  borderRadius: theme.spacing(3),
+  background: `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.light} 100%)`,
+  backdropFilter: 'blur(20px)',
+  border: `1px solid ${theme.palette.grey[600]}30`,
+  boxShadow: `0 8px 32px ${theme.palette.grey[900]}50`,
+  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+  position: 'relative',
+  zIndex: 3,
+  
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: theme.spacing(3),
+    background: `linear-gradient(145deg, transparent 0%, ${theme.palette.common.white}05 50%, transparent 100%)`,
+    opacity: 0,
+    transition: 'opacity 0.4s ease-in-out',
+    zIndex: -1,
+  },
   
   '&:hover': {
-    transform: 'translateY(-8px)',
-    background: 'rgba(255, 255, 255, 0.12)',
-    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
+    transform: 'translateY(-12px) scale(1.02)',
+    background: `linear-gradient(145deg, ${theme.palette.primary.light}60 0%, ${theme.palette.primary.dark} 100%)`,
+    border: `1px solid ${theme.palette.grey[500]}50`,
+    boxShadow: `0 24px 48px ${theme.palette.grey[900]}60, 0 0 0 1px ${theme.palette.grey[600]}20`,
+    
+    '&::before': {
+      opacity: 1,
+    },
   },
 }));
 
 const IconWrapper = styled(Box)(({ theme }) => ({
-  width: 80,
-  height: 80,
+  width: 88,
+  height: 88,
   borderRadius: '50%',
-  background: `linear-gradient(135deg, ${theme.palette.secondary.main} 0%, ${theme.palette.secondary.light} 100%)`,
+  background: `linear-gradient(135deg, ${theme.palette.grey[100]} 0%, ${theme.palette.common.white} 100%)`,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   margin: '0 auto 24px auto',
-  boxShadow: '0 8px 32px rgba(244, 214, 22, 0.3)',
+  boxShadow: `0 12px 40px ${theme.palette.grey[900]}40, 0 0 0 1px ${theme.palette.grey[600]}20`,
+  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+  position: 'relative',
+  
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: -2,
+    left: -2,
+    right: -2,
+    bottom: -2,
+    borderRadius: '50%',
+    background: `linear-gradient(135deg, ${theme.palette.secondary.main}60 0%, ${theme.palette.primary.main}40 100%)`,
+    opacity: 0,
+    transition: 'opacity 0.4s ease-in-out',
+    zIndex: -1,
+  },
   
   '& .MuiSvgIcon-root': {
-    fontSize: 36,
-    color: theme.palette.primary.main,
+    fontSize: 40,
+    color: theme.palette.grey[700],
+    transition: 'all 0.4s ease-in-out',
+  },
+  
+  '&:hover': {
+    transform: 'scale(1.1) rotate(5deg)',
+    
+    '&::before': {
+      opacity: 1,
+    },
+    
+    '& .MuiSvgIcon-root': {
+      color: theme.palette.grey[800],
+      transform: 'scale(1.1)',
+    },
   },
 }));
 
@@ -123,6 +191,7 @@ const StatsOverview: React.FC = () => {
             sx={{ 
               fontWeight: 700, 
               mb: 2,
+              color: theme.palette.primary.main,
               fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' }
             }}
           >
@@ -133,6 +202,7 @@ const StatsOverview: React.FC = () => {
             sx={{ 
               opacity: 0.9, 
               maxWidth: 600, 
+              color: theme.palette.grey[800],
               mx: 'auto',
               fontSize: { xs: '1rem', sm: '1.1rem', md: '1.25rem' }
             }}

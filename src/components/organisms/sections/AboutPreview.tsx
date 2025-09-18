@@ -10,6 +10,7 @@ import {
   EmojiObjects,
   Star
 } from '@mui/icons-material';
+import theme from '../../../theme';
 
 const AboutSection = styled(Box)(({ theme }) => ({
   padding: theme.spacing(12, 0),
@@ -132,14 +133,14 @@ const AboutPreview: React.FC = () => {
             sx={{ 
               fontWeight: 700, 
               mb: 2,
-              fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' }
+              fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
+              color: theme.palette.primary.main
             }}
           >
             About AA Uganda
           </Typography>
           <Typography 
             variant="h6" 
-            color="text.secondary"
             sx={{ 
               maxWidth: 700, 
               mx: 'auto',
@@ -151,7 +152,6 @@ const AboutPreview: React.FC = () => {
           </Typography>
           <Typography 
             variant="body1" 
-            color="primary"
             sx={{ 
               fontWeight: 600,
               fontSize: { xs: '1rem', sm: '1.1rem', md: '1.125rem' }
@@ -196,79 +196,11 @@ const AboutPreview: React.FC = () => {
           ))}
         </Grid>
 
-        {/* Team Preview */}
-        <TeamPreview>
-          <Typography 
-            variant="h4" 
-            align="center" 
-            sx={{ 
-              fontWeight: 700, 
-              mb: 4,
-              fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2rem' }
-            }}
-          >
-            Meet Our Leadership
-          </Typography>
-          
-          <Grid container spacing={3} justifyContent="center">
-            {management.slice(0, 4).map((member, index) => (
-              <Grid item xs={6} sm={4} md={3} key={index}>
-                <TeamMemberCard>
-                  <MemberAvatar 
-                    className="member-avatar"
-                    sx={{ 
-                      backgroundImage: `url(${member.img})`,
-                    }}
-                  />
-                  
-                  <Typography 
-                    variant="subtitle1" 
-                    sx={{ 
-                      fontWeight: 600, 
-                      mb: 0.5,
-                      fontSize: { xs: '0.875rem', sm: '1rem', md: '1.125rem' }
-                    }}
-                  >
-                    {member.name}
-                  </Typography>
-                  
-                  <Typography 
-                    variant="body2" 
-                    color="text.secondary"
-                    sx={{ 
-                      fontSize: { xs: '0.75rem', sm: '0.875rem', md: '1rem' }
-                    }}
-                  >
-                    {member.role}
-                  </Typography>
-                </TeamMemberCard>
-              </Grid>
-            ))}
-          </Grid>
-          
-          <Box sx={{ textAlign: 'center', mt: 4 }}>
-            <Button
-              variant="outlined"
-              size="large"
-              href="/about/team"
-              sx={{ mr: 2, mb: { xs: 2, sm: 0 } }}
-            >
-              Meet Full Team
-            </Button>
-            <Button
-              variant="contained"
-              size="large"
-              href="/about/who-we-are"
-            >
-              Learn More About Us
-            </Button>
-          </Box>
-        </TeamPreview>
-
         {/* Call to Action */}
         <Box sx={{ textAlign: 'center', mt: 8 }}>
           <Typography 
             variant="h4" 
+            color="primary" 
             sx={{ 
               fontWeight: 700, 
               mb: 2,
@@ -279,7 +211,6 @@ const AboutPreview: React.FC = () => {
           </Typography>
           <Typography 
             variant="h6" 
-            color="text.secondary" 
             sx={{ 
               mb: 4, 
               maxWidth: 500, 
@@ -290,11 +221,13 @@ const AboutPreview: React.FC = () => {
             Experience the peace of mind that comes with Uganda's most trusted motoring organization
           </Typography>
           
+          <Grid item container justifyContent="center">
           <ContactButtons 
-            phoneText="Get Membership Info"
-            whatsappText="Join Today"
+            phoneText="Talk to us"
+            whatsappText="Chat with us"
             whatsappMessage="Hello! I'm interested in becoming an AA Uganda member. Can you provide more information?"
           />
+          </Grid>
         </Box>
       </Container>
     </AboutSection>
