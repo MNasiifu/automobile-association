@@ -162,7 +162,7 @@ export const affiliates = [
 
 export const heroContent = {
   title: "Your Trusted Partner on Uganda's Roads",
-  subtitle: `For over ${new Date().getFullYear() - 1986} years, AA Uganda has been providing reliable motoring solutions, driving education, and rescue services across Uganda.`,
+  subtitle: "From International Driving Permits valid in 150+ countries to 24/7 emergency rescue services, we deliver comprehensive automotive solutions that keep you moving safely across Uganda and beyond.",
   ctaText: "Apply for IDP",
   ctaLink: "/idp/apply",
   backgroundImage: "/images/hero-bg.jpg",

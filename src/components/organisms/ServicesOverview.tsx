@@ -1,21 +1,37 @@
 import React from 'react';
 import { Box, Container, Typography, Grid } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { Heading } from '../atoms';
+import { Heading, Button } from '../atoms';
 import { ServiceCard } from '../molecules';
 import { services } from '../../data/servicesData';
 
 const ServicesSection = styled(Box)(({ theme }) => ({
-  padding: theme.spacing(8, 0),
-  backgroundColor: theme.palette.grey[50],
+  padding: theme.spacing(12, 0),
+  background: `linear-gradient(135deg, ${theme.palette.background.default} 0%, ${theme.palette.grey[50]} 100%)`,
+  position: 'relative',
+  
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23024f31" fill-opacity="0.02"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
+    zIndex: 1,
+  },
 }));
 
 const SectionHeader = styled(Box)(({ theme }) => ({
   textAlign: 'center',
-  marginBottom: theme.spacing(6),
+  marginBottom: theme.spacing(8),
+  position: 'relative',
+  zIndex: 2,
 }));
 
 const ServicesGrid = styled(Grid)(() => ({
+  position: 'relative',
+  zIndex: 2,
   '& .MuiGrid-item': {
     display: 'flex',
   },
@@ -41,7 +57,16 @@ const ServicesOverview: React.FC<ServicesOverviewProps> = ({
     <ServicesSection>
       <Container maxWidth="lg">
         <SectionHeader>
-          <Heading variant="h2" align="center" gutterBottom>
+          <Heading 
+            variant="h2" 
+            align="center" 
+            gutterBottom
+            sx={{
+              fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
+              fontWeight: 700,
+              mb: 2,
+            }}
+          >
             Our Services
           </Heading>
           
@@ -49,32 +74,105 @@ const ServicesOverview: React.FC<ServicesOverviewProps> = ({
             variant="h6"
             color="text.secondary"
             align="center"
-            sx={{ maxWidth: 600, mx: 'auto' }}
+            sx={{ 
+              maxWidth: 700, 
+              mx: 'auto',
+              fontSize: { xs: '1rem', sm: '1.1rem', md: '1.25rem' },
+              lineHeight: 1.6,
+              mb: 2,
+            }}
           >
             Comprehensive automotive solutions designed to keep you safe and 
             confident on Uganda's roads
           </Typography>
+          
+          <Typography
+            variant="body1"
+            color="primary"
+            align="center"
+            sx={{ 
+              fontWeight: 600,
+              fontSize: { xs: '1rem', sm: '1.1rem', md: '1.125rem' }
+            }}
+          >
+            ✓ Professional Service • ✓ 24/7 Support • ✓ Nationwide Coverage
+          </Typography>
         </SectionHeader>
         
         <ServicesGrid container spacing={4}>
-          {displayedServices.map((service) => (
+          {displayedServices.map((service, index) => (
             <Grid item xs={12} sm={6} lg={4} key={service.id}>
-              <ServiceCard
-                title={service.title}
-                description={service.description}
-                icon={service.icon}
-                features={service.features}
-                onClick={() => handleServiceClick(service.id)}
-              />
+              <Box
+                sx={{
+                  animation: `fadeInUp 0.6s ease-out ${index * 0.1}s both`,
+                  '@keyframes fadeInUp': {
+                    '0%': {
+                      opacity: 0,
+                      transform: 'translateY(30px)',
+                    },
+                    '100%': {
+                      opacity: 1,
+                      transform: 'translateY(0)',
+                    },
+                  },
+                }}
+              >
+                <ServiceCard
+                  title={service.title}
+                  description={service.description}
+                  icon={service.icon}
+                  features={service.features}
+                  onClick={() => handleServiceClick(service.id)}
+                />
+              </Box>
             </Grid>
           ))}
         </ServicesGrid>
         
         {!showAll && services.length > maxServices && (
-          <Box sx={{ textAlign: 'center', mt: 6 }}>
-            <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-              And {services.length - maxServices} more services...
+          <Box sx={{ textAlign: 'center', mt: 8, position: 'relative', zIndex: 2 }}>
+            <Typography 
+              variant="h6" 
+              color="text.secondary" 
+              sx={{ 
+                mb: 3,
+                fontSize: { xs: '1rem', sm: '1.1rem', md: '1.25rem' }
+              }}
+            >
+              And {services.length - maxServices} more specialized services...
             </Typography>
+            
+            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
+              <Button
+                variant="contained"
+                size="large"
+                href="/services"
+                sx={{
+                  py: 2,
+                  px: 4,
+                  fontSize: '1.125rem',
+                  fontWeight: 600,
+                  borderRadius: 3,
+                }}
+              >
+                View All Services
+              </Button>
+              
+              <Button
+                variant="outlined"
+                size="large"
+                href="/contact"
+                sx={{
+                  py: 2,
+                  px: 4,
+                  fontSize: '1.125rem',
+                  fontWeight: 600,
+                  borderRadius: 3,
+                }}
+              >
+                Get Custom Quote
+              </Button>
+            </Box>
           </Box>
         )}
       </Container>
