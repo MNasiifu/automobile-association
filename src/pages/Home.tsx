@@ -6,7 +6,8 @@ import {
   AboutPreview,
   TestimonialsSection,
   PartnershipsSection,
-  CallToActionSection
+  CallToActionSection,
+  IdpSection
 } from '../components/organisms/sections';
 import { SEO } from '../components/SEO';
 import { homeSEO } from '../data/seoData';
@@ -27,6 +28,9 @@ const Home: React.FC = () => {
       
       {/* Services Overview - Enhanced with better presentation */}
       <ServicesOverview showAll />
+      
+      {/* International Driving Permit Section - IDP application and verification */}
+      <IdpSection />
       
       {/* Testimonials - Social proof from satisfied customers */}
       <TestimonialsSection />

@@ -13,6 +13,7 @@ import {
 } from "@mui/icons-material";
 import { config } from "../../../utils/config/config";
 import theme from "../../../theme";
+import { useNavigate } from "react-router-dom";
 
 const CTASection = styled(Box)(({ theme }) => ({
   padding: theme.spacing(12, 0),
@@ -152,6 +153,11 @@ const quickActions = [
 ];
 
 const CallToActionSection: React.FC = () => {
+const navigate = useNavigate();
+  const handleNavigateToMembership = () => {
+    navigate("/membership");
+  };
+
   return (
     <CTASection>
       <CTAContainer maxWidth="lg">
@@ -194,7 +200,7 @@ const CallToActionSection: React.FC = () => {
               variant="contained"
               color="secondary"
               size="large"
-              href="/membership"
+              onClick={handleNavigateToMembership}
               sx={{
                 py: 2,
                 px: 4,
@@ -378,7 +384,7 @@ const CallToActionSection: React.FC = () => {
                 variant="body2"
                 sx={{ fontSize: { xs: "0.875rem", sm: "1rem" } }}
               >
-                +256 772 366004
+                {config.company.contactNumber}
               </Typography>
             </Box>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
