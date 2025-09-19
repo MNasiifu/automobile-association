@@ -97,11 +97,21 @@ export const management: Person[] = [
   }
 ];
 
+export const servicesNavItems: ReadonlyArray<NavItem> = [
+  { label: "Vehicle Valuation", path: "/services/vehicle-valuation" },
+      { label: "Fleet Management", path: "/services/fleet-management" },
+      { label: "Rescue Services", path: "/services/rescue-services" },
+      { label: "Vehicle Inspection", path: "/services/vehicle-inspection" },
+      { label: "Insurance Services", path: "/services/insurance-services" },
+      { label: "Automotive Advisory", path: "/services/automotive-advisory" },
+];
+
 export const navigationItems: ReadonlyArray<NavItem> = [
   { label: 'Home', path: '/' },
   {
     label: 'IDP',
     path: '#',
+    route: '/idp/about',
     children: [
       { label: 'About IDP', path: '/idp/about', icon: 'Info' },
       { label: 'Apply for IDP', path: '/idp/apply', icon: 'PostAdd' },
@@ -116,6 +126,7 @@ export const navigationItems: ReadonlyArray<NavItem> = [
   {
     label: 'Driving School',
     path: '#',
+    route: '/driving-school/about',
     children: [
       { label: 'About the School', path: '/driving-school/about', icon: 'School' },
       { label: 'Refresher Courses', path: '/driving-school/refresher', icon: 'Replay' },
@@ -125,6 +136,7 @@ export const navigationItems: ReadonlyArray<NavItem> = [
   {
     label: 'Our Services',
     path: '#',
+    skip: true,
     children: [
       { label: "Vehicle Valuation", path: "/services/vehicle-valuation", icon: "Assessment" },
       { label: "Fleet Management", path: "/services/fleet-management", icon: "DirectionsCar" },
@@ -137,12 +149,12 @@ export const navigationItems: ReadonlyArray<NavItem> = [
     {
     label: 'About Us',
     path: '#',
+    route: "/about/who-we-are",
     children: [
       { label: 'Who We Are', path: '/about/who-we-are', icon: 'Flag' },
       { label: 'Our Team', path: '/about/team', icon: 'Groups' },
       { label: 'Affiliation', path: '/about/affiliation', icon: 'Handshake' },
-      { label: 'Careers', path: '/about/careers', icon: 'Work' },
-      { label: 'Gallery', path: '/about/gallery', icon: 'PhotoLibrary' },
+      { label: 'Careers', path: '/about/careers', icon: 'Work' }
     ],
   },
   {
@@ -162,7 +174,7 @@ export const affiliates = [
 
 export const heroContent = {
   title: "Your Trusted Partner on Uganda's Roads",
-  subtitle: `For over ${new Date().getFullYear() - 1986} years, AA Uganda has been providing reliable motoring solutions, driving education, and rescue services across Uganda.`,
+  subtitle: "From International Driving Permits valid in 150+ countries to 24/7 emergency rescue services, we deliver comprehensive automotive solutions that keep you moving safely across Uganda and beyond.",
   ctaText: "Apply for IDP",
   ctaLink: "/idp/apply",
   backgroundImage: "/images/hero-bg.jpg",
@@ -185,6 +197,7 @@ export const milestones = [
 export default {
   companyInfo,
   navigationItems,
+  servicesNavItems,
   heroContent,
   management,
   affiliates,

@@ -1,4 +1,17 @@
 // Services data for AA Uganda
+// Each service now includes a route property for navigation
+
+/**
+ * Route Mappings:
+ * - fleet-management -> /services/fleet-management
+ * - vehicle-valuation -> /services/vehicle-valuation  
+ * - rescue-services -> /services/rescue-services
+ * - driving-school -> /driving-school/about
+ * - vehicle-inspection -> /services/vehicle-inspection
+ * - insurance-services -> /services/insurance-services
+ * - automotive-advisory -> /services/automotive-advisory
+ * - membership-benefits -> /membership
+ */
 
 export interface Service {
   id: string;
@@ -8,9 +21,50 @@ export interface Service {
   features: string[];
   category: "rescue" | "driving" | "insurance" | "advisory";
   image?: string;
+  route: string;
 }
 
 export const services: Service[] = [
+  {
+    id: "fleet-management",
+    title: "Fleet Management Solutions",
+    description:
+      "Comprehensive fleet management and vehicle tracking solutions for businesses across Uganda. Monitor, protect, and optimize your fleet operations with advanced GPS tracking and analytics.",
+    icon: "DirectionsCar",
+    category: "advisory",
+    features: [
+      "Real-time GPS Vehicle Tracking",
+      "24/7 Theft Recovery Services",
+      "Driver Behavior Monitoring",
+      "Route Optimization & Planning",
+      "Maintenance Scheduling",
+      "Fuel Management & Analytics",
+      "Comprehensive Fleet Reporting",
+      "Mobile App Access",
+    ],
+    image: "/images/fleet-management.jpg",
+    route: "/services/fleet-management",
+  },
+  {
+    id: "vehicle-valuation",
+    title: "Professional Vehicle Valuation",
+    description:
+      "Independent, market-aware vehicle valuations tailored to Uganda's automotive environment. Expert assessments for insurance, sales, finance, fleet management, and legal purposes.",
+    icon: "Assessment",
+    category: "advisory",
+    features: [
+      "Pre-Insurance Valuations",
+      "Market Value Assessments",
+      "Technical Brief Valuations",
+      "Accident Damage Assessment",
+      "Fleet Valuation Solutions",
+      "Comprehensive Inspection Reports",
+      "VIN Verification & Documentation",
+      "Expert Follow-up Support",
+    ],
+    image: "/images/vehicle-valuation.jpg",
+    route: "/services/vehicle-valuation",
+  },
   {
     id: "rescue-services",
     title: "Rescue Services",
@@ -29,6 +83,7 @@ export const services: Service[] = [
       "Fuel Delivery Service",
     ],
     image: "/images/rescue-service.jpg",
+    route: "/services/rescue-services",
   },
   {
     id: "driving-school",
@@ -48,6 +103,7 @@ export const services: Service[] = [
       "Courses Coming Soon...",
     ],
     image: "/images/driving-school.jpg",
+    route: "/driving-school/about",
   },
   {
     id: "vehicle-inspection",
@@ -65,6 +121,7 @@ export const services: Service[] = [
       "Compliance Certification",
     ],
     image: "/images/vehicle-inspection.jpg",
+    route: "/services/vehicle-inspection",
   },
   {
     id: "insurance-services",
@@ -82,6 +139,7 @@ export const services: Service[] = [
       "Competitive Premium Rates",
     ],
     image: "/images/insurance.jpg",
+    route: "/services/insurance-services",
   },
   {
     id: "automotive-advisory",
@@ -99,6 +157,7 @@ export const services: Service[] = [
       "Vehicle Valuation Services",
     ],
     image: "/images/advisory.jpg",
+    route: "/services/automotive-advisory",
   },
   {
     id: "membership-benefits",
@@ -117,6 +176,7 @@ export const services: Service[] = [
       "Partner Discounts",
     ],
     image: "/images/membership.jpg",
+    route: "/membership",
   },
 ];
 

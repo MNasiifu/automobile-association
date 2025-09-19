@@ -49,7 +49,7 @@ const StyledHeading = styled(MuiTypography)(({ theme }) => ({
 const Heading: React.FC<HeadingProps> = ({
   children,
   variant = 'h2',
-  color = 'textPrimary',
+  color = 'primary',
   align = 'left',
   gutterBottom = false,
   ...props

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Container,
@@ -31,6 +31,8 @@ import {
   Support as SupportIcon,
   ExpandMore as ExpandMoreIcon,
   MonetizationOn as MoneyIcon,
+  HelpOutline as HelpIcon,
+  Lightbulb as LightbulbIcon,
 } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
 import { ContactButtons, PageHeader } from "../../components/molecules";
@@ -38,6 +40,7 @@ import { Heading } from "../../components/atoms";
 import { SEO } from "../../components/SEO";
 import { insuranceServicesSEO } from "../../data/seoData";
 import { config } from "../../utils/config/config";
+import { FormattedTypography } from "../../utils/textFormatter";
 
 const HeroSection = styled(Box)(({ theme }) => ({
   background: `linear-gradient(135deg, ${theme.palette.primary.main}15 0%, ${theme.palette.secondary.main}10 100%)`,
@@ -96,7 +99,138 @@ const ProcessStep = styled(Paper)(({ theme }) => ({
   },
 }));
 
+const FAQSection = styled(Box)(({ theme }) => ({
+  background: `linear-gradient(135deg, ${theme.palette.grey[50]} 0%, ${theme.palette.grey[100]} 100%)`,
+  position: "relative",
+  overflow: "hidden",
+  "&::before": {
+    content: '""',
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundImage: `radial-gradient(circle at 20% 80%, ${theme.palette.primary.main}08 0%, transparent 50%),
+                      radial-gradient(circle at 80% 20%, ${theme.palette.secondary.main}08 0%, transparent 50%),
+                      radial-gradient(circle at 40% 40%, ${theme.palette.primary.main}05 0%, transparent 50%)`,
+    pointerEvents: "none",
+  },
+}));
+
+const FAQContainer = styled(Container)(() => ({
+  position: "relative",
+  zIndex: 1,
+}));
+
+const FAQHeader = styled(Box)(({ theme }) => ({
+  textAlign: "center",
+  marginBottom: theme.spacing(6),
+  position: "relative",
+  "&::after": {
+    content: '""',
+    position: "absolute",
+    bottom: theme.spacing(-2),
+    left: "50%",
+    transform: "translateX(-50%)",
+    width: 80,
+    height: 4,
+    background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+    borderRadius: 2,
+  },
+}));
+
+const StyledAccordion = styled(Accordion)(({ theme }) => ({
+  marginBottom: theme.spacing(2),
+  borderRadius: `${theme.spacing(2)} !important`,
+  border: `1px solid ${theme.palette.divider}`,
+  background: theme.palette.background.paper,
+  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.05)",
+  overflow: "hidden",
+  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+  "&:hover": {
+    boxShadow: "0 8px 25px rgba(0, 0, 0, 0.1)",
+    transform: "translateY(-2px)",
+  },
+  "&.Mui-expanded": {
+    margin: `${theme.spacing(2)} 0 !important`,
+    boxShadow: `0 8px 32px ${theme.palette.primary.main}15`,
+    border: `1px solid ${theme.palette.primary.light}`,
+  },
+  "&::before": {
+    display: "none",
+  },
+}));
+
+const StyledAccordionSummary = styled(AccordionSummary)(({ theme }) => ({
+  padding: theme.spacing(2, 3),
+  background: theme.palette.background.paper,
+  borderRadius: theme.spacing(2),
+  transition: "all 0.3s ease",
+  "&:hover": {
+    background: `linear-gradient(135deg, ${theme.palette.primary.main}05 0%, ${theme.palette.secondary.main}05 100%)`,
+  },
+  "&.Mui-expanded": {
+    background: `linear-gradient(135deg, ${theme.palette.primary.main}10 0%, ${theme.palette.secondary.main}10 100%)`,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+    borderBottom: `1px solid ${theme.palette.divider}`,
+  },
+  "& .MuiAccordionSummary-expandIconWrapper": {
+    color: theme.palette.primary.main,
+    transition: "all 0.3s ease",
+    "&.Mui-expanded": {
+      transform: "rotate(180deg)",
+      color: theme.palette.secondary.main,
+    },
+  },
+  "& .MuiAccordionSummary-content": {
+    margin: `${theme.spacing(1)} 0`,
+    alignItems: "center",
+  },
+}));
+
+const StyledAccordionDetails = styled(AccordionDetails)(({ theme }) => ({
+  padding: theme.spacing(3),
+  background: theme.palette.background.default,
+  borderTop: "none",
+  "& .MuiTypography-root": {
+    lineHeight: 1.7,
+  },
+}));
+
+const QuestionIcon = styled(Box)(({ theme }) => ({
+  width: 32,
+  height: 32,
+  borderRadius: "50%",
+  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  marginRight: theme.spacing(2),
+  flexShrink: 0,
+  "& svg": {
+    color: "white",
+    fontSize: "1.2rem",
+  },
+  [theme.breakpoints.down("sm")]: {
+    width: 28,
+    height: 28,
+    marginRight: theme.spacing(1.5),
+    "& svg": {
+      fontSize: "1rem",
+    },
+  },
+}));
+
 const InsuranceServices: React.FC = () => {
+  // State for managing which FAQ accordion is expanded
+  const [expandedFaq, setExpandedFaq] = useState<string | false>(false);
+
+  // Handler for FAQ accordion expansion
+  const handleFaqChange = (panel: string) => (_event: React.SyntheticEvent, isExpanded: boolean) => {
+    setExpandedFaq(isExpanded ? panel : false);
+  };
+
   // Handler for getting insurance quote - benchmarked from handleTalkToUs in ContactButtons.tsx
   const handleGetQuote = () => {
     try {
@@ -223,27 +357,27 @@ const InsuranceServices: React.FC = () => {
     {
       question: "What does comprehensive motor insurance cover?",
       answer:
-        "Comprehensive insurance covers damage to your own vehicle from accidents, theft, fire, flood, and vandalism, plus third-party liability. It also includes windscreen replacement, emergency roadside assistance, and personal accident cover.",
+        "Our **comprehensive insurance** provides complete protection for your vehicle and peace of mind on the road. Coverage includes: damage to your own vehicle from accidents, theft, fire, flood, and vandalism, plus full third-party liability protection. Additional benefits include **windscreen replacement**, **24/7 emergency roadside assistance**, and **personal accident cover** for you and your passengers.",
     },
     {
       question: "How quickly are claims processed?",
       answer:
-        "Most claims are processed within 48-72 hours of receiving complete documentation. Emergency situations and minor claims can often be approved within 24 hours.",
+        "We pride ourselves on **fast claim processing**. Most claims are processed within **48-72 hours** of receiving complete documentation. For emergency situations and minor claims, we often provide approval within **24 hours**. Our streamlined digital process ensures you get back on the road quickly.",
     },
     {
       question: "Can I get insurance for an imported vehicle?",
       answer:
-        "Yes, we provide coverage for both locally assembled and imported vehicles. Additional inspection may be required for imported vehicles to determine their current market value.",
+        "**Absolutely yes!** We provide comprehensive coverage for both locally assembled and imported vehicles. For imported vehicles, we may require an additional inspection to determine current market value, ensuring you get the right coverage at the best price. Our expertise covers all vehicle types and origins.",
     },
     {
       question: "What payment methods do you accept?",
       answer:
-        "We accept mobile money (MTN, Airtel), bank transfers, cash payments at our offices, and credit/debit cards. Payment plans are available for annual premiums.",
+        "We offer **flexible payment options** to suit your convenience: **Mobile Money** (MTN Mobile Money, Airtel Money), **bank transfers**, **cash payments** at our offices, and **credit/debit cards**. We also provide convenient **payment plans** for annual premiums, making insurance affordable for everyone.",
     },
     {
       question: "Do you offer discounts for multiple vehicles?",
       answer:
-        "Yes, we offer attractive discounts for fleet insurance covering multiple vehicles. The discount increases with the number of vehicles insured.",
+        "Yes! We offer **attractive fleet discounts** for multiple vehicles. The more vehicles you insure with us, the greater your savings. Our fleet insurance packages are perfect for families with multiple cars or businesses managing vehicle fleets. **Contact us** for a personalized quote and discover your potential savings.",
     },
   ];
 
@@ -277,7 +411,7 @@ const InsuranceServices: React.FC = () => {
                 your vehicle covered with competitive rates and excellent
                 customer service.
               </Typography>
-              <Alert severity="info" sx={{ mb: 4 }}>
+              <Alert sx={{ mb: 4, backgroundColor: "#bedaf0" }}>
                 <Typography variant="body1">
                   <strong>Special Offer:</strong> Get 10% off your first year
                   premium when you combine with AA Membership!
@@ -490,38 +624,157 @@ const InsuranceServices: React.FC = () => {
       </Container>
 
       {/* FAQ Section */}
-      <Box sx={{ backgroundColor: "grey.50", py: 8 }}>
-        <Container maxWidth="lg">
-          <Heading variant="h2" align="center" gutterBottom>
-            Frequently Asked Questions
-          </Heading>
-          <Typography
-            variant="h6"
-            align="center"
-            color="text.secondary"
-            sx={{ mb: 6 }}
-          >
-            Common questions about our motor insurance services
-          </Typography>
+      <FAQSection sx={{ py: { xs: 6, md: 8 } }}>
+        <FAQContainer maxWidth="lg">
+          <FAQHeader>
+            <Box sx={{ mb: 2 }}>
+              <LightbulbIcon 
+                sx={{ 
+                  fontSize: { xs: 48, md: 56 }, 
+                  color: 'primary.main',
+                  mb: 2,
+                  filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.1))'
+                }} 
+              />
+            </Box>
+            <Heading 
+              variant="h2" 
+              align="center" 
+              gutterBottom
+              sx={{ 
+                fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
+                fontWeight: 700,
+                background: (theme) => `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                mb: 2
+              }}
+            >
+              Frequently Asked Questions
+            </Heading>
+            <Typography
+              variant="h6"
+              align="center"
+              color="text.secondary"
+              sx={{ 
+                maxWidth: 600, 
+                mx: 'auto',
+                fontSize: { xs: '1rem', sm: '1.1rem', md: '1.25rem' },
+                lineHeight: 1.6
+              }}
+            >
+              Get instant answers to common questions about our comprehensive motor insurance services
+            </Typography>
+          </FAQHeader>
 
-          <Box sx={{ maxWidth: 800, mx: "auto" }}>
-            {faqData.map((faq, index) => (
-              <Accordion key={index} sx={{ mb: 2 }}>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                    {faq.question}
-                  </Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Typography variant="body1" color="text.secondary">
-                    {faq.answer}
-                  </Typography>
-                </AccordionDetails>
-              </Accordion>
-            ))}
+          <Grid container spacing={4}>
+            <Grid item xs={12}>
+              <Box sx={{ maxWidth: { xs: '100%', md: 900 }, mx: "auto" }}>
+                {faqData.map((faq, index) => {
+                  const panelId = `panel${index}`;
+                  const isExpanded = expandedFaq === panelId;
+                  
+                  return (
+                    <StyledAccordion 
+                      key={index}
+                      expanded={isExpanded}
+                      onChange={handleFaqChange(panelId)}
+                      elevation={0}
+                    >
+                      <StyledAccordionSummary 
+                        expandIcon={<ExpandMoreIcon />}
+                        aria-controls={`${panelId}-content`}
+                        id={`${panelId}-header`}
+                      >
+                        <QuestionIcon>
+                          <HelpIcon />
+                        </QuestionIcon>
+                        <Typography 
+                          variant="h6" 
+                          sx={{ 
+                            fontWeight: 600,
+                            fontSize: { xs: '1rem', sm: '1.1rem', md: '1.25rem' },
+                            color: isExpanded ? 'primary.main' : 'text.primary',
+                            transition: 'color 0.3s ease',
+                            pr: 1
+                          }}
+                        >
+                          {faq.question}
+                        </Typography>
+                      </StyledAccordionSummary>
+                      <StyledAccordionDetails>
+                        <Box sx={{ pl: { xs: 0, sm: 6 } }}>
+                          <FormattedTypography 
+                            variant="body1" 
+                            sx={{
+                              color: 'text.secondary',
+                              fontSize: { xs: '0.9rem', sm: '1rem' },
+                              lineHeight: 1.7,
+                              '& strong': {
+                                color: 'primary.main',
+                                fontWeight: 600
+                              }
+                            }}
+                          >
+                            {faq.answer}
+                          </FormattedTypography>
+                        </Box>
+                      </StyledAccordionDetails>
+                    </StyledAccordion>
+                  );
+                })}
+              </Box>
+            </Grid>
+          </Grid>
+
+          {/* FAQ CTA */}
+          <Box sx={{ textAlign: 'center', mt: { xs: 4, md: 6 } }}>
+            <Paper
+              elevation={0}
+              sx={{
+                p: { xs: 3, sm: 4, md: 5 },
+                borderRadius: 3,
+                background: (theme) => `linear-gradient(135deg, ${theme.palette.primary.main}08 0%, ${theme.palette.secondary.main}08 100%)`,
+                border: (theme) => `1px solid ${theme.palette.primary.light}30`,
+                maxWidth: 600,
+                mx: 'auto'
+              }}
+            >
+              <Typography 
+                variant="h5" 
+                gutterBottom 
+                sx={{ 
+                  fontWeight: 600,
+                  fontSize: { xs: '1.2rem', sm: '1.3rem', md: '1.5rem' },
+                  color: 'primary.main'
+                }}
+              >
+                Still have questions?
+              </Typography>
+              <Typography 
+                variant="body1" 
+                color="text.secondary" 
+                sx={{ mb: 3, fontSize: { xs: '0.9rem', sm: '1rem' } }}
+              >
+                Our expert insurance advisors are here to help you find the perfect coverage for your needs.
+              </Typography>
+              <ContactButtons 
+                phoneText="Speak with Expert"
+                whatsappMessage="Hello! I have questions about your insurance services and would like to speak with an expert."
+                justifyContent="center"
+                spacing={2}
+                buttonSx={{ 
+                  px: { xs: 2, sm: 3 }, 
+                  py: 1.5,
+                  fontSize: { xs: '0.85rem', sm: '0.9rem' },
+                  fontWeight: 600
+                }}
+              />
+            </Paper>
           </Box>
-        </Container>
-      </Box>
+        </FAQContainer>
+      </FAQSection>
 
       {/* CTA Section */}
       <Container maxWidth="lg" sx={{ py: 8 }}>

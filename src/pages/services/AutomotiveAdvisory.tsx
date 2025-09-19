@@ -114,7 +114,7 @@ const ProcessCard = styled(Paper)(({ theme }) => ({
 
 const ProcessIconWrapper = styled(Box)(({ theme }) => ({
   position: "absolute",
-  top: -30,
+  top: 4,
   left: "50%",
   transform: "translateX(-50%)",
   width: 60,
@@ -160,7 +160,7 @@ const ProcessTimeline = styled(Box)(({ theme }) => ({
 }));
 
 const ProcessContent = styled(Box)(({ theme }) => ({
-  marginTop: theme.spacing(5),
+  marginTop: theme.spacing(8),
   position: "relative",
   zIndex: 1,
 }));
@@ -465,13 +465,13 @@ const AutomotiveAdvisory: React.FC = () => {
               <Typography
                 variant="h3"
                 gutterBottom
+                color="primary"
                 sx={{ fontWeight: 700, mb: 3 }}
               >
                 Expert Automotive Advice You Can Trust
               </Typography>
               <Typography
                 variant="h6"
-                color="text.secondary"
                 sx={{ mb: 4, lineHeight: 1.6 }}
               >
                 Whether you're buying your first car, managing a fleet, or
@@ -505,7 +505,6 @@ const AutomotiveAdvisory: React.FC = () => {
         <Typography
           variant="h6"
           align="center"
-          color="text.secondary"
           sx={{ mb: 6, maxWidth: 800, mx: "auto" }}
         >
           Comprehensive automotive consultation services designed to help you
@@ -625,7 +624,7 @@ const AutomotiveAdvisory: React.FC = () => {
       </Container>
 
       {/* Expertise Areas */}
-      <Box sx={{ backgroundColor: "grey.50", py: 8 }}>
+      <Box sx={{ backgroundColor: "grey.200", py: 8 }}>
         <Container maxWidth="lg">
           <Heading variant="h2" align="center" gutterBottom>
             Our Areas of Expertise
@@ -633,7 +632,6 @@ const AutomotiveAdvisory: React.FC = () => {
           <Typography
             variant="h6"
             align="center"
-            color="text.secondary"
             sx={{ mb: 6, maxWidth: 800, mx: "auto" }}
           >
             Specialized knowledge across all aspects of vehicle ownership and
@@ -1107,6 +1105,7 @@ const AutomotiveAdvisory: React.FC = () => {
       </Box>
 
       {/* Why Choose Us */}
+      <Box sx={{ bgcolor: "grey.100" }}>
       <Container maxWidth="lg" sx={{ py: {xs: 4, sm: 8} }}>
         <Grid container spacing={6} alignItems="center">
           <Grid item xs={12} md={6}>
@@ -1209,6 +1208,7 @@ const AutomotiveAdvisory: React.FC = () => {
           </Grid>
         </Grid>
       </Container>
+      </Box>
 
       {/* CTA Section */}
       <Container maxWidth="lg" sx={{ py: {xs: 4, sm: 8} }}>

@@ -39,6 +39,7 @@ import { Heading } from "../../components/atoms";
 import { SEO } from "../../components/SEO";
 import { vehicleInspectionSEO } from "../../data/seoData";
 import { config } from "../../utils/config/config";
+import { useNavigate } from "react-router-dom";
 
 const HeroSection = styled(Box)(({ theme }) => ({
   background: `linear-gradient(135deg, ${theme.palette.primary.main}15 0%, ${theme.palette.secondary.main}10 100%)`,
@@ -82,6 +83,7 @@ const PremiumBadge = styled(Chip)(({ theme }) => ({
 }));
 
 const VehicleInspection: React.FC = () => {
+  const navigate = useNavigate();
   // Handler for booking inspection call functionality
   const handleBookInspection = () => {
     try {
@@ -102,18 +104,7 @@ const VehicleInspection: React.FC = () => {
 
   // Handler for membership inquiry - benchmarked from handleTalkToUs in ContactButtons.tsx
   const handleNavigateToMembershipPage = () => {
-    try {
-      window.location.href = `tel:${config.company.contactNumber}`;
-    } catch (error) {
-      console.error('Error initiating phone call for membership inquiry:', error);
-      // Fallback: copy number to clipboard
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(config.company.contactNumber);
-        alert(`Phone number copied to clipboard: ${config.company.contactNumber}`);
-      } else {
-        alert(`Please call us at: ${config.company.contactNumber}`);
-      }
-    }
+    navigate("/membership");
   };
 
   const inspectionTypes = [
@@ -297,7 +288,7 @@ const VehicleInspection: React.FC = () => {
       <HeroSection>
         <Container maxWidth="lg">
           <Grid container spacing={4} alignItems="center">
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={8}>
               <Typography
                 variant="h3"
                 gutterBottom
@@ -320,7 +311,7 @@ const VehicleInspection: React.FC = () => {
                 whatsappMessage="Hello! I would like to inquire about your vehicle inspection services."
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={4}>
               <Box sx={{ textAlign: "center" }}>
                 <InspectionIcon
                   sx={{
