@@ -54,6 +54,7 @@ import { SEO } from '../../components/SEO';
 import { rescueServicesSEO } from '../../data/seoData';
 import { config } from '../../utils/config/config';
 import { colors } from '../../theme/colors';
+import theme from '../../theme';
 
 const HeroSection = styled(Box)(({ theme }) => ({
   background: `linear-gradient(135deg, ${theme.palette.primary.main}15 0%, ${theme.palette.secondary.main}10 100%)`,
@@ -146,7 +147,7 @@ const RescueServices: React.FC = () => {
   });
 
   const handleNavigateToMembershipPage = () => {
-    navigate('/services/membership');
+    navigate('/membership');
   };
 
   // Enhanced handleTalkToUs function with benchmarking
@@ -480,7 +481,7 @@ const RescueServices: React.FC = () => {
       />
 
       {/* Emergency Alert */}
-      <Container maxWidth="lg" sx={{ pt: 4, mb: 4 }}>
+      <Container maxWidth="md" sx={{ pt: 4, mb: 4 }}>
         <EmergencyCard>
           <Typography variant="h4" gutterBottom sx={{ fontWeight: 700 }}>
             🚨 24/7 Emergency Hotline
@@ -497,9 +498,9 @@ const RescueServices: React.FC = () => {
             startIcon={<PhoneIcon />}
             onClick={handleEmergencyCall}
             sx={{ 
-              backgroundColor: 'white',
+              background: 'white',
               color: 'error.light',
-              '&:hover': { backgroundColor: 'grey.100' },
+              '&:hover': { background: '#eeeeee' },
               px: 4,
               py: 1.5,
               fontSize: {xs: '0.9rem', sm: '1.1rem'},
@@ -521,7 +522,7 @@ const RescueServices: React.FC = () => {
               <Typography variant="h6" color="text.secondary" sx={{ mb: 4, lineHeight: 1.6 }}>
                 When you're stranded on the road, AA Uganda is your trusted partner. Our rescue teams deliver fast, professional help across Uganda, backed by a nationwide network of 30+ rescue and recovery vehicles.
               </Typography>
-              <Alert severity="info" sx={{ mb: 4 }}>
+              <Alert sx={{ mb: 4, backgroundColor: '#bedaf0' }}>
                 <Typography variant="body1">
                   <strong>Fast Response:</strong> Average response time of 30 minutes in urban areas and 60 minutes in rural locations.
                 </Typography>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Container,
@@ -30,6 +30,8 @@ import {
   Schedule as ScheduleIcon,
   Build as BuildIcon,
   Person as PersonIcon,
+  HelpOutline as HelpIcon,
+  Lightbulb as LightbulbIcon,
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import { ContactButtons, PageHeader } from '../../components/molecules';
@@ -37,6 +39,7 @@ import { Heading } from '../../components/atoms';
 import { SEO } from '../../components/SEO';
 import { fleetManagementSEO } from '../../data/seoData';
 import { config } from '../../utils/config/config';
+import { FormattedTypography } from '../../utils/textFormatter';
 
 const HeroSection = styled(Box)(({ theme }) => ({
   background: `linear-gradient(135deg, ${theme.palette.primary.main}15 0%, ${theme.palette.secondary.main}10 100%)`,
@@ -79,7 +82,142 @@ const StatsCard = styled(Paper)(({ theme }) => ({
   height: '100%',
 }));
 
+// Enhanced FAQ Section Styled Components
+const FAQSection = styled(Box)(({ theme }) => ({
+  background: `linear-gradient(135deg, ${theme.palette.grey[50]} 0%, ${theme.palette.grey[100]} 100%)`,
+  position: "relative",
+  overflow: "hidden",
+  "&::before": {
+    content: '""',
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundImage: `radial-gradient(circle at 20% 80%, ${theme.palette.primary.main}08 0%, transparent 50%),
+                      radial-gradient(circle at 80% 20%, ${theme.palette.secondary.main}08 0%, transparent 50%),
+                      radial-gradient(circle at 40% 40%, ${theme.palette.primary.main}05 0%, transparent 50%)`,
+    pointerEvents: "none",
+  },
+}));
+
+const FAQContainer = styled(Container)(() => ({
+  position: "relative",
+  zIndex: 1,
+}));
+
+const FAQHeader = styled(Box)(({ theme }) => ({
+  textAlign: "center",
+  marginBottom: theme.spacing(6),
+  position: "relative",
+  "&::after": {
+    content: '""',
+    position: "absolute",
+    bottom: theme.spacing(-2),
+    left: "50%",
+    transform: "translateX(-50%)",
+    width: 80,
+    height: 4,
+    background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+    borderRadius: 2,
+  },
+}));
+
+const StyledAccordion = styled(Accordion)(({ theme }) => ({
+  marginBottom: theme.spacing(2),
+  borderRadius: `${theme.spacing(2)} !important`,
+  border: `1px solid ${theme.palette.divider}`,
+  background: theme.palette.background.paper,
+  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.05)",
+  overflow: "hidden",
+  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+  "&:hover": {
+    boxShadow: "0 8px 25px rgba(0, 0, 0, 0.1)",
+    transform: "translateY(-2px)",
+  },
+  "&.Mui-expanded": {
+    margin: `${theme.spacing(2)} 0 !important`,
+    boxShadow: `0 8px 32px ${theme.palette.primary.main}15`,
+    border: `1px solid ${theme.palette.primary.light}`,
+  },
+  "&::before": {
+    display: "none",
+  },
+}));
+
+const StyledAccordionSummary = styled(AccordionSummary)(({ theme }) => ({
+  padding: theme.spacing(2, 3),
+  background: theme.palette.background.paper,
+  borderRadius: theme.spacing(2),
+  transition: "all 0.3s ease",
+  "&:hover": {
+    background: `linear-gradient(135deg, ${theme.palette.primary.main}05 0%, ${theme.palette.secondary.main}05 100%)`,
+  },
+  "&.Mui-expanded": {
+    background: `linear-gradient(135deg, ${theme.palette.primary.main}10 0%, ${theme.palette.secondary.main}10 100%)`,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+    borderBottom: `1px solid ${theme.palette.divider}`,
+  },
+  "& .MuiAccordionSummary-expandIconWrapper": {
+    color: theme.palette.primary.main,
+    transition: "all 0.3s ease",
+    "&.Mui-expanded": {
+      transform: "rotate(180deg)",
+      color: theme.palette.secondary.main,
+    },
+  },
+  "& .MuiAccordionSummary-content": {
+    margin: `${theme.spacing(1)} 0`,
+    alignItems: "center",
+  },
+}));
+
+const StyledAccordionDetails = styled(AccordionDetails)(({ theme }) => ({
+  padding: theme.spacing(3),
+  background: theme.palette.background.default,
+  borderTop: "none",
+  "& .MuiTypography-root": {
+    lineHeight: 1.7,
+  },
+}));
+
+const QuestionIcon = styled(Box)(({ theme }) => ({
+  width: 32,
+  height: 32,
+  borderRadius: "50%",
+  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  marginRight: theme.spacing(2),
+  flexShrink: 0,
+  "& svg": {
+    color: "white",
+    fontSize: "1.2rem",
+  },
+  [theme.breakpoints.down("sm")]: {
+    width: 28,
+    height: 28,
+    marginRight: theme.spacing(1.5),
+    "& svg": {
+      fontSize: "1rem",
+    },
+  },
+}));
+
 const FleetManagement: React.FC = () => {
+  // State for controlling which FAQ accordion is expanded
+  const [expandedFaq, setExpandedFaq] = useState<string | false>(false);
+
+  // Handler for FAQ accordion expansion
+  const handleFaqAccordionChange = (panel: string) => (
+    _event: React.SyntheticEvent,
+    isExpanded: boolean
+  ) => {
+    setExpandedFaq(isExpanded ? panel : false);
+  };
+
   // Handler for fleet setup button - benchmarked from handleTalkToUs in ContactButtons.tsx
   const handleFleetSetup = () => {
     try {
@@ -182,19 +320,27 @@ const FleetManagement: React.FC = () => {
   const faqData = [
     {
       question: 'What types of vehicles can be tracked?',
-      answer: 'Our system supports cars, trucks, motorcycles, trailers, and even static assets like generators. We provide solutions for both light and heavy commercial vehicles.',
+      answer: 'Our **comprehensive tracking system** supports all vehicle types including **passenger cars**, **commercial trucks**, **motorcycles**, **trailers**, and even **static assets** like generators and construction equipment. We provide tailored solutions for both **light commercial vehicles** and **heavy-duty fleet operations**.',
     },
     {
       question: 'How does the theft recovery service work?',
-      answer: 'When theft is detected, our 24/7 control room immediately coordinates with local authorities and our recovery teams. We provide real-time location updates to expedite vehicle recovery.',
+      answer: 'When theft is detected, our **24/7 control room** immediately springs into action, coordinating with **local authorities** and our experienced **recovery teams** across Uganda. We provide **real-time location updates** and work tirelessly to expedite vehicle recovery, often within hours of the incident.',
     },
     {
       question: 'Can I access the system on mobile devices?',
-      answer: 'Yes, our fleet portal is fully responsive and accessible on smartphones, tablets, and computers. You can monitor your fleet from anywhere with an internet connection.',
+      answer: 'Absolutely! Our **fleet management portal** is fully responsive and accessible on **smartphones**, **tablets**, and **computers**. Monitor your entire fleet from anywhere with an internet connection - whether you\'re in Kampala or traveling across East Africa.',
     },
     {
       question: 'What kind of reports can I generate?',
-      answer: 'You can generate trip reports, fuel consumption analyses, driver behavior summaries, maintenance schedules, and custom reports tailored to your specific business needs.',
+      answer: 'Generate comprehensive reports including **detailed trip analyses**, **fuel consumption breakdowns**, **driver behavior summaries**, **maintenance schedules**, **route optimization reports**, and **custom reports** tailored to your specific business requirements. All reports can be scheduled for automatic delivery.',
+    },
+    {
+      question: 'How accurate is the GPS tracking?',
+      answer: 'Our **military-grade GPS technology** provides accuracy within **3-5 meters** under normal conditions. The system works seamlessly across Uganda\'s diverse terrain, from urban Kampala to remote rural areas, ensuring **reliable tracking** regardless of location.',
+    },
+    {
+      question: 'What is the installation timeline?',
+      answer: 'Most vehicle installations take **30-60 minutes** per vehicle at our certified installation centers. For **large fleets**, we can deploy mobile installation teams to your location, typically completing **50+ vehicles within a week** depending on fleet size and requirements.',
     },
   ];
 
@@ -217,7 +363,7 @@ const FleetManagement: React.FC = () => {
               <Typography variant="h6" color="text.secondary" sx={{ mb: 4, lineHeight: 1.6 }}>
                 AA Uganda combines local expertise and global best practices to deliver comprehensive fleet tracking, rapid recovery, and fuel optimization with 24/7 support.
               </Typography>
-              <Alert severity="info" sx={{ mb: 4 }}>
+              <Alert sx={{ mb: 4, backgroundColor: "rgb(203 226 246)" }}>
                 <Typography variant="body1">
                   <strong>Trusted Heritage:</strong> Built on the Automobile Association legacy with decades of experience serving Ugandan motorists.
                 </Typography>
@@ -909,41 +1055,157 @@ const FleetManagement: React.FC = () => {
       </Box>
 
       {/* FAQ Section */}
-      <Container maxWidth="lg" sx={{ py: 8 }}>
-        <Heading variant="h2" align="center" gutterBottom>
-          Frequently Asked Questions
-        </Heading>
-        <Typography variant="h6" align="center" color="text.secondary" sx={{ mb: 6 }}>
-          Get answers to common questions about our fleet management solutions
-        </Typography>
-
-        <Box sx={{ maxWidth: 800, mx: 'auto' }}>
-          {faqData.map((faq, index) => (
-            <Accordion key={index} sx={{ mb: 2, borderRadius: 2, '&:before': { display: 'none' } }}>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
+      <FAQSection sx={{ py: { xs: 6, md: 8 } }}>
+        <FAQContainer maxWidth="lg">
+          <FAQHeader>
+            <Box sx={{ mb: 2 }}>
+              <LightbulbIcon 
                 sx={{ 
-                  backgroundColor: 'grey.50',
-                  borderRadius: 2,
-                  '&.Mui-expanded': {
-                    borderBottomLeftRadius: 0,
-                    borderBottomRightRadius: 0,
-                  }
+                  fontSize: { xs: 48, md: 56 }, 
+                  color: 'primary.main',
+                  mb: 2,
+                  filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.1))'
+                }} 
+              />
+            </Box>
+            <Heading 
+              variant="h2" 
+              align="center" 
+              gutterBottom
+              sx={{ 
+                fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
+                fontWeight: 700,
+                background: (theme) => `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                mb: 2
+              }}
+            >
+              Frequently Asked Questions
+            </Heading>
+            <Typography
+              variant="h6"
+              align="center"
+              color="text.secondary"
+              sx={{ 
+                maxWidth: 600, 
+                mx: 'auto',
+                fontSize: { xs: '1rem', sm: '1.1rem', md: '1.25rem' },
+                lineHeight: 1.6
+              }}
+            >
+              Get instant answers to common questions about our comprehensive fleet management solutions
+            </Typography>
+          </FAQHeader>
+
+          <Grid container spacing={4}>
+            <Grid item xs={12}>
+              <Box sx={{ maxWidth: { xs: '100%', md: 900 }, mx: "auto" }}>
+                {faqData.map((faq, index) => {
+                  const panelId = `faq-panel-${index}`;
+                  const isExpanded = expandedFaq === panelId;
+                  
+                  return (
+                    <StyledAccordion 
+                      key={index}
+                      expanded={isExpanded}
+                      onChange={handleFaqAccordionChange(panelId)}
+                      elevation={0}
+                    >
+                      <StyledAccordionSummary 
+                        expandIcon={<ExpandMoreIcon />}
+                        aria-controls={`${panelId}-content`}
+                        id={`${panelId}-header`}
+                      >
+                        <QuestionIcon>
+                          <HelpIcon />
+                        </QuestionIcon>
+                        <Typography 
+                          variant="h6" 
+                          sx={{ 
+                            fontWeight: 600,
+                            fontSize: { xs: '1rem', sm: '1.1rem', md: '1.25rem' },
+                            color: isExpanded ? 'primary.main' : 'text.primary',
+                            transition: 'color 0.3s ease',
+                            pr: 1
+                          }}
+                        >
+                          {faq.question}
+                        </Typography>
+                      </StyledAccordionSummary>
+                      <StyledAccordionDetails>
+                        <Box sx={{ pl: { xs: 0, sm: 6 } }}>
+                          <FormattedTypography 
+                            variant="body1" 
+                            sx={{
+                              color: 'text.secondary',
+                              fontSize: { xs: '0.9rem', sm: '1rem' },
+                              lineHeight: 1.7,
+                              '& strong': {
+                                color: 'primary.main',
+                                fontWeight: 600
+                              }
+                            }}
+                          >
+                            {faq.answer}
+                          </FormattedTypography>
+                        </Box>
+                      </StyledAccordionDetails>
+                    </StyledAccordion>
+                  );
+                })}
+              </Box>
+            </Grid>
+          </Grid>
+
+          {/* FAQ CTA */}
+          <Box sx={{ textAlign: 'center', mt: { xs: 4, md: 6 } }}>
+            <Paper
+              elevation={0}
+              sx={{
+                p: { xs: 3, sm: 4, md: 5 },
+                borderRadius: 3,
+                background: (theme) => `linear-gradient(135deg, ${theme.palette.primary.main}08 0%, ${theme.palette.secondary.main}08 100%)`,
+                border: (theme) => `1px solid ${theme.palette.primary.light}30`,
+                maxWidth: 600,
+                mx: 'auto'
+              }}
+            >
+              <Typography 
+                variant="h5" 
+                gutterBottom 
+                sx={{ 
+                  fontWeight: 600,
+                  fontSize: { xs: '1.2rem', sm: '1.3rem', md: '1.5rem' },
+                  color: 'primary.main'
                 }}
               >
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                  {faq.question}
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails sx={{ backgroundColor: 'background.paper', borderRadius: '0 0 8px 8px' }}>
-                <Typography variant="body1" sx={{ lineHeight: 1.7 }}>
-                  {faq.answer}
-                </Typography>
-              </AccordionDetails>
-            </Accordion>
-          ))}
-        </Box>
-      </Container>
+                Ready to Optimize Your Fleet?
+              </Typography>
+              <Typography 
+                variant="body1" 
+                color="text.secondary" 
+                sx={{ mb: 3, fontSize: { xs: '0.9rem', sm: '1rem' } }}
+              >
+                Our fleet management experts are ready to help you streamline operations and reduce costs.
+              </Typography>
+              <ContactButtons 
+                phoneText="Speak with Fleet Expert"
+                whatsappMessage="Hello! I'm interested in your fleet management solutions and would like to discuss my requirements."
+                justifyContent="center"
+                spacing={2}
+                buttonSx={{ 
+                  px: { xs: 2, sm: 3 }, 
+                  py: 1.5,
+                  fontSize: { xs: '0.85rem', sm: '0.9rem' },
+                  fontWeight: 600
+                }}
+              />
+            </Paper>
+          </Box>
+        </FAQContainer>
+      </FAQSection>
 
       {/* CTA Section */}
       <Container maxWidth="lg" sx={{ py: 8 }}>
