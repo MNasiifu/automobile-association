@@ -10,4 +10,6 @@ export interface NavItem {
     readonly path: string;
     readonly icon?: string;
   }>;
+  readonly route?: string;
+  readonly skip?: boolean;
 }

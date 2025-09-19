@@ -102,6 +102,7 @@ export const navigationItems: ReadonlyArray<NavItem> = [
   {
     label: 'IDP',
     path: '#',
+    route: '/idp/about',
     children: [
       { label: 'About IDP', path: '/idp/about', icon: 'Info' },
       { label: 'Apply for IDP', path: '/idp/apply', icon: 'PostAdd' },
@@ -116,6 +117,7 @@ export const navigationItems: ReadonlyArray<NavItem> = [
   {
     label: 'Driving School',
     path: '#',
+    route: '/driving-school/about',
     children: [
       { label: 'About the School', path: '/driving-school/about', icon: 'School' },
       { label: 'Refresher Courses', path: '/driving-school/refresher', icon: 'Replay' },
@@ -125,6 +127,7 @@ export const navigationItems: ReadonlyArray<NavItem> = [
   {
     label: 'Our Services',
     path: '#',
+    skip: true,
     children: [
       { label: "Vehicle Valuation", path: "/services/vehicle-valuation", icon: "Assessment" },
       { label: "Fleet Management", path: "/services/fleet-management", icon: "DirectionsCar" },
@@ -137,6 +140,7 @@ export const navigationItems: ReadonlyArray<NavItem> = [
     {
     label: 'About Us',
     path: '#',
+    route: "/about/who-we-are",
     children: [
       { label: 'Who We Are', path: '/about/who-we-are', icon: 'Flag' },
       { label: 'Our Team', path: '/about/team', icon: 'Groups' },
