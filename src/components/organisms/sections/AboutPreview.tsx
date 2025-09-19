@@ -1,9 +1,8 @@
 import React from 'react';
 import { Box, Container, Typography, Grid, Paper } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { Button } from '../../atoms';
 import { ContactButtons } from '../../molecules';
-import { companyInfo, management } from '../../../data/companyData';
+import { companyInfo } from '../../../data/companyData';
 import { 
   Business,
   Visibility,
@@ -54,48 +53,6 @@ const IconWrapper = styled(Box)(({ theme }) => ({
   '& .MuiSvgIcon-root': {
     fontSize: 36,
     color: theme.palette.primary.contrastText,
-  },
-}));
-
-const TeamPreview = styled(Box)(({ theme }) => ({
-  background: `linear-gradient(135deg, ${theme.palette.grey[50]} 0%, ${theme.palette.background.default} 100%)`,
-  borderRadius: theme.spacing(2),
-  padding: theme.spacing(4),
-  marginTop: theme.spacing(6),
-}));
-
-const TeamMemberCard = styled(Box)(({ theme }) => ({
-  textAlign: 'center',
-  padding: theme.spacing(2),
-  borderRadius: theme.spacing(1.5),
-  transition: 'all 0.3s ease-in-out',
-  
-  '&:hover': {
-    transform: 'translateY(-4px)',
-    background: theme.palette.background.default,
-    boxShadow: theme.shadows[4],
-    
-    '& .member-avatar': {
-      transform: 'scale(1.05)',
-      boxShadow: '0 8px 32px rgba(2, 79, 49, 0.2)',
-    },
-  },
-}));
-
-const MemberAvatar = styled(Box)(({ theme }) => ({
-  width: 80,
-  height: 80,
-  borderRadius: '50%',
-  margin: '0 auto 16px auto',
-  backgroundSize: 'cover',
-  backgroundPosition: 'center',
-  border: `3px solid ${theme.palette.primary.main}`,
-  transition: 'all 0.3s ease-in-out',
-  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)',
-  
-  [theme.breakpoints.down('sm')]: {
-    width: 60,
-    height: 60,
   },
 }));
 

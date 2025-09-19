@@ -30,7 +30,6 @@ import { PageHeader, ContactButtons } from '../../components/molecules';
 import { Heading } from '../../components/atoms';
 import { SEO } from '../../components/SEO';
 import { vehicleValuationSEO } from '../../data/seoData';
-import { color } from '@mui/system';
 
 const HeroSection = styled(Box)(({ theme }) => ({
   background: `linear-gradient(135deg, ${theme.palette.primary.main}15 0%, ${theme.palette.secondary.main}10 100%)`,

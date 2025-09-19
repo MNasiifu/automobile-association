@@ -54,7 +54,6 @@ import { SEO } from '../../components/SEO';
 import { rescueServicesSEO } from '../../data/seoData';
 import { config } from '../../utils/config/config';
 import { colors } from '../../theme/colors';
-import theme from '../../theme';
 
 const HeroSection = styled(Box)(({ theme }) => ({
   background: `linear-gradient(135deg, ${theme.palette.primary.main}15 0%, ${theme.palette.secondary.main}10 100%)`,
