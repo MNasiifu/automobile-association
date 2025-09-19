@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Container, Typography, Grid } from "@mui/material";
+import { Box, Container, Typography, Grid, Button } from "@mui/material";
 import {
   Facebook,
   Twitter,
@@ -9,7 +9,11 @@ import {
 } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
 import { keyframes } from "@mui/system";
-import { companyInfo, navigationItems } from "../../data/companyData";
+import {
+  companyInfo,
+  navigationItems,
+  servicesNavItems,
+} from "../../data/companyData";
 import AAULogo from "../../assets/images/aau-logo.png";
 import { config } from "../../utils/config/config";
 import { useNavigate } from "react-router-dom";
@@ -227,11 +231,15 @@ const Footer: React.FC = () => {
                           animationDelay: `${index * 0.1}s`,
                         }}
                       >
-                        <Typography
+                        <Button
                           onClick={() =>
-                            navigate(item.path === "#" ? item.path : item.route)
+                            navigate(
+                              item.path === "#"
+                                ? item.route || item.path
+                                : item.path
+                            )
                           }
-                          variant="body2"
+                          variant="text"
                           sx={{
                             color: "inherit",
                             textDecoration: "none",
@@ -240,11 +248,21 @@ const Footer: React.FC = () => {
                             position: "relative",
                             transition: "all 0.3s ease",
                             pl: 1,
-                            cursor: "pointer",
+                            pr: 0,
+                            py: 0,
+                            minWidth: 0,
+                            fontSize: "0.875rem",
+                            fontWeight: 400,
+                            lineHeight: 1.43,
+                            letterSpacing: "0.01071em",
+                            textAlign: "left",
+                            justifyContent: "flex-start",
+                            textTransform: "none",
                             "&:hover": {
-                              color: "grey.50",
+                              color: "secondary.main",
                               transform: "translateX(8px)",
                               fontWeight: 600,
+                              backgroundColor: "transparent",
                             },
                             "&::before": {
                               content: '""',
@@ -264,7 +282,7 @@ const Footer: React.FC = () => {
                           }}
                         >
                           {item.label}
-                        </Typography>
+                        </Button>
                       </Box>
                     )}
                   </>
@@ -284,16 +302,10 @@ const Footer: React.FC = () => {
             </Typography>
 
             <Box component="ul" sx={{ listStyle: "none", p: 0, m: 0 }}>
-              {[
-                "Emergency Rescue",
-                "Driving School",
-                "Vehicle Inspection",
-                "Insurance Services",
-                "Automotive Advisory",
-              ].map((service, index) => (
+              {servicesNavItems.map((service, index) => (
                 <Box
                   component="li"
-                  key={service}
+                  key={service.label}
                   sx={{
                     mb: 1,
                     opacity: 0,
@@ -301,12 +313,16 @@ const Footer: React.FC = () => {
                     animationDelay: `${index * 0.1 + 0.3}s`,
                   }}
                 >
-                  <Typography
-                    variant="body2"
+                  <Button
+                    onClick={() => navigate(service.path)}
+                    variant="text"
                     sx={{
+                      color: "inherit",
+                      textDecoration: "none",
                       opacity: 0.8,
-                      lineHeight: 1.6,
+                      display: "inline-block",
                       pl: 1,
+                      py: 0,
                       position: "relative",
                       transition: "all 0.3s ease",
                       "&::before": {
@@ -323,15 +339,15 @@ const Footer: React.FC = () => {
                       },
                       "&:hover": {
                         pl: 2,
-                        color: "secondary.light",
+                        color: "secondary.main",
                       },
                       "&:hover::before": {
                         transform: "translateY(-50%) scale(1)",
                       },
                     }}
                   >
-                    {service}
-                  </Typography>
+                    {service.label}
+                  </Button>
                 </Box>
               ))}
             </Box>

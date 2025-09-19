@@ -638,7 +638,6 @@ export const WhoWeAre: React.FC = () => {
         }}
       >
         <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1 }}>
-          <Fade in={heroInView} timeout={1200}>
             <Box sx={{ textAlign: "center", mb: 8 }}>
               <Stack
                 direction="row"
@@ -898,7 +897,6 @@ export const WhoWeAre: React.FC = () => {
                 </Typography>
               </Box>
             </Box>
-          </Fade>
         </Container>
       </SectionContainer>
 

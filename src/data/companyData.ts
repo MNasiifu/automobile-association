@@ -97,6 +97,15 @@ export const management: Person[] = [
   }
 ];
 
+export const servicesNavItems: ReadonlyArray<NavItem> = [
+  { label: "Vehicle Valuation", path: "/services/vehicle-valuation" },
+      { label: "Fleet Management", path: "/services/fleet-management" },
+      { label: "Rescue Services", path: "/services/rescue-services" },
+      { label: "Vehicle Inspection", path: "/services/vehicle-inspection" },
+      { label: "Insurance Services", path: "/services/insurance-services" },
+      { label: "Automotive Advisory", path: "/services/automotive-advisory" },
+];
+
 export const navigationItems: ReadonlyArray<NavItem> = [
   { label: 'Home', path: '/' },
   {
@@ -188,6 +197,7 @@ export const milestones = [
 export default {
   companyInfo,
   navigationItems,
+  servicesNavItems,
   heroContent,
   management,
   affiliates,

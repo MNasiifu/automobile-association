@@ -30,6 +30,7 @@ import { PageHeader, ContactButtons } from '../../components/molecules';
 import { Heading } from '../../components/atoms';
 import { SEO } from '../../components/SEO';
 import { vehicleValuationSEO } from '../../data/seoData';
+import { color } from '@mui/system';
 
 const HeroSection = styled(Box)(({ theme }) => ({
   background: `linear-gradient(135deg, ${theme.palette.primary.main}15 0%, ${theme.palette.secondary.main}10 100%)`,
@@ -51,28 +52,103 @@ const HeroSection = styled(Box)(({ theme }) => ({
 
 const FeatureCard = styled(Card)(({ theme }) => ({
   height: '100%',
-  transition: 'all 0.3s ease-in-out',
-  '&:hover': {
-    transform: 'translateY(-4px)',
-    boxShadow: theme.shadows[8],
-  },
-  borderRadius: theme.spacing(2),
-  overflow: 'visible',
+  transition: 'all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+  borderRadius: theme.spacing(3),
+  overflow: 'hidden',
   position: 'relative',
+  border: `1px solid ${theme.palette.divider}`,
+  background: 'linear-gradient(145deg, #ffffff 0%, #fafafa 100%)',
+  cursor: 'pointer',
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: `linear-gradient(135deg, ${theme.palette.primary.main}08, ${theme.palette.secondary.main}05)`,
+    opacity: 0,
+    transition: 'opacity 0.4s ease-in-out',
+    zIndex: 0,
+  },
+  '&::after': {
+    content: '""',
+    position: 'absolute',
+    top: -2,
+    left: -2,
+    right: -2,
+    bottom: -2,
+    background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+    borderRadius: theme.spacing(3),
+    opacity: 0,
+    transition: 'opacity 0.4s ease-in-out',
+    zIndex: -1,
+  },
+  '&:hover': {
+    transform: 'translateY(-8px) scale(1.02)',
+    color: 'white',
+    boxShadow: `0 20px 40px ${theme.palette.primary.main}15, 0 8px 32px ${theme.palette.secondary.main}10`,
+    borderColor: 'transparent',
+    '&::before': {
+      opacity: 1,
+    },
+    '&::after': {
+      opacity: 1,
+    },
+    '& .feature-icon': {
+      transform: 'scale(1.1) rotate(5deg)',
+      background: `linear-gradient(135deg, ${theme.palette.secondary.main}, ${theme.palette.primary.main})`,
+    },
+    '& .feature-title': {
+      color: theme.palette.grey[100],
+      transform: 'translateY(-2px)',
+    },
+    '& .feature-chips': {
+      '& .MuiChip-root': {
+        transform: 'scale(1.05)',
+        borderColor: theme.palette.grey[200],
+        color: theme.palette.primary.main,
+        backgroundColor: `${theme.palette.grey[100]}`,
+        '&:nth-of-type(2n)': {
+          color: theme.palette.secondary.dark,
+        },
+      },
+    },
+  },
 }));
 
 const IconWrapper = styled(Box)(({ theme }) => ({
-  width: 60,
-  height: 60,
+  width: 68,
+  height: 68,
   borderRadius: '50%',
   background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  marginBottom: theme.spacing(2),
+  marginBottom: theme.spacing(3),
+  position: 'relative',
+  transition: 'all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+  boxShadow: `0 8px 24px ${theme.palette.primary.main}25, 0 4px 12px ${theme.palette.secondary.main}15`,
+  border: `3px solid white`,
+  zIndex: 2,
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: -4,
+    left: -4,
+    right: -4,
+    bottom: -4,
+    borderRadius: '50%',
+    background: `linear-gradient(135deg, ${theme.palette.primary.main}20, ${theme.palette.secondary.main}15)`,
+    opacity: 0,
+    transition: 'opacity 0.3s ease-in-out',
+    zIndex: -1,
+  },
   '& svg': {
     color: 'white',
-    fontSize: '2rem',
+    fontSize: '2.2rem',
+    transition: 'all 0.3s ease-in-out',
+    filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))',
   },
 }));
 
@@ -167,6 +243,8 @@ const StepIconWrapper = styled(Box)(({ theme }) => ({
     transition: 'all 0.3s ease-in-out',
   },
 }));
+
+
 
 const VehicleValuation: React.FC = () => {
   const valuationServices = [
@@ -324,38 +402,153 @@ const VehicleValuation: React.FC = () => {
       </Container>
 
       {/* Valuation Services */}
-      <Box sx={{ backgroundColor: 'grey.50', py: 8 }}>
+      <Box sx={{ 
+        backgroundColor: 'grey.50', 
+        py: 8,
+        position: 'relative',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: `linear-gradient(135deg, transparent 0%, rgba(25, 118, 210, 0.02) 50%, transparent 100%)`,
+          pointerEvents: 'none',
+        }
+      }}>
         <Container maxWidth="lg">
-          <Heading variant="h2" align="center" gutterBottom>
-            Our Valuation Services
-          </Heading>
-          <Typography variant="h6" align="center" color="text.secondary" sx={{ mb: 6, maxWidth: 800, mx: 'auto' }}>
-            Comprehensive suite of vehicle inspection and valuation services for individuals, insurers, financiers and fleet operators.
-          </Typography>
+          <Box sx={{ textAlign: 'center', mb: 8, position: 'relative', zIndex: 1 }}>
+            <Heading variant="h2" gutterBottom align="center" sx={{ 
+              fontWeight: 700,
+              background: (theme) => `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              mb: 3
+            }}>
+              Our Valuation Services
+            </Heading>
+            <Typography variant="h6" color="text.secondary" sx={{ 
+              mb: 4, 
+              maxWidth: 800, 
+              mx: 'auto',
+              lineHeight: 1.6,
+              fontSize: { xs: '1.1rem', sm: '1.25rem' }
+            }}>
+              Comprehensive suite of vehicle inspection and valuation services for individuals, insurers, financiers and fleet operators.
+            </Typography>
+            <Box sx={{
+              width: 120,
+              height: 4,
+              background: (theme) => `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+              borderRadius: 4,
+              mx: 'auto',
+              mb: 2
+            }} />
+            <Typography variant="body2" color="text.secondary" sx={{ opacity: 0.8, fontStyle: 'italic' }}>
+              Trusted by thousands of vehicle owners across Uganda
+            </Typography>
+          </Box>
 
           <Grid container spacing={4}>
             {valuationServices.map((service, index) => (
               <Grid item xs={12} md={6} key={index}>
                 <FeatureCard>
-                  <CardContent sx={{ p: 4 }}>
-                    <IconWrapper>
-                      {service.icon}
-                    </IconWrapper>
-                    <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-                      {service.title}
-                    </Typography>
-                    <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-                      {service.description}
-                    </Typography>
-                    <Box>
+                  <CardContent sx={{ 
+                    p: { xs: 3, sm: 4 }, 
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    position: 'relative',
+                    zIndex: 1
+                  }}>
+                    <Box sx={{ textAlign: 'center', mb: 3 }}>
+                      <IconWrapper className="feature-icon">
+                        {service.icon}
+                      </IconWrapper>
+                    </Box>
+                    
+                    <Box sx={{ flexGrow: 1, textAlign: 'center' }}>
+                      <Typography 
+                        variant="h5" 
+                        gutterBottom 
+                        className="feature-title"
+                        sx={{ 
+                          fontWeight: 700,
+                          mb: 2,
+                          transition: 'all 0.3s ease-in-out',
+                          fontSize: { xs: '1.25rem', sm: '1.5rem' },
+                          lineHeight: 1.3
+                        }}
+                      >
+                        {service.title}
+                      </Typography>
+                      
+                      <Typography 
+                        variant="body1" 
+                        color="text.secondary" 
+                        className="feature-title"
+                        sx={{ 
+                          mb: 4,
+                          lineHeight: 1.6,
+                          fontSize: { xs: '0.95rem', sm: '1rem' },
+                          textAlign: 'center'
+                        }}
+                      >
+                        {service.description}
+                      </Typography>
+                    </Box>
+
+                    <Box className="feature-chips" sx={{ 
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      mt: 'auto'
+                    }}>
                       {service.features.map((feature, idx) => (
                         <Chip
                           key={idx}
                           label={feature}
                           size="small"
-                          sx={{ m: 0.5 }}
                           variant="outlined"
-                          color="primary"
+                          sx={{
+                            fontSize: '0.75rem',
+                            fontWeight: 500,
+                            borderRadius: 2,
+                            backgroundColor: 'background.paper',
+                            border: (theme) => `1px solid ${theme.palette.primary.main}30`,
+                            color: 'text.primary',
+                            transition: 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                            position: 'relative',
+                            overflow: 'hidden',
+                            backdropFilter: 'blur(8px)',
+                            '&::before': {
+                              content: '""',
+                              position: 'absolute',
+                              top: 0,
+                              left: '-100%',
+                              width: '100%',
+                              height: '100%',
+                              background: (theme) => `linear-gradient(90deg, transparent, ${theme.palette.primary.main}15, transparent)`,
+                              transition: 'left 0.6s ease-in-out',
+                            },
+                            '&:hover': {
+                              transform: 'translateY(-2px) scale(1.05)',
+                              boxShadow: (theme) => `0 4px 12px ${theme.palette.primary.main}20`,
+                              '&::before': {
+                                left: '100%',
+                              },
+                            },
+                            '&:nth-of-type(2n)': {
+                              borderColor: (theme) => `${theme.palette.secondary.main}30`,
+                              '&:hover': {
+                                boxShadow: (theme) => `0 4px 12px ${theme.palette.secondary.main}20`,
+                              },
+                            },
+                          }}
                         />
                       ))}
                     </Box>
@@ -364,6 +557,47 @@ const VehicleValuation: React.FC = () => {
               </Grid>
             ))}
           </Grid>
+
+          {/* Additional Service Highlights */}
+          <Box sx={{ mt: 8, textAlign: 'center' }}>
+            <Paper sx={{
+              p: 4,
+              borderRadius: 4,
+              background: (theme) => `linear-gradient(135deg, ${theme.palette.background.paper} 0%, ${theme.palette.grey[50]} 100%)`,
+              border: (theme) => `1px solid ${theme.palette.primary.main}10`,
+              boxShadow: (theme) => `0 8px 32px ${theme.palette.primary.main}08`,
+            }}>
+              <Typography variant="h5" gutterBottom sx={{ 
+                fontWeight: 600, 
+                color: 'primary.main',
+                mb: 3
+              }}>
+                🏆 Why Choose Our Valuation Services?
+              </Typography>
+              <Grid container spacing={3}>
+                {[
+                  { icon: '⚡', title: 'Fast Turnaround', desc: 'Reports delivered within 24-48 hours' },
+                  { icon: '🎯', title: 'Local Expertise', desc: 'Deep understanding of Uganda\'s vehicle market' },
+                  { icon: '📋', title: 'Comprehensive Reports', desc: 'Detailed analysis with photo documentation' },
+                  { icon: '🤝', title: 'Trusted by Industry', desc: 'Preferred by insurers, banks, and dealers' },
+                ].map((highlight, index) => (
+                  <Grid item xs={12} sm={6} md={3} key={index}>
+                    <Box sx={{ textAlign: 'center' }}>
+                      <Typography variant="h4" sx={{ mb: 1 }}>
+                        {highlight.icon}
+                      </Typography>
+                      <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, fontSize: '1rem' }}>
+                        {highlight.title}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
+                        {highlight.desc}
+                      </Typography>
+                    </Box>
+                  </Grid>
+                ))}
+              </Grid>
+            </Paper>
+          </Box>
         </Container>
       </Box>
 
