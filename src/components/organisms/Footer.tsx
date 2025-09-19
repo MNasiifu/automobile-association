@@ -5,6 +5,7 @@ import { styled } from '@mui/material/styles';
 import { keyframes } from '@mui/system';
 import { companyInfo, navigationItems } from '../../data/companyData';
 import AAULogo from '../../assets/images/aau-logo.png';
+import { config } from '../../utils/config/config';
 
 const animationKeyframes = {
   fadeIn: keyframes`
@@ -323,11 +324,11 @@ const Footer: React.FC = () => {
               },
               {
                 Icon: Phone,
-                content: companyInfo.contact.phone,
+                content: `${config.company.contactNumber} / ${config.company.secondaryContactNumber}`,
               },
               {
                 Icon: Email,
-                content: companyInfo.contact.email,
+                content: config.company.email,
               },
             ].map(({ Icon, content }, index) => (
               <ContactItem
@@ -361,7 +362,7 @@ const Footer: React.FC = () => {
       
       <FooterBottom>
         <Typography variant="body2" sx={{ opacity: 0.7 }}>
-          © {currentYear} {companyInfo.name}. All rights reserved.
+          © {currentYear} {config.company.email}. All rights reserved.
         </Typography>
       </FooterBottom>
     </FooterSection>

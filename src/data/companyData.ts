@@ -141,8 +141,7 @@ export const navigationItems: ReadonlyArray<NavItem> = [
       { label: 'Who We Are', path: '/about/who-we-are', icon: 'Flag' },
       { label: 'Our Team', path: '/about/team', icon: 'Groups' },
       { label: 'Affiliation', path: '/about/affiliation', icon: 'Handshake' },
-      { label: 'Careers', path: '/about/careers', icon: 'Work' },
-      { label: 'Gallery', path: '/about/gallery', icon: 'PhotoLibrary' },
+      { label: 'Careers', path: '/about/careers', icon: 'Work' }
     ],
   },
   {

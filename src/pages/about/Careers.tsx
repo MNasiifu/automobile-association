@@ -4,8 +4,28 @@ import { Box, Container, Typography, Button, Grid } from '@mui/material';
 import { PageHeader } from '../../components/molecules';
 import { SEO } from '../../components/SEO';
 import { careersSEO } from '../../data/seoData';
+import { config } from '../../utils/config/config';
 
 const Careers: React.FC = () => {
+  // Handler for Contact HR button
+  const handleContactHR = () => {
+    try {
+      const subject = encodeURIComponent('Career Inquiry - AA Uganda');
+      const body = encodeURIComponent('Hello,\n\nI am interested in future career opportunities at AA Uganda. Please let me know when positions become available.\n\nThank you for your time.\n\nBest regards,');
+      const mailtoUrl = `mailto:${config.company.email}?subject=${subject}&body=${body}`;
+      window.location.href = mailtoUrl;
+    } catch (error) {
+      console.error('Error opening email client:', error);
+      // Fallback: copy email to clipboard if possible
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(config.company.email);
+        alert(`Email address copied to clipboard: ${config.company.email}`);
+      } else {
+        alert(`Please email us at: ${config.company.email}`);
+      }
+    }
+  };
+
   return (
     <Box>
       <SEO seoData={careersSEO} />
@@ -37,6 +57,7 @@ const Careers: React.FC = () => {
               <Button
                 variant="contained"
                 color="secondary"
+                onClick={handleContactHR}
                 sx={{
                   // Yellow bg + green text (consistent with your brand)
                   bgcolor: 'secondary.main',
@@ -44,7 +65,6 @@ const Careers: React.FC = () => {
                   fontWeight: 800,
                   '&:hover': { bgcolor: 'secondary.light', color: 'primary.dark' },
                 }}
-                href="/contact"
               >
                 Contact HR
               </Button>
