@@ -1,9 +1,10 @@
 import React from 'react';
-import { Box, Container, Typography, Grid, Paper } from '@mui/material';
+import { Box, Container, Typography, Grid, Paper, Button } from '@mui/material';
 import { Phone, DirectionsCar, School, AccessTime, CardMembership } from '@mui/icons-material';
 import { PageHeader } from '../../components/molecules';
 import { SEO } from '../../components/SEO';
 import { drivingSchoolAboutSEO } from '../../data/seoData';
+import theme from '../../theme';
 
 const FeatureCard = ({ icon, title, description }: { icon: React.ReactNode, title: string, description: React.ReactNode }) => (
   <Paper
@@ -169,12 +170,38 @@ const About: React.FC = () => {
               <Typography variant="h6" sx={{ fontWeight: 500 }}>
                 Ms. Robina
               </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-                <Phone sx={{ fontSize: 24 }} />
-                <Typography variant="h5" sx={{ fontWeight: 700, mt: 1 }}>
-                  +256 782 756287
-                </Typography>
-              </Box>
+              <Button
+                variant="contained"
+                size="large"
+                startIcon={<Phone />}
+                href="tel:+256782756287"
+                sx={{
+                  mt: 2,
+                  background: theme.palette.secondary.main,
+                  color: 'primary.main',
+                  borderRadius: 3,
+                  px: 3,
+                  py: 1.5,
+                  fontSize: '1.1rem',
+                  fontWeight: 600,
+                  textTransform: 'none',
+                  backdropFilter: 'blur(10px)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    background: theme.palette.secondary.light,
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 8px 20px rgba(0, 0, 0, 0.3)',
+                    border: '1px solid rgba(255, 255, 255, 0.4)',
+                  },
+                  '&:active': {
+                    transform: 'translateY(0px)',
+                  }
+                }}
+                aria-label="Call Ms. Robina at +256 782 756287"
+              >
+                +256 782 756287
+              </Button>
             </Box>
           </Box>
 

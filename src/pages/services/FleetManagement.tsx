@@ -1206,29 +1206,6 @@ const FleetManagement: React.FC = () => {
           </Box>
         </FAQContainer>
       </FAQSection>
-
-      {/* CTA Section */}
-      <Container maxWidth="lg" sx={{ py: 8 }}>
-        <Paper 
-          sx={{ 
-            p: 6, 
-            textAlign: 'center',
-            borderRadius: 4,
-            backgroundImage: (theme) => `linear-gradient(135deg, ${theme.palette.primary.light}20 0%, ${theme.palette.secondary.light}20 100%)`,
-          }}
-        >
-          <Typography variant="h3" gutterBottom sx={{ fontWeight: 700 }}>
-            Ready to Optimize Your Fleet?
-          </Typography>
-          <Typography variant="h6" color="text.secondary" sx={{ mb: 4, maxWidth: 600, mx: 'auto' }}>
-            Join hundreds of businesses across Uganda who trust AA Uganda for their fleet management needs.
-          </Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-            <ContactButtons phoneText='Schedule Demo' whatsappMessage="Hello! I would like to inquire about your fleet management services." />
-          </Box>
-         
-        </Paper>
-      </Container>
     </Box>
   );
 };

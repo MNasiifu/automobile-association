@@ -576,7 +576,7 @@ const VehicleValuation: React.FC = () => {
               <Grid container spacing={3}>
                 {[
                   { icon: '⚡', title: 'Fast Turnaround', desc: 'Reports delivered within 24-48 hours' },
-                  { icon: '🎯', title: 'Local Expertise', desc: 'Deep understanding of Uganda\'s vehicle market' },
+                  { icon: '🎯', title: 'Local Expertise', desc: 'Deep understanding of Uganda`s vehicle market' },
                   { icon: '📋', title: 'Comprehensive Reports', desc: 'Detailed analysis with photo documentation' },
                   { icon: '🤝', title: 'Trusted by Industry', desc: 'Preferred by insurers, banks, and dealers' },
                 ].map((highlight, index) => (

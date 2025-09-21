@@ -398,9 +398,9 @@ const RefresherCourses: React.FC = () => {
               whatsappMessage="Hello! I'm interested in learning more about your refresher driving courses. Could you provide me with details about schedules, pricing, and enrollment?"
               buttonSx={{
                 '&.MuiButton-contained': {
-                  background: theme.palette.secondary.dark,
+                  background: theme.palette.secondary.main,
                   borderColor: 'white',
-                  color: 'white',
+                  color: 'primary.main',
                   '&:hover': {
                     bgcolor: 'white',
                     color: 'secondary.dark',

@@ -809,7 +809,7 @@ const Contact: React.FC = () => {
       const emailSubject = `AAU Contact — ${formState.subject} — ${formState.firstName} ${formState.lastName} (${formState.email} | ${formState.phoneFull})`;
 
       await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-        to_email: "hadijahaws@gmail.com", // TODO: Update to odongkara@aau.co.ug
+        to_email: companyInfo.contact.email,
         reply_to: formState.email,
         email_subject: emailSubject,
         first_name: formState.firstName,

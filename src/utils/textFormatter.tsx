@@ -7,7 +7,7 @@ import type { TypographyProps } from '@mui/material';
  * Converts text like "This is **bold** text" to proper JSX with bold formatting
  */
 export const parseFormattedText = (text: string): React.ReactNode[] => {
-  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  const parts = text.split(/(\*\*.*?\*\*)/g);
   
   return parts.map((part, index) => {
     if (part.startsWith('**') && part.endsWith('**')) {

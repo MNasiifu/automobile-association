@@ -3,6 +3,7 @@ import { Box, Container, Typography, Grid, Avatar, Rating } from '@mui/material'
 import { styled } from '@mui/material/styles';
 import { Card } from '../../atoms';
 import { FormatQuote } from '@mui/icons-material';
+import AvatarImage from '../../../assets/images/avatar-15.png';
 
 const TestimonialsSection = styled(Box)(({ theme }) => ({
   padding: theme.spacing(12, 0),
@@ -76,7 +77,7 @@ const testimonials = [
     name: 'Sarah Nakato',
     role: 'Business Owner',
     company: 'Kampala',
-    avatar: '/api/placeholder/60/60',
+    avatar: AvatarImage,
     rating: 5,
     content: 'AA Uganda saved me during a breakdown on the Kampala-Entebbe highway. Their rescue team arrived within 30 minutes and got me back on the road. Excellent service!',
     service: 'Rescue Services',
@@ -86,7 +87,7 @@ const testimonials = [
     name: 'James Okello',
     role: 'Fleet Manager',
     company: 'Transport Company',
-    avatar: '/api/placeholder/60/60',
+    avatar: AvatarImage,
     rating: 5,
     content: 'As a fleet manager, I rely on AA Uganda for vehicle inspections and maintenance advice. Their expertise has helped us maintain our vehicles in top condition.',
     service: 'Vehicle Inspection',
@@ -96,7 +97,7 @@ const testimonials = [
     name: 'Grace Atuhaire',
     role: 'New Driver',
     company: 'Mbarara',
-    avatar: '/api/placeholder/60/60',
+    avatar: AvatarImage,
     rating: 5,
     content: 'I learned to drive at AA Uganda\'s driving school. The instructors were patient and professional. I passed my test on the first try!',
     service: 'Driving School',
@@ -106,7 +107,7 @@ const testimonials = [
     name: 'Peter Ssemwanga',
     role: 'Family Man',
     company: 'Jinja',
-    avatar: '/api/placeholder/60/60',
+    avatar: AvatarImage,
     rating: 5,
     content: 'AA Uganda\'s insurance services gave me peace of mind. When I had an accident, they handled everything professionally and quickly.',
     service: 'Insurance Services',
@@ -116,7 +117,7 @@ const testimonials = [
     name: 'Mary Nalwoga',
     role: 'Solo Traveler',
     company: 'Gulu',
-    avatar: '/api/placeholder/60/60',
+    avatar: AvatarImage,
     rating: 5,
     content: 'Traveling alone as a woman, AA Uganda membership gives me confidence. Their 24/7 support means I\'m never stranded.',
     service: 'Emergency Support',
@@ -126,7 +127,7 @@ const testimonials = [
     name: 'David Kato',
     role: 'Car Enthusiast',
     company: 'Fort Portal',
-    avatar: '/api/placeholder/60/60',
+    avatar: AvatarImage,
     rating: 5,
     content: 'The automotive advisory service helped me choose the right car for Uganda\'s roads. Their expertise is unmatched.',
     service: 'Automotive Advisory',
