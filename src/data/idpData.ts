@@ -142,27 +142,27 @@ export const idpRequirements = {
 export const idpFAQs = [
   {
     question: 'What is an International Driving Permit (IDP)?',
-    answer: 'An IDP is an official translation of your national driving license that allows you to drive legally in foreign countries. It\'s not a license itself but a translation document that must be carried alongside your original license.',
+    answer: 'An **International Driving Permit (IDP)** is an official translation of your national driving license that allows you to drive legally in foreign countries. It\'s not a standalone license but a **certified translation document** that must be carried alongside your original Ugandan license for international recognition.',
   },
   {
     question: 'Which countries require an IDP?',
-    answer: 'Over 150 countries recognize IDPs. Requirements vary by country - some require it for all foreign drivers, others only for car rentals or long-term stays. We recommend checking specific country requirements before travel.',
+    answer: 'Over **150 countries worldwide** recognize and accept IDPs. Requirements vary by destination - some countries require it for **all foreign drivers**, others specifically for **car rentals** or **long-term stays**. We strongly recommend checking specific country requirements before travel to ensure compliance.',
   },
   {
     question: 'How long is an IDP valid?',
-    answer: 'IDPs are typically valid for one year from the date of issue. However, you can only use it as long as your original Ugandan license remains valid.',
+    answer: 'IDPs are typically valid for **one full year** from the date of issue. However, you can only use it as long as your **original Ugandan license remains valid**. If your domestic license expires, your IDP becomes invalid regardless of its own expiry date.',
   },
   {
     question: 'Can I apply for an IDP if I\'m already abroad?',
-    answer: 'Unfortunately, IDPs must be obtained before traveling. They can only be issued in the same country where your original license was issued. Plan ahead and apply before your trip.',
+    answer: '**Unfortunately, no.** IDPs must be obtained **before traveling abroad**. They can only be issued in the same country where your original license was issued. This is an international requirement, so **plan ahead** and apply before your departure.',
   },
   {
     question: 'Do I need both 1968 and 1949 IDPs?',
-    answer: 'Most travelers only need the 1968 IDP as it covers the majority of countries. The 1949 IDP is only required for specific countries not party to the 1968 Vienna Convention.',
+    answer: 'Most travelers only need the **1968 IDP** as it covers the majority of countries worldwide. The **1949 IDP** is only required for specific countries not party to the 1968 Vienna Convention. Our team will advise you on which type you need based on your destination.',
   },
   {
     question: 'Can I renew my IDP?',
-    answer: 'IDPs cannot be renewed. You must apply for a new IDP each time. However, you can apply for a new one up to 3 months before your current IDP expires.',
+    answer: 'IDPs **cannot be renewed** - you must apply for a completely new IDP each time. However, you can apply for a new one **up to 3 months before** your current IDP expires, ensuring continuous coverage for frequent travelers.',
   },
 ];
 

@@ -1771,7 +1771,7 @@ const VerifyIdp: React.FC = () => {
       </Box>
 
       {/* Features Section */}
-      <Box sx={{ py: { xs: 4, md: 6 }, backgroundColor: "grey.50" }}>
+      <Box sx={{ py: { xs: 4, md: 6 }, backgroundColor: "grey.200" }}>
         <Container maxWidth="xl">
           <Box sx={{ textAlign: "center", mb: { xs: 4, md: 6 } }}>
             <Heading variant="h2" align="center" gutterBottom>

@@ -45,6 +45,8 @@ import {
   Description,
   PhotoCamera,
   ContactSupport,
+  HelpOutline as HelpIcon,
+  Lightbulb as LightbulbIcon,
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import { SEO } from '../components/SEO';
@@ -53,6 +55,8 @@ import { Heading, Button, HeaderContainer, AnimatedTitle, ContentContainer, Anim
 import { idpBenefits, idpFAQs } from '../data/idpData';
 import { DecorativeBackground } from '../components';
 import { config } from '../utils/config/config';
+import theme from '../theme';
+import { FormattedTypography } from '../utils/textFormatter';
 
 const FeatureCard = styled(Card)(({ theme }) => ({
   height: '100%',
@@ -131,6 +135,130 @@ const StatCard = styled(Paper)(({ theme }) => ({
     fontWeight: 500,
     textTransform: 'uppercase',
     letterSpacing: '0.5px',
+  },
+}));
+
+// Enhanced FAQ Section Styled Components
+const FAQSection = styled(Box)(({ theme }) => ({
+  background: `linear-gradient(135deg, ${theme.palette.grey[50]} 0%, ${theme.palette.grey[100]} 100%)`,
+  position: "relative",
+  overflow: "hidden",
+  "&::before": {
+    content: '""',
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundImage: `radial-gradient(circle at 20% 80%, ${theme.palette.primary.main}08 0%, transparent 50%),
+                      radial-gradient(circle at 80% 20%, ${theme.palette.secondary.main}08 0%, transparent 50%),
+                      radial-gradient(circle at 40% 40%, ${theme.palette.primary.main}05 0%, transparent 50%)`,
+    pointerEvents: "none",
+  },
+}));
+
+const FAQContainer = styled(Container)(() => ({
+  position: "relative",
+  zIndex: 1,
+}));
+
+const FAQHeader = styled(Box)(({ theme }) => ({
+  textAlign: "center",
+  marginBottom: theme.spacing(6),
+  position: "relative",
+  "&::after": {
+    content: '""',
+    position: "absolute",
+    bottom: theme.spacing(-2),
+    left: "50%",
+    transform: "translateX(-50%)",
+    width: 80,
+    height: 4,
+    background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+    borderRadius: 2,
+  },
+}));
+
+const StyledAccordion = styled(Accordion)(({ theme }) => ({
+  marginBottom: theme.spacing(2),
+  borderRadius: `${theme.spacing(2)} !important`,
+  border: `1px solid ${theme.palette.divider}`,
+  background: theme.palette.background.paper,
+  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.05)",
+  overflow: "hidden",
+  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+  "&:hover": {
+    boxShadow: "0 8px 25px rgba(0, 0, 0, 0.1)",
+    transform: "translateY(-2px)",
+  },
+  "&.Mui-expanded": {
+    margin: `${theme.spacing(2)} 0 !important`,
+    boxShadow: `0 8px 32px ${theme.palette.primary.main}15`,
+    border: `1px solid ${theme.palette.primary.light}`,
+  },
+  "&::before": {
+    display: "none",
+  },
+}));
+
+const StyledAccordionSummary = styled(AccordionSummary)(({ theme }) => ({
+  padding: theme.spacing(2, 3),
+  background: theme.palette.background.paper,
+  borderRadius: theme.spacing(2),
+  transition: "all 0.3s ease",
+  "&:hover": {
+    background: `linear-gradient(135deg, ${theme.palette.primary.main}05 0%, ${theme.palette.secondary.main}05 100%)`,
+  },
+  "&.Mui-expanded": {
+    background: `linear-gradient(135deg, ${theme.palette.primary.main}10 0%, ${theme.palette.secondary.main}10 100%)`,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+    borderBottom: `1px solid ${theme.palette.divider}`,
+  },
+  "& .MuiAccordionSummary-expandIconWrapper": {
+    color: theme.palette.primary.main,
+    transition: "all 0.3s ease",
+    "&.Mui-expanded": {
+      transform: "rotate(180deg)",
+      color: theme.palette.secondary.main,
+    },
+  },
+  "& .MuiAccordionSummary-content": {
+    margin: `${theme.spacing(1)} 0`,
+    alignItems: "center",
+  },
+}));
+
+const StyledAccordionDetails = styled(AccordionDetails)(({ theme }) => ({
+  padding: theme.spacing(3),
+  background: theme.palette.background.default,
+  borderTop: "none",
+  "& .MuiTypography-root": {
+    lineHeight: 1.7,
+  },
+}));
+
+const QuestionIcon = styled(Box)(({ theme }) => ({
+  width: 32,
+  height: 32,
+  borderRadius: "50%",
+  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  marginRight: theme.spacing(2),
+  flexShrink: 0,
+  "& svg": {
+    color: "white",
+    fontSize: "1.2rem",
+  },
+  [theme.breakpoints.down("sm")]: {
+    width: 28,
+    height: 28,
+    marginRight: theme.spacing(1.5),
+    "& svg": {
+      fontSize: "1rem",
+    },
   },
 }));
 
@@ -393,7 +521,7 @@ const IdpAbout: React.FC = () => {
       <Box sx={{ py: 8, backgroundColor: 'grey.50' }}>
         <Container maxWidth="lg">
           <Box sx={{ textAlign: 'center', mb: 6 }}>
-            <Heading variant="h2" gutterBottom>
+            <Heading variant="h2" align="center" gutterBottom>
               Benefits of Getting an IDP
             </Heading>
             <Typography variant="h6" color="text.secondary">
@@ -430,7 +558,7 @@ const IdpAbout: React.FC = () => {
                   <CardContent sx={{ p: 4 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                       <FlightTakeoff sx={{ fontSize: 40, color: 'primary.main', mr: 2 }} />
-                      <Typography variant="h5" fontWeight={600}>
+                      <Typography variant="h5" color='primary.main' fontWeight={600}>
                         Hassle-free Travel
                       </Typography>
                     </Box>
@@ -448,7 +576,7 @@ const IdpAbout: React.FC = () => {
                   <CardContent sx={{ p: 4 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                       <Speed sx={{ fontSize: 40, color: 'success.main', mr: 2 }} />
-                      <Typography variant="h5" fontWeight={600}>
+                      <Typography variant="h5" color='primary.main' fontWeight={600}>
                         No Additional Tests
                       </Typography>
                     </Box>
@@ -470,7 +598,7 @@ const IdpAbout: React.FC = () => {
       <Box sx={{ py: 8 }}>
         <Container maxWidth="lg">
           <Box sx={{ textAlign: 'center', mb: 6 }}>
-            <Heading variant="h2" gutterBottom>
+            <Heading variant="h2" align='center' gutterBottom>
               Why Choose AA Uganda?
             </Heading>
             <Typography variant="h6" color="text.secondary">
@@ -517,7 +645,7 @@ const IdpAbout: React.FC = () => {
             <Typography variant="h2" gutterBottom sx={{ fontWeight: 700, color: 'white' }}>
               Why Join AA Uganda?
             </Typography>
-            <Typography variant="h6" sx={{ color: 'primary.light' }}>
+            <Typography variant="h6" sx={{ color: 'grey.500' }}>
               Unlock exclusive benefits and significant savings on your IDP application
             </Typography>
           </Box>
@@ -540,7 +668,7 @@ const IdpAbout: React.FC = () => {
                       left: 0,
                       right: 0,
                       height: 4,
-                      background: 'linear-gradient(90deg, #ff4081, #3f51b5)',
+                      background: `linear-gradient(90deg, ${theme.palette.secondary.main}, ${theme.palette.primary.main})`,
                     },
                     transition: 'all 0.3s ease',
                     '&:hover': {
@@ -556,7 +684,7 @@ const IdpAbout: React.FC = () => {
                       position: 'absolute',
                       top: 16,
                       right: 16,
-                      background: 'linear-gradient(45deg, #ff4081, #3f51b5)',
+                      background: `linear-gradient(45deg, ${theme.palette.secondary.main}, ${theme.palette.primary.main})`,
                       color: 'white',
                       fontWeight: 600,
                     }}
@@ -579,7 +707,7 @@ const IdpAbout: React.FC = () => {
             <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, color: 'white' }}>
               Ready to Save UGX 100,000 on Your IDP?
             </Typography>
-            <Typography variant="body1" sx={{ mb: 4, color: 'primary.light' }}>
+            <Typography variant="body1" sx={{ mb: 4, color: 'grey.400' }}>
               Join AA Uganda today and enjoy priority processing, exclusive benefits, and significant savings.
             </Typography>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="center">
@@ -603,7 +731,7 @@ const IdpAbout: React.FC = () => {
               <Button
                 variant="outlined"
                 size="large"
-                onClick={() => navigate('/apply-for-idp')}
+                onClick={() => navigate('/idp/apply')}
                 startIcon={<Assignment />}
                 sx={{
                   borderColor: 'white',
@@ -627,7 +755,7 @@ const IdpAbout: React.FC = () => {
       <Box sx={{ py: 8 }}>
         <Container maxWidth="lg">
           <Box sx={{ textAlign: 'center', mb: 6 }}>
-            <Heading variant="h2" align='center' gutterBottom>
+            <Heading variant="h2" align="center" gutterBottom>
               Application Process
             </Heading>
             <Typography variant="h6" color="text.secondary">
@@ -730,7 +858,7 @@ const IdpAbout: React.FC = () => {
       <Box sx={{ py: 8 }}>
         <Container maxWidth="lg">
           <Box sx={{ textAlign: 'center', mb: 6 }}>
-            <Heading variant="h2" gutterBottom>
+            <Heading variant="h2" align="center" gutterBottom>
               Application Fees
             </Heading>
             <Typography variant="h6" color="text.secondary">
@@ -852,79 +980,235 @@ const IdpAbout: React.FC = () => {
       </Box>
 
       {/* FAQ Section */}
-      <Box sx={{ py: 8, backgroundColor: 'grey.50' }}>
-        <Container maxWidth="lg">
-          <Box sx={{ textAlign: 'center', mb: 6 }}>
-            <Heading variant="h2" align="center" gutterBottom>
+      <FAQSection sx={{ py: { xs: 6, md: 8 } }}>
+        <FAQContainer maxWidth="lg">
+          <FAQHeader>
+            <Box sx={{ mb: 2 }}>
+              <LightbulbIcon 
+                sx={{ 
+                  fontSize: { xs: 48, md: 56 }, 
+                  color: 'primary.main',
+                  mb: 2,
+                  filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.1))'
+                }} 
+              />
+            </Box>
+            <Heading 
+              variant="h2" 
+              align="center" 
+              gutterBottom
+              sx={{ 
+                fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
+                fontWeight: 700,
+                background: (theme) => `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                mb: 2
+              }}
+            >
               Frequently Asked Questions
             </Heading>
-            <Typography variant="h6" color="text.secondary">
-              Get answers to common questions about IDPs
+            <Typography
+              variant="h6"
+              align="center"
+              color="text.secondary"
+              sx={{ 
+                maxWidth: 600, 
+                mx: 'auto',
+                fontSize: { xs: '1rem', sm: '1.1rem', md: '1.25rem' },
+                lineHeight: 1.6
+              }}
+            >
+              Get instant answers to common questions about International Driving Permits
             </Typography>
-          </Box>
+          </FAQHeader>
 
           <Grid container spacing={4}>
             <Grid item xs={12} md={6}>
               {idpFAQs.slice(0, Math.ceil(idpFAQs.length / 2)).map((faq, index) => {
                 const panelId = `panel-left-${index}`;
+                const isExpanded = expandedAccordion === panelId;
+                
                 return (
-                  <Accordion 
-                    key={index} 
-                    elevation={2} 
-                    sx={{ mb: 2 }}
-                    expanded={expandedAccordion === panelId}
+                  <StyledAccordion 
+                    key={index}
+                    expanded={isExpanded}
                     onChange={handleAccordionChange(panelId)}
+                    elevation={0}
                   >
-                    <AccordionSummary 
+                    <StyledAccordionSummary 
                       expandIcon={<ExpandMore />}
                       aria-controls={`${panelId}-content`}
                       id={`${panelId}-header`}
                     >
-                      <Typography variant="subtitle1" fontWeight={600}>
+                      <QuestionIcon>
+                        <HelpIcon />
+                      </QuestionIcon>
+                      <Typography 
+                        variant="subtitle1" 
+                        sx={{ 
+                          fontWeight: 600,
+                          fontSize: { xs: '0.95rem', sm: '1rem', md: '1.1rem' },
+                          color: isExpanded ? 'primary.main' : 'text.primary',
+                          transition: 'color 0.3s ease',
+                          pr: 1
+                        }}
+                      >
                         {faq.question}
                       </Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Typography variant="body2" color="text.secondary">
-                        {faq.answer}
-                      </Typography>
-                    </AccordionDetails>
-                  </Accordion>
+                    </StyledAccordionSummary>
+                    <StyledAccordionDetails>
+                      <Box sx={{ pl: { xs: 0, sm: 6 } }}>
+                        <FormattedTypography 
+                          variant="body2" 
+                          sx={{
+                            color: 'text.secondary',
+                            fontSize: { xs: '0.85rem', sm: '0.9rem' },
+                            lineHeight: 1.7,
+                            '& strong': {
+                              color: 'primary.main',
+                              fontWeight: 600
+                            }
+                          }}
+                        >
+                          {faq.answer}
+                        </FormattedTypography>
+                      </Box>
+                    </StyledAccordionDetails>
+                  </StyledAccordion>
                 );
               })}
             </Grid>
             <Grid item xs={12} md={6}>
               {idpFAQs.slice(Math.ceil(idpFAQs.length / 2)).map((faq, index) => {
                 const panelId = `panel-right-${index}`;
+                const isExpanded = expandedAccordion === panelId;
+                
                 return (
-                  <Accordion 
-                    key={index} 
-                    elevation={2} 
-                    sx={{ mb: 2 }}
-                    expanded={expandedAccordion === panelId}
+                  <StyledAccordion 
+                    key={index}
+                    expanded={isExpanded}
                     onChange={handleAccordionChange(panelId)}
+                    elevation={0}
                   >
-                    <AccordionSummary 
+                    <StyledAccordionSummary 
                       expandIcon={<ExpandMore />}
                       aria-controls={`${panelId}-content`}
                       id={`${panelId}-header`}
                     >
-                      <Typography variant="subtitle1" fontWeight={600}>
+                      <QuestionIcon>
+                        <HelpIcon />
+                      </QuestionIcon>
+                      <Typography 
+                        variant="subtitle1" 
+                        sx={{ 
+                          fontWeight: 600,
+                          fontSize: { xs: '0.95rem', sm: '1rem', md: '1.1rem' },
+                          color: isExpanded ? 'primary.main' : 'text.primary',
+                          transition: 'color 0.3s ease',
+                          pr: 1
+                        }}
+                      >
                         {faq.question}
                       </Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Typography variant="body2" color="text.secondary">
-                        {faq.answer}
-                      </Typography>
-                    </AccordionDetails>
-                  </Accordion>
+                    </StyledAccordionSummary>
+                    <StyledAccordionDetails>
+                      <Box sx={{ pl: { xs: 0, sm: 6 } }}>
+                        <FormattedTypography 
+                          variant="body2" 
+                          sx={{
+                            color: 'text.secondary',
+                            fontSize: { xs: '0.85rem', sm: '0.9rem' },
+                            lineHeight: 1.7,
+                            '& strong': {
+                              color: 'primary.main',
+                              fontWeight: 600
+                            }
+                          }}
+                        >
+                          {faq.answer}
+                        </FormattedTypography>
+                      </Box>
+                    </StyledAccordionDetails>
+                  </StyledAccordion>
                 );
               })}
             </Grid>
           </Grid>
-        </Container>
-      </Box>
+
+          {/* FAQ CTA */}
+          <Box sx={{ textAlign: 'center', mt: { xs: 4, md: 6 } }}>
+            <Paper
+              elevation={0}
+              sx={{
+                p: { xs: 3, sm: 4, md: 5 },
+                borderRadius: 3,
+                background: (theme) => `linear-gradient(135deg, ${theme.palette.primary.main}08 0%, ${theme.palette.secondary.main}08 100%)`,
+                border: (theme) => `1px solid ${theme.palette.primary.light}30`,
+                maxWidth: 600,
+                mx: 'auto'
+              }}
+            >
+              <Typography 
+                variant="h5" 
+                gutterBottom 
+                sx={{ 
+                  fontWeight: 600,
+                  fontSize: { xs: '1.2rem', sm: '1.3rem', md: '1.5rem' },
+                  color: 'primary.main'
+                }}
+              >
+                Ready to Apply for Your IDP?
+              </Typography>
+              <Typography 
+                variant="body1" 
+                color="text.secondary" 
+                sx={{ mb: 3, fontSize: { xs: '0.9rem', sm: '1rem' } }}
+              >
+                Our expert team is ready to guide you through the simple application process.
+              </Typography>
+              <Stack
+                direction={{ xs: 'column', sm: 'row' }}
+                spacing={2}
+                justifyContent="center"
+                alignItems="center"
+              >
+                <Button
+                  variant="contained"
+                  size="large"
+                  startIcon={<Assignment />}
+                  onClick={() => navigate('/idp/apply')}
+                  sx={{
+                    px: { xs: 2, sm: 3 },
+                    py: 1.5,
+                    fontSize: { xs: '0.85rem', sm: '0.9rem' },
+                    fontWeight: 600,
+                    minWidth: { xs: '100%', sm: 'auto' }
+                  }}
+                >
+                  Apply Now
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="large"
+                  startIcon={<ContactSupport />}
+                  href={`tel:${config.company.contactNumber}`}
+                  sx={{
+                    px: { xs: 2, sm: 3 },
+                    py: 1.5,
+                    fontSize: { xs: '0.85rem', sm: '0.9rem' },
+                    fontWeight: 600,
+                    minWidth: { xs: '100%', sm: 'auto' }
+                  }}
+                >
+                  Contact Support
+                </Button>
+              </Stack>
+            </Paper>
+          </Box>
+        </FAQContainer>
+      </FAQSection>
 
       {/* Contact Section */}
       <Box sx={{ py: 8, backgroundColor: 'primary.dark', color: 'white' }}>
