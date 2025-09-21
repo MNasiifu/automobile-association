@@ -337,9 +337,8 @@ const EmergencyCard = styled(Paper)(({ theme }) => ({
     right: -2,
     bottom: -2,
     background: `linear-gradient(45deg, 
-      ${theme.palette.error.light}, 
-      ${theme.palette.warning.main}, 
-      ${theme.palette.error.light})`,
+      ${theme.palette.error.main}, 
+      ${theme.palette.error.dark})`,
     borderRadius: theme.spacing(3),
     zIndex: -1,
     opacity: 0,
@@ -347,6 +346,7 @@ const EmergencyCard = styled(Paper)(({ theme }) => ({
   },
   
   '&:hover': {
+    background: theme.palette.error.main,
     transform: 'translateY(-8px) scale(1.02)',
     boxShadow: `
       0 20px 60px rgba(211, 47, 47, 0.4),
@@ -1392,7 +1392,7 @@ const Contact: React.FC = () => {
                           fontSize: { xs: "0.9rem", md: "1rem" },
                         }}
                       >
-                        Tap to call instantly • No charges for emergency calls
+                        Tap to call instantly
                       </Typography>
                     </EmergencyPhoneContainer>
 
