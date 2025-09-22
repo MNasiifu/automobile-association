@@ -55,8 +55,12 @@ import {
   Search as SearchIcon,
   CheckCircleOutline as CheckCircleOutlineIcon,
   PersonSearch as PersonSearchIcon,
+  Payment as PaymentIcon,
+  AccountBalance as AccountBalanceIcon,
+  Security as SecurityIcon,
 } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
+import { MuiTelInput } from "mui-tel-input";
 import {
   Button,
   Heading,
@@ -669,6 +673,8 @@ const ApplyForIdp: React.FC = () => {
                               {index === 4 &&
                                 "Provide your Uganda driving license details"}
                               {index === 5 &&
+                                "Enter MTN Mobile Money number for payment"}
+                              {index === 6 &&
                                 "Review and confirm your application"}
                             </Typography>
 
@@ -1639,8 +1645,214 @@ const ApplyForIdp: React.FC = () => {
                       </Box>
                     )}
 
-                    {/* Step 6: Declaration & Submit */}
+                    {/* Step 6: Payment Details */}
                     {activeStep === 5 && (
+                      <Box>
+                        <Typography
+                          variant="h5"
+                          gutterBottom
+                          sx={{ fontWeight: 600, mb: 3 }}
+                        >
+                          Payment Details
+                        </Typography>
+
+                        {/* Payment Information Card */}
+                        <Card
+                          sx={{
+                            mb: 4,
+                            p: 3,
+                            background: `linear-gradient(135deg, ${theme.palette.secondary.light}20, ${theme.palette.secondary.main}20)`,
+                            border: `1px solid ${theme.palette.secondary.main}30`,
+                          }}
+                        >
+                          <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                            <PaymentIcon 
+                              sx={{ 
+                                fontSize: 32, 
+                                color: "secondary.main", 
+                                mr: 2 
+                              }} 
+                            />
+                            <Typography
+                              variant="h6"
+                              sx={{ fontWeight: 600, color: "text.primary" }}
+                            >
+                              MTN Mobile Money Payment
+                            </Typography>
+                          </Box>
+                          
+                          <Grid container spacing={2} alignItems="center">
+                            <Grid item xs={12} md={6}>
+                              <Typography variant="body2" sx={{ mb: 1 }}>
+                                <strong>Application Fee:</strong> UGX {applicationFee.toLocaleString()}
+                              </Typography>
+                              <Typography variant="body2" sx={{ mb: 1 }}>
+                                <strong>Payment Method:</strong> MTN Mobile Money
+                              </Typography>
+                              <Typography variant="body2" color="text.secondary">
+                                Payment will be processed securely through MTN Mobile Money API
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                              <Box 
+                                sx={{ 
+                                  display: "flex", 
+                                  alignItems: "center", 
+                                  justifyContent: { xs: "flex-start", md: "flex-end" } 
+                                }}
+                              >
+                                <Box
+                                  sx={{
+                                    backgroundColor: "secondary.main",
+                                    color: "secondary.contrastText",
+                                    px: 3,
+                                    py: 1.5,
+                                    borderRadius: 2,
+                                    fontWeight: 700,
+                                    fontSize: "1.2rem",
+                                  }}
+                                >
+                                  UGX {applicationFee.toLocaleString()}
+                                </Box>
+                              </Box>
+                            </Grid>
+                          </Grid>
+                        </Card>
+
+                        {/* MTN Mobile Money Number Input */}
+                        <Grid container spacing={3}>
+                          <Grid item xs={12}>
+                            <Typography
+                              variant="h6"
+                              sx={{ fontWeight: 600, mb: 2 }}
+                            >
+                              Enter MTN Mobile Money Number
+                            </Typography>
+                            
+                            <Controller
+                              name="mtnPaymentPhoneNumber"
+                              control={control}
+                              render={({ field, fieldState: { error } }) => (
+                                <MuiTelInput
+                                  {...field}
+                                  fullWidth
+                                  label="MTN Mobile Money Number"
+                                  variant="outlined"
+                                  defaultCountry="UG"
+                                  onlyCountries={["UG"]}
+                                  forceCallingCode
+                                  required
+                                  error={!!error}
+                                  helperText={
+                                    error?.message || 
+                                    "Enter your MTN Mobile Money number (+25677xxxxxxx, +25678xxxxxxx, or +25676xxxxxxx)"
+                                  }
+                                  onChange={(value: string) => {
+                                    field.onChange(value);
+                                  }}
+                                  InputProps={{
+                                    startAdornment: (
+                                      <Box sx={{ 
+                                        display: "flex", 
+                                        alignItems: "center", 
+                                        mr: 1 
+                                      }}>
+                                        <Phone sx={{ color: "text.primary", mr: 0.5 }} />
+                                        <Typography 
+                                          variant="caption" 
+                                          sx={{ 
+                                            color: "primary.main", 
+                                            fontWeight: 600,
+                                            fontSize: "0.75rem"
+                                          }}
+                                        >
+                                          MTN
+                                        </Typography>
+                                      </Box>
+                                    ),
+                                  }}
+                                  sx={{
+                                    "& .MuiOutlinedInput-root": {
+                                      "&.Mui-focused": {
+                                        "& .MuiOutlinedInput-notchedOutline": {
+                                          borderColor: "secondary.main",
+                                        },
+                                      },
+                                    },
+                                    "& .MuiInputLabel-root.Mui-focused": {
+                                      color: "secondary.main",
+                                    },
+                                  }}
+                                />
+                              )}
+                            />
+                          </Grid>
+                        </Grid>
+
+                        {/* Payment Information Cards */}
+                        <Grid container spacing={3} sx={{ mt: 2 }}>
+                          <Grid item xs={12} md={6}>
+                            <Card sx={{ p: 2, height: "100%" }}>
+                              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                                <SecurityIcon 
+                                  sx={{ 
+                                    color: "success.main", 
+                                    mr: 1 
+                                  }} 
+                                />
+                                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                                  Secure Payment
+                                </Typography>
+                              </Box>
+                              <Typography variant="body2" color="text.secondary">
+                                Your payment is processed securely through MTN's official API. 
+                                Your financial information is protected with bank-level security.
+                              </Typography>
+                            </Card>
+                          </Grid>
+                          
+                          <Grid item xs={12} md={6}>
+                            <Card sx={{ p: 2, height: "100%" }}>
+                              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                                <AccountBalanceIcon 
+                                  sx={{ 
+                                    color: "info.main", 
+                                    mr: 1 
+                                  }} 
+                                />
+                                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                                  Payment Process
+                                </Typography>
+                              </Box>
+                              <Typography variant="body2" color="text.secondary">
+                                After submitting, you'll receive an MTN Mobile Money prompt on your phone. 
+                                Authorize the payment to complete your application.
+                              </Typography>
+                            </Card>
+                          </Grid>
+                        </Grid>
+
+                        <Alert severity="info" sx={{ mt: 3 }}>
+                          <Typography variant="body2">
+                            <strong>Important:</strong> Make sure your MTN Mobile Money account has 
+                            sufficient balance (UGX {applicationFee.toLocaleString()}) and that your phone 
+                            is available to approve the payment when you submit this application.
+                          </Typography>
+                        </Alert>
+
+                        <Alert severity="warning" sx={{ mt: 2 }}>
+                          <Typography variant="body2">
+                            <strong>Note:</strong> Only MTN Mobile Money numbers are accepted for payment 
+                            (numbers starting with +25677, +25678, or +25676). If you don't have an MTN number, 
+                            please visit any MTN service center to get one or ask a friend/family member with 
+                            MTN Mobile Money to help with the payment.
+                          </Typography>
+                        </Alert>
+                      </Box>
+                    )}
+
+                    {/* Step 7: Declaration & Submit */}
+                    {activeStep === 6 && (
                       <Box>
                         <Typography
                           variant="h5"
@@ -1863,7 +2075,7 @@ const ApplyForIdp: React.FC = () => {
                       </Box>
                     )}
                     {/* Google Recaptcha*/}
-                    {activeStep === 5 && (
+                    {activeStep === 6 && (
                       <Grid item xs={12}>
                         <Box sx={{ mb: 2 }}>
                           <Typography

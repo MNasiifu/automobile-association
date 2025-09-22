@@ -156,6 +156,35 @@ const createFileHash = async (file: File): Promise<string> => {
   return hashHex;
 };
 
+// MTN-specific phone number validation function
+const validateMTNPhoneNumber = (phoneNumber: string): { isValid: boolean; error?: string } => {
+  // First validate as a general Uganda phone number
+  const ugandaValidation = validateUgandaPhoneNumber(phoneNumber);
+  
+  if (!ugandaValidation.isValid) {
+    return { isValid: false, error: ugandaValidation.error };
+  }
+  
+  // Extract the full formatted number (should be +256xxxxxxxxx)
+  const formattedNumber = ugandaValidation.formattedNumber;
+  if (!formattedNumber) {
+    return { isValid: false, error: "Invalid phone number format" };
+  }
+  
+  // Check if it's a valid MTN number with specific prefixes
+  // MTN Uganda uses: +25677xxxxxxx, +25678xxxxxxx, +25676xxxxxxx
+  const mtnPattern = /^\+256(77|78|76)\d{7}$/;
+  
+  if (!mtnPattern.test(formattedNumber)) {
+    return { 
+      isValid: false, 
+      error: "Payment requires an MTN Mobile Money number. MTN numbers must be in format +25677xxxxxxx, +25678xxxxxxx, or +25676xxxxxxx." 
+    };
+  }
+  
+  return { isValid: true };
+};
+
 // Validation schema based on idp.md requirements
 // Configured for onBlur validation - all validations trigger when user leaves the field
 const validationSchema = yup.object({
@@ -287,6 +316,24 @@ const validationSchema = yup.object({
     .array()
     .of(yup.string().required())
     .min(1, "At least one driving permit class is required"),
+
+  // Payment information (MTN Mobile Money)
+  mtnPaymentPhoneNumber: yup
+    .string()
+    .required("MTN Mobile Money phone number is required for payment")
+    .test(
+      "mtnPhoneValidation",
+      "Invalid MTN Mobile Money number",
+      function (value) {
+        if (!value) return false;
+
+        const validation = validateMTNPhoneNumber(value);
+        if (!validation.isValid) {
+          return this.createError({ message: validation.error });
+        }
+        return true;
+      }
+    ),
 
   // Terms and declaration
   termsAccepted: yup
@@ -437,6 +484,7 @@ const useApplyForIdp = () => {
       ugandaDrivingPermitNumber: "",
       expiryDateOfDrivingPermit: undefined,
       classesOfDrivingPermit: [],
+      mtnPaymentPhoneNumber: "",
       termsAccepted: false,
       declarationAccepted: false,
     },
@@ -454,6 +502,7 @@ const useApplyForIdp = () => {
     "Passport & Visa Info",
     "Document Upload",
     "Driving License Details",
+    "Payment Details",
     "Declaration & Submit",
   ];
 
@@ -594,6 +643,9 @@ const useApplyForIdp = () => {
         ];
         break;
       case 5:
+        fieldsToValidate = ["mtnPaymentPhoneNumber"];
+        break;
+      case 6:
         fieldsToValidate = ["termsAccepted", "declarationAccepted"];
         break;
     }
