@@ -114,7 +114,7 @@ const getStatusIcon = (status: string) => {
     case "valid":
       return <CheckCircleIcon sx={{ color: "secondary.main", fontSize: 24 }} />;
     case "invalid":
-      return <CancelIcon sx={{ color: "error.main", fontSize: 24 }} />;
+      return <CancelIcon sx={{ color: "warning.main", fontSize: 24 }} />;
     case "expired":
       return <ErrorIcon sx={{ color: "warning.main", fontSize: 24 }} />;
     case "suspended":
@@ -390,6 +390,7 @@ const VerifyIdp: React.FC = () => {
                     alignItems: "stretch",
                     width: "100%",
                     maxWidth: 600,
+                    flexDirection: { xs: "column", md: "row" },
                   }}
                 >
                   <TextField
@@ -518,8 +519,8 @@ const VerifyIdp: React.FC = () => {
 
             <Box
               sx={{
-                mt: 4,
-                p: 3,
+                mt: {xs: 0, md: 4},
+                p: {xs: 0, md: 3},
                 backgroundColor: "primary.50",
                 borderRadius: 2,
               }}

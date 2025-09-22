@@ -55,7 +55,7 @@ const StatCard = styled(Box)(({ theme }) => ({
   textAlign: 'center',
   padding: theme.spacing(4),
   borderRadius: theme.spacing(3),
-  background: `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.light} 100%)`,
+  background: theme.palette.secondary.dark,
   backdropFilter: 'blur(20px)',
   border: `1px solid ${theme.palette.grey[600]}30`,
   boxShadow: `0 8px 32px ${theme.palette.grey[900]}50`,
@@ -79,7 +79,7 @@ const StatCard = styled(Box)(({ theme }) => ({
   
   '&:hover': {
     transform: 'translateY(-12px) scale(1.02)',
-    background: `linear-gradient(145deg, ${theme.palette.primary.light}60 0%, ${theme.palette.primary.dark} 100%)`,
+    background: `linear-gradient(45deg, ${theme.palette.secondary.main} 5%, ${theme.palette.secondary.dark} 100%)`,
     border: `1px solid ${theme.palette.grey[500]}50`,
     boxShadow: `0 24px 48px ${theme.palette.grey[900]}60, 0 0 0 1px ${theme.palette.grey[600]}20`,
     
