@@ -1157,7 +1157,7 @@ const IdpAbout: React.FC = () => {
               <Stack direction={{ xs: 'column', sm: 'row' }}
                 spacing={2}
                 justifyContent="flex-start"
-                alignItems="left" 
+                alignItems="flex-start" 
                 sx={{ mt: 4 }}>
                 <Button
                   variant="contained"

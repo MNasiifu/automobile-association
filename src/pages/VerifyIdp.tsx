@@ -520,7 +520,7 @@ const VerifyIdp: React.FC = () => {
             <Box
               sx={{
                 mt: {xs: 0, md: 4},
-                p: {xs:0, md: 3},
+                p: {xs: 0, md: 3},
                 backgroundColor: "primary.50",
                 borderRadius: 2,
               }}
