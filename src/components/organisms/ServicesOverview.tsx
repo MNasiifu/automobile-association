@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Container, Typography, Grid } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
-import { Heading, Button } from '../atoms';
+import { Heading } from '../atoms';
 import { ServiceCard } from '../molecules';
 import { services } from '../../data/servicesData';
 import theme from '../../theme';
@@ -45,7 +45,7 @@ interface ServicesOverviewProps {
 }
 
 const ServicesOverview: React.FC<ServicesOverviewProps> = ({ 
-  maxServices = 6, 
+  maxServices = 8, 
   showAll = false 
 }) => {
   const navigate = useNavigate();
@@ -138,53 +138,6 @@ const ServicesOverview: React.FC<ServicesOverviewProps> = ({
             </Grid>
           ))}
         </ServicesGrid>
-        
-        {!showAll && services.length > maxServices && (
-          <Box sx={{ textAlign: 'center', mt: 8, position: 'relative', zIndex: 2 }}>
-            <Typography 
-              variant="h6" 
-              color="text.secondary" 
-              sx={{ 
-                mb: 3,
-                fontSize: { xs: '1rem', sm: '1.1rem', md: '1.25rem' }
-              }}
-            >
-              And {services.length - maxServices} more specialized services...
-            </Typography>
-            
-            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
-              <Button
-                variant="contained"
-                size="large"
-                href="/services"
-                sx={{
-                  py: 2,
-                  px: 4,
-                  fontSize: '1.125rem',
-                  fontWeight: 600,
-                  borderRadius: 3,
-                }}
-              >
-                View All Services
-              </Button>
-              
-              <Button
-                variant="outlined"
-                size="large"
-                href="/contact"
-                sx={{
-                  py: 2,
-                  px: 4,
-                  fontSize: '1.125rem',
-                  fontWeight: 600,
-                  borderRadius: 3,
-                }}
-              >
-                Get Custom Quote
-              </Button>
-            </Box>
-          </Box>
-        )}
       </Container>
     </ServicesSection>
   );

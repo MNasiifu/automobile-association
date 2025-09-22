@@ -126,7 +126,7 @@ const StatCard = styled(Paper)(({ theme }) => ({
   color: theme.palette.primary.main,
   border: 'none',
   '& .stat-number': {
-    fontSize: '2.5rem',
+    fontSize: '2.0rem',
     fontWeight: 700,
     lineHeight: 1,
   },
@@ -431,7 +431,7 @@ const IdpAbout: React.FC = () => {
       </HeaderContainer>
 
       {/* IDP Statistics */}
-      <Box sx={{ py: 6, backgroundColor: 'grey.50' }}>
+      <Box sx={{ py: 8, backgroundColor: 'grey.100' }}>
         <Container maxWidth="lg">
           <Grid container spacing={4}>
             {idpStats.map((stat, index) => (
@@ -518,7 +518,7 @@ const IdpAbout: React.FC = () => {
       </Box>
 
       {/* Benefits of IDP */}
-      <Box sx={{ py: 8, backgroundColor: 'grey.50' }}>
+      <Box sx={{ py: 8, backgroundColor: 'grey.100' }}>
         <Container maxWidth="lg">
           <Box sx={{ textAlign: 'center', mb: 6 }}>
             <Heading variant="h2" align="center" gutterBottom>
@@ -805,7 +805,7 @@ const IdpAbout: React.FC = () => {
       </Box>
 
       {/* Requirements Section */}
-      <Box sx={{ py: 8, backgroundColor: 'grey.50' }}>
+      <Box sx={{ py: 8, backgroundColor: 'grey.100' }}>
         <Container maxWidth="lg">
           <Box sx={{ textAlign: 'center', mb: 6 }}>
             <Heading variant="h2" align='center' gutterBottom>
@@ -1136,77 +1136,6 @@ const IdpAbout: React.FC = () => {
               })}
             </Grid>
           </Grid>
-
-          {/* FAQ CTA */}
-          <Box sx={{ textAlign: 'center', mt: { xs: 4, md: 6 } }}>
-            <Paper
-              elevation={0}
-              sx={{
-                p: { xs: 3, sm: 4, md: 5 },
-                borderRadius: 3,
-                background: (theme) => `linear-gradient(135deg, ${theme.palette.primary.main}08 0%, ${theme.palette.secondary.main}08 100%)`,
-                border: (theme) => `1px solid ${theme.palette.primary.light}30`,
-                maxWidth: 600,
-                mx: 'auto'
-              }}
-            >
-              <Typography 
-                variant="h5" 
-                gutterBottom 
-                sx={{ 
-                  fontWeight: 600,
-                  fontSize: { xs: '1.2rem', sm: '1.3rem', md: '1.5rem' },
-                  color: 'primary.main'
-                }}
-              >
-                Ready to Apply for Your IDP?
-              </Typography>
-              <Typography 
-                variant="body1" 
-                color="text.secondary" 
-                sx={{ mb: 3, fontSize: { xs: '0.9rem', sm: '1rem' } }}
-              >
-                Our expert team is ready to guide you through the simple application process.
-              </Typography>
-              <Stack
-                direction={{ xs: 'column', sm: 'row' }}
-                spacing={2}
-                justifyContent="center"
-                alignItems="center"
-              >
-                <Button
-                  variant="contained"
-                  size="large"
-                  startIcon={<Assignment />}
-                  onClick={() => navigate('/idp/apply')}
-                  sx={{
-                    px: { xs: 2, sm: 3 },
-                    py: 1.5,
-                    fontSize: { xs: '0.85rem', sm: '0.9rem' },
-                    fontWeight: 600,
-                    minWidth: { xs: '100%', sm: 'auto' }
-                  }}
-                >
-                  Apply Now
-                </Button>
-                <Button
-                  variant="outlined"
-                  size="large"
-                  startIcon={<ContactSupport />}
-                  href={`tel:${config.company.contactNumber}`}
-                  sx={{
-                    px: { xs: 2, sm: 3 },
-                    py: 1.5,
-                    fontSize: { xs: '0.85rem', sm: '0.9rem' },
-                    fontWeight: 600,
-                    minWidth: { xs: '100%', sm: 'auto' }
-                  }}
-                >
-                  Contact Support
-                </Button>
-              </Stack>
-            </Paper>
-          </Box>
         </FAQContainer>
       </FAQSection>
 
@@ -1225,7 +1154,11 @@ const IdpAbout: React.FC = () => {
                 Our team at AA Uganda is here to help you through every step of the application process. Contact us for any questions or assistance.
               </Typography>
               
-              <Stack direction="row" spacing={2} sx={{ mt: 4 }}>
+              <Stack direction={{ xs: 'column', sm: 'row' }}
+                spacing={2}
+                justifyContent="flex-start"
+                alignItems="left" 
+                sx={{ mt: 4 }}>
                 <Button
                   variant="contained"
                   size="large"

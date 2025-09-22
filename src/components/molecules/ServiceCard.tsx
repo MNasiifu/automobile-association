@@ -116,18 +116,18 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
             <IconComponent sx={{ fontSize: 32 }} />
           </IconWrapper>
           
-          <Typography variant="h6" component="h3" gutterBottom sx={{ fontWeight: 600 }}>
+          <Typography variant="h6" color="primary" component="h3" gutterBottom sx={{ fontWeight: 600 }}>
             {title}
           </Typography>
           
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          <Typography variant="body2" sx={{ mb: 2 }}>
             {description}
           </Typography>
         </Box>
         
         {features && features.length > 0 && (
           <Box sx={{ flexGrow: 1 }}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+            <Typography variant="subtitle2" color="primary" sx={{ fontWeight: 600, mb: 1 }}>
               Key Features:
             </Typography>
             <Box component="ul" sx={{ pl: 2, m: 0 }}>
@@ -136,7 +136,6 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
                   key={index}
                   component="li"
                   variant="body2"
-                  color="text.secondary"
                   sx={{ mb: 0.5 }}
                 >
                   {feature}

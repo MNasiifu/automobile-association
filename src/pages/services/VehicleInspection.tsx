@@ -678,7 +678,7 @@ const VehicleInspection: React.FC = () => {
       </Container>
 
       {/* CTA Section */}
-      <Container maxWidth="lg" sx={{ py: 8 }}>
+      <Container maxWidth="lg" sx={{ pt: {xs: 1, md: 8}, pb: 8 }}>
         <Paper
           sx={{
             p: 6,

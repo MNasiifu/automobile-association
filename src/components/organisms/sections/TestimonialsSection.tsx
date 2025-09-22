@@ -7,7 +7,7 @@ import AvatarImage from '../../../assets/images/avatar-15.png';
 
 const TestimonialsSection = styled(Box)(({ theme }) => ({
   padding: theme.spacing(12, 0),
-  background: `linear-gradient(135deg, ${theme.palette.grey[200]} 0%, ${theme.palette.background.default} 100%)`,
+  background: theme.palette.grey[200],
   position: 'relative',
   overflow: 'hidden',
   

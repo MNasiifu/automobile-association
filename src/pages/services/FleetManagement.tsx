@@ -527,7 +527,7 @@ const FleetManagement: React.FC = () => {
                       variant="overline" 
                       sx={{ 
                         display: 'block',
-                        textAlign: 'center',
+                        textAlign: 'left',
                         mb: 2,
                         fontWeight: 600,
                         color: 'primary.main',
