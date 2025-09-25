@@ -29,15 +29,6 @@ const slideInRight = keyframes`
   }
 `;
 
-const glow = keyframes`
-  0%, 100% {
-    box-shadow: 0 4px 16px rgba(244, 214, 22, 0.4);
-  }
-  50% {
-    box-shadow: 0 8px 32px rgba(244, 214, 22, 0.8);
-  }
-`;
-
 const HeroSection = styled(Box)(({ theme }) => ({
   background: `linear-gradient(135deg, ${theme.palette.grey[900]} 0%, ${theme.palette.primary.dark} 100%)`,
   color: theme.palette.primary.contrastText,
