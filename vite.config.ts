@@ -13,7 +13,8 @@ const getDevelopmentCorsOrigins = () => [
 
 const getProductionCorsOrigins = () => [
   'https://aauganda.co.ug',
-  'https://www.aauganda.co.ug'
+  'https://www.aauganda.co.ug',
+  'https://automobile-association.vercel.app'
 ]
 
 // Environment-based CORS configuration
