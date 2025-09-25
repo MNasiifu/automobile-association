@@ -29,15 +29,6 @@ const slideInRight = keyframes`
   }
 `;
 
-const glow = keyframes`
-  0%, 100% {
-    box-shadow: 0 4px 16px rgba(244, 214, 22, 0.4);
-  }
-  50% {
-    box-shadow: 0 8px 32px rgba(244, 214, 22, 0.8);
-  }
-`;
-
 const HeroSection = styled(Box)(({ theme }) => ({
   background: `linear-gradient(135deg, ${theme.palette.grey[900]} 0%, ${theme.palette.primary.dark} 100%)`,
   color: theme.palette.primary.contrastText,
@@ -248,10 +239,7 @@ const Hero: React.FC = () => {
                     minWidth: 200,
                     background: (theme) =>
                       `linear-gradient(135deg, ${theme.palette.secondary.main} 0%, ${theme.palette.secondary.dark} 100%)`,
-                    boxShadow: "0 8px 32px rgba(244, 214, 22, 0.4)",
-                    animation: `${glow} 2s ease-in-out infinite alternate`,
                     "&:hover": {
-                      boxShadow: "0 12px 48px rgba(244, 214, 22, 0.6)",
                       transform: "translateY(-4px) scale(1.05)",
                       background: (theme) =>
                         `linear-gradient(135deg, ${theme.palette.secondary.dark} 0%, ${theme.palette.secondary.main} 100%)`,
@@ -515,8 +503,8 @@ const Hero: React.FC = () => {
               <Box
                 sx={{
                   position: "absolute",
-                  bottom: -30,
-                  right: -30,
+                  bottom: 0,
+                  right: 0,
                   display: "flex",
                   flexDirection: "column",
                   gap: 2,
