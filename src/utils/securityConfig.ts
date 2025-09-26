@@ -19,7 +19,8 @@ export const CORS_ORIGINS = {
   ],
   production: [
     'https://aauganda.co.ug',
-    'https://www.aauganda.co.ug'
+    'https://www.aauganda.co.ug',
+    'https://automobile-association.vercel.app'
   ]
 } as const
 
@@ -27,7 +28,7 @@ export const CORS_ORIGINS = {
 export const SECURITY_HEADERS = {
   'Content-Security-Policy': isDevelopment 
     ? "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: http://localhost:* http://127.0.0.1:* https://*.supabase.co https://*.supabase.io; img-src 'self' data: blob: https:; media-src 'self' data: blob:;"
-    : "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://aauganda.co.ug https://*.supabase.co https://*.supabase.io;",
+    : "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://aauganda.co.ug https://automobile-association.vercel.app https://*.supabase.co https://*.supabase.io;",
   'X-Content-Type-Options': 'nosniff',
   'X-Frame-Options': 'DENY',
   'X-XSS-Protection': '1; mode=block',
@@ -49,7 +50,11 @@ export const API_CONFIG = {
   supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
   supabaseKey: import.meta.env.VITE_SUPABASE_KEY,
   baseUrl: import.meta.env.VITE_API_BASE_URL || (
-    isDevelopment ? 'http://localhost:5173' : 'https://aauganda.co.ug'
+    isDevelopment 
+      ? 'http://localhost:5173' 
+      : (typeof window !== 'undefined' && window.location.origin === 'https://automobile-association.vercel.app')
+        ? 'https://automobile-association.vercel.app'
+        : 'https://aauganda.co.ug'
   ),
   enableDebug: isDevelopment && import.meta.env.VITE_ENABLE_DEBUG === 'true',
   enableConsoleLogs: isDevelopment && import.meta.env.VITE_ENABLE_CONSOLE_LOGS === 'true'
@@ -103,8 +108,22 @@ export const secureLog = {
 
 // Origin validation for client-side CORS checks
 export const validateOrigin = (): boolean => {
+  // Allow validation to pass during SSR or when window is not available
+  if (typeof window === 'undefined') {
+    return true
+  }
+  
   const currentOrigin = window.location.origin
-  return isAllowedOrigin(currentOrigin)
+  const isValid = isAllowedOrigin(currentOrigin)
+  
+  // Log validation attempts for debugging
+  if (!isValid) {
+    secureLog.error(`Origin validation failed for: ${currentOrigin}`)
+    secureLog.error(`Allowed origins for ${isDevelopment ? 'development' : 'production'}:`, 
+      isDevelopment ? CORS_ORIGINS.development : CORS_ORIGINS.production)
+  }
+  
+  return isValid
 }
 
 export default {
