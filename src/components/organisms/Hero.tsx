@@ -353,87 +353,9 @@ const Hero: React.FC = () => {
                       },
                     },
                   }}
+                  sx={{ display: "flex", justifyContent: "center"}}
                 />
               </ContactButtonsWrapper>
-
-              {/* Mobile Features Section */}
-              <Box
-                sx={{
-                  display: { xs: "block", lg: "none" },
-                  mt: 4,
-                  background: "rgba(255, 255, 255, 0.05)",
-                  backdropFilter: "blur(10px)",
-                  borderRadius: 3,
-                  p: 3,
-                  border: "1px solid rgba(255, 255, 255, 0.1)",
-                }}
-              >
-                <Typography
-                  variant="h6"
-                  sx={{
-                    fontWeight: 700,
-                    color: "secondary.main",
-                    mb: 2,
-                    textAlign: "center",
-                  }}
-                >
-                  Why Choose AA Uganda?
-                </Typography>
-
-                <Grid container spacing={2}>
-                  <Grid item xs={4}>
-                    <Box sx={{ textAlign: "center" }}>
-                      <Security
-                        sx={{ color: "secondary.main", fontSize: 32, mb: 1 }}
-                      />
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          color: "white",
-                          fontWeight: 600,
-                          display: "block",
-                        }}
-                      >
-                        24/7 Support
-                      </Typography>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={4}>
-                    <Box sx={{ textAlign: "center" }}>
-                      <Speed
-                        sx={{ color: "secondary.main", fontSize: 32, mb: 1 }}
-                      />
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          color: "white",
-                          fontWeight: 600,
-                          display: "block",
-                        }}
-                      >
-                        Fast Response
-                      </Typography>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={4}>
-                    <Box sx={{ textAlign: "center" }}>
-                      <Groups
-                        sx={{ color: "secondary.main", fontSize: 32, mb: 1 }}
-                      />
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          color: "white",
-                          fontWeight: 600,
-                          display: "block",
-                        }}
-                      >
-                        Expert Team
-                      </Typography>
-                    </Box>
-                  </Grid>
-                </Grid>
-              </Box>
 
               {/* Mobile responsive stats for smaller screens */}
               <Box
@@ -463,6 +385,37 @@ const Hero: React.FC = () => {
                     sx={{ opacity: 0.9, color: "white" }}
                   >
                     Years
+                  </Typography>
+                </StatsBox>
+
+                <StatsBox sx={{ animationDelay: "0.9s" }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      mb: 1,
+                    }}
+                  >
+                    <Speed
+                      sx={{ color: "secondary.main", fontSize: 24, mr: 1 }}
+                    />
+                    <Typography
+                      variant="h4"
+                      sx={{
+                        fontWeight: 900,
+                        color: "secondary.main",
+                        textShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                      }}
+                    >
+                      24/7
+                    </Typography>
+                  </Box>
+                  <Typography
+                    variant="body2"
+                    sx={{ opacity: 0.95, fontWeight: 600, color: "white" }}
+                  >
+                    Emergency Response
                   </Typography>
                 </StatsBox>
 
