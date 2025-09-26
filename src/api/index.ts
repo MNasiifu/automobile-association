@@ -32,8 +32,10 @@ export const callSupabaseEdgeFunction = async (
 ) => {
   // Validate origin before making requests
   if (!validateOrigin()) {
-    const error = `Invalid origin: ${window.location.origin}. This request is not allowed from the current domain.`;
+    const currentOrigin = typeof window !== 'undefined' ? window.location.origin : 'unknown';
+    const error = `Invalid origin: ${currentOrigin}. This request is not allowed from the current domain. Please contact support if this issue persists.`;
     secureLog.error(error);
+    secureLog.error('If you are seeing this error on a valid domain, please check your security configuration.');
     throw new Error(error);
   }
 
@@ -56,9 +58,8 @@ export const callSupabaseEdgeFunction = async (
       method: "POST",
       headers,
       body: JSON.stringify(requestBody),
-      // Use 'same-origin' to ensure proper CORS headers are sent
-      // This will make the browser include the Origin header automatically
-      credentials: 'same-origin',
+      // Use 'include' for production to ensure proper CORS handling
+      credentials: 'include',
       // Explicitly set mode to 'cors' to trigger CORS preflight when needed
       mode: 'cors',
     });
