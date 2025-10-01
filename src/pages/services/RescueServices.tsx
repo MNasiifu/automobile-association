@@ -200,16 +200,16 @@ const RescueServices: React.FC = () => {
 
         // Fallback: copy number to clipboard if possible
         if (navigator.clipboard) {
-          navigator.clipboard.writeText(config.company.contactNumber);
+          navigator.clipboard.writeText(config.company.rescue.primaryContact);
           setNotification({
             open: true,
-            message: `Phone number copied to clipboard: ${config.company.contactNumber}`,
+            message: `Phone number copied to clipboard: ${config.company.rescue.primaryContact}`,
             severity: "warning",
           });
         } else {
           setNotification({
             open: true,
-            message: `Please call us at: ${config.company.contactNumber}`,
+            message: `Please call us at: ${config.company.rescue.primaryContact}`,
             severity: "info",
           });
         }

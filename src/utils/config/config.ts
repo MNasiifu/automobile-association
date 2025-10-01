@@ -23,7 +23,7 @@ export const config = {
         idp: {
             name: "Felix Dongokara",
             primaryContact: "+256752760252",
-            secondaryContact: "+25677676052"
+            secondaryContact: "+256776760252"
         }
     }
 };

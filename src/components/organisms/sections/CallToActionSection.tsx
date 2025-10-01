@@ -97,18 +97,18 @@ const handleChatWithUs = () => {
   const whatsappMessage = "Hello! I would like to inquire about your services.";
   try {
     const message = encodeURIComponent(whatsappMessage);
-    const whatsappUrl = `https://wa.me/${config.company.membership.secondaryContact}?text=${message}`;
+    const whatsappUrl = `https://wa.me/${config.company.membership.primaryContact}?text=${message}`;
     window.open(whatsappUrl, "_blank", "noopener,noreferrer");
   } catch (error) {
     console.error("Error opening WhatsApp:", error);
     // Fallback: copy number to clipboard
     if (navigator.clipboard) {
-      navigator.clipboard.writeText(config.company.membership.secondaryContact);
+      navigator.clipboard.writeText(config.company.membership.primaryContact);
       alert(
-        `WhatsApp number copied to clipboard: ${config.company.membership.secondaryContact}`
+        `WhatsApp number copied to clipboard: ${config.company.membership.primaryContact}`
       );
     } else {
-      alert(`Please message us on WhatsApp: ${config.company.membership.secondaryContact}`);
+      alert(`Please message us on WhatsApp: ${config.company.membership.primaryContact}`);
     }
   }
 };
