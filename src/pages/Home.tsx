@@ -9,8 +9,10 @@ import {
   CallToActionSection,
   IdpSection
 } from '../components/organisms/sections';
+import { FAQSection } from '../components/molecules';
 import { SEO } from '../components/SEO';
 import { homeSEO } from '../data/seoData';
+import { homeFAQs } from '../data/homeFAQs';
 
 const Home: React.FC = () => {
   return (
@@ -37,6 +39,12 @@ const Home: React.FC = () => {
       
       {/* Partnerships - International affiliations and credibility */}
       <PartnershipsSection />
+      
+      {/* FAQ Section - Frequently Asked Questions */}
+      <FAQSection 
+        faqs={homeFAQs}
+        subtitle="Get instant answers to common questions about AA Uganda's automotive services"
+      />
       
       {/* Call to Action - Final conversion section */}
       <CallToActionSection />

@@ -32,6 +32,16 @@ export interface ContactButtonsProps extends Omit<StackProps, 'children'> {
    */
   whatsappText?: string;
   /**
+   * Custom text for the phone button
+   * @default 'Talk To Us'
+   */
+  phoneContact?: string;
+  /**
+   * Custom text for the WhatsApp button
+   * @default 'Chat with us'
+   */
+  whatsappContact?: string;
+  /**
    * Custom message for WhatsApp
    * @default 'Hello! I would like to inquire about your services.'
    */
@@ -60,6 +70,8 @@ const ContactButtons: React.FC<ContactButtonsProps> = ({
   variant = 'both',
   phoneText = 'Talk To Us',
   whatsappText = 'Chat with us',
+  phoneContact = config.company.contactNumber,
+  whatsappContact = config.company.whatsAppNumber,
   whatsappMessage = 'Hello! I would like to inquire about your services.',
   fullWidthOnMobile = true,
   buttonSx = {},
@@ -90,15 +102,15 @@ const ContactButtons: React.FC<ContactButtonsProps> = ({
     }
 
     try {
-      window.location.href = `tel:${config.company.contactNumber}`;
+      window.location.href = `tel:${phoneContact}`;
     } catch (error) {
       console.error('Error initiating phone call:', error);
       // Fallback: copy number to clipboard if possible
       if (navigator.clipboard) {
-        navigator.clipboard.writeText(config.company.contactNumber);
-        alert(`Phone number copied to clipboard: ${config.company.contactNumber}`);
+        navigator.clipboard.writeText(phoneContact);
+        alert(`Phone number copied to clipboard: ${phoneContact}`);
       } else {
-        alert(`Please call us at: ${config.company.contactNumber}`);
+        alert(`Please call us at: ${phoneContact}`);
       }
     }
   };
@@ -112,16 +124,16 @@ const ContactButtons: React.FC<ContactButtonsProps> = ({
 
     try {
       const message = encodeURIComponent(whatsappMessage);
-      const whatsappUrl = `https://wa.me/${config.company.whatsAppNumber}?text=${message}`;
+      const whatsappUrl = `https://wa.me/${whatsappContact}?text=${message}`;
       window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
     } catch (error) {
       console.error('Error opening WhatsApp:', error);
       // Fallback: copy number to clipboard
       if (navigator.clipboard) {
-        navigator.clipboard.writeText(config.company.whatsAppNumber);
-        alert(`WhatsApp number copied to clipboard: ${config.company.whatsAppNumber}`);
+        navigator.clipboard.writeText(whatsappContact);
+        alert(`WhatsApp number copied to clipboard: ${whatsappContact}`);
       } else {
-        alert(`Please message us on WhatsApp: ${config.company.whatsAppNumber}`);
+        alert(`Please message us on WhatsApp: ${whatsappContact}`);
       }
     }
   };

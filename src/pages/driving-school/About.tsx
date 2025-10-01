@@ -5,6 +5,7 @@ import { PageHeader } from '../../components/molecules';
 import { SEO } from '../../components/SEO';
 import { drivingSchoolAboutSEO } from '../../data/seoData';
 import theme from '../../theme';
+import { config } from '../../utils/config/config';
 
 const FeatureCard = ({ icon, title, description }: { icon: React.ReactNode, title: string, description: React.ReactNode }) => (
   <Paper
@@ -168,13 +169,13 @@ const About: React.FC = () => {
                 Contact our driving school coordinator:
               </Typography>
               <Typography variant="h6" sx={{ fontWeight: 500 }}>
-                Ms. Robina
+                Ms. {config.company.drivingSchool.name}
               </Typography>
               <Button
                 variant="contained"
                 size="large"
                 startIcon={<Phone />}
-                href="tel:+256782756287"
+                href={`tel:${config.company.drivingSchool.primaryContact}`}
                 sx={{
                   mt: 2,
                   background: theme.palette.secondary.main,
@@ -198,9 +199,9 @@ const About: React.FC = () => {
                     transform: 'translateY(0px)',
                   }
                 }}
-                aria-label="Call Ms. Robina at +256 782 756287"
+                aria-label={`Call Ms. Robina at ${config.company.drivingSchool.primaryContact}`}
               >
-                +256 782 756287
+                {config.company.drivingSchool.primaryContact}
               </Button>
             </Box>
           </Box>

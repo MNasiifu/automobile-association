@@ -6,6 +6,7 @@ import { ContactButtons } from "../molecules";
 import { heroContent } from "../../data/companyData";
 import HeroImage from "../../assets/images/TOWINGANDRECOVERYFRESHCAR.jpeg";
 import { Star, Security, Speed, Groups } from "@mui/icons-material";
+import { config } from "../../utils/config/config";
 
 const fadeInUp = keyframes`
   from {
@@ -306,6 +307,7 @@ const Hero: React.FC = () => {
                 <ContactButtons
                   phoneText="Emergency Help"
                   whatsappText="Get Info"
+                  phoneContact={config.company.rescue.primaryContact}
                   whatsappMessage="Hello! I'm interested in AA Uganda services. Can you provide more information?"
                   buttonSx={{
                     borderRadius: 3,

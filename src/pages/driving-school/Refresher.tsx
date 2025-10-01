@@ -32,6 +32,7 @@ import {
   AutoAwesomeRounded,
   SupportAgentRounded
 } from '@mui/icons-material';
+import { config } from '../../utils/config/config';
 
 // Feature Card Component
 interface FeatureCardProps {
@@ -395,6 +396,8 @@ const RefresherCourses: React.FC = () => {
               size="large"
               whatsappText="Chat About Courses"
               phoneText="Call for Info"
+              phoneContact={config.company.drivingSchool.primaryContact}
+              whatsappContact={config.company.drivingSchool.primaryContact}
               whatsappMessage="Hello! I'm interested in learning more about your refresher driving courses. Could you provide me with details about schedules, pricing, and enrollment?"
               buttonSx={{
                 '&.MuiButton-contained': {

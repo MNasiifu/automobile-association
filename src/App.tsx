@@ -43,8 +43,6 @@ import {
   VehicleValuation,
   FleetManagement,
   RescueServices,
-  VehicleInspection,
-  InsuranceServices,
   AutomotiveAdvisory,
   MembershipPage,
   WhoWeAre,
@@ -578,8 +576,6 @@ const App: React.FC = () => {
                 <Route path="/services/vehicle-valuation" element={<VehicleValuation />} />
                 <Route path="/services/fleet-management" element={<FleetManagement />} />
                 <Route path="/services/rescue-services" element={<RescueServices />} />
-                <Route path="/services/vehicle-inspection" element={<VehicleInspection />} />
-                <Route path="/services/insurance-services" element={<InsuranceServices />} />
                 <Route path="/services/automotive-advisory" element={<AutomotiveAdvisory />} />
                 <Route path="/membership" element={<MembershipPage />} />
                 <Route path="/idp/about" element={<IdpAbout />} />

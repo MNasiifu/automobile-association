@@ -1371,7 +1371,7 @@ const ApplyForIdp: React.FC = () => {
                                 <TextField
                                   {...field}
                                   fullWidth
-                                  label="Passport Number *"
+                                  label="Passport Number"
                                   error={!!error}
                                   helperText={error?.message}
                                   InputProps={{
