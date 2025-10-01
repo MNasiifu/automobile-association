@@ -51,6 +51,7 @@ import { SEO } from "../../components/SEO";
 import { eligibleCountriesData } from "../../data/eligibleCountriesData";
 import { eligibleCountriesSEO } from "../../data/seoData";
 import { useInView } from "react-intersection-observer";
+import { IDP_ESTABLISHMENT_YEAR } from "../../constants";
 
 // Enhanced animations
 const float = keyframes`
@@ -563,7 +564,7 @@ export const EligibleCountries: React.FC = () => {
                       <DateRange fontSize="large" />
                     </Avatar>
                     <Typography variant="h3" sx={{ fontWeight: 800, mb: 1 }}>
-                      1926
+                      {IDP_ESTABLISHMENT_YEAR}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       Since Year
