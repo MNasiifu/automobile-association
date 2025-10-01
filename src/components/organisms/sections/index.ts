@@ -8,3 +8,4 @@ export { default as TestimonialsSection } from './TestimonialsSection';
 export { default as PartnershipsSection } from './PartnershipsSection';
 export { default as CallToActionSection } from './CallToActionSection';
 export { default as IdpSection } from './IdpSection';
+export { default as EligibleCountriesSection } from './EligibleCountriesSection';

@@ -7,7 +7,8 @@ import {
   TestimonialsSection,
   PartnershipsSection,
   CallToActionSection,
-  IdpSection
+  IdpSection,
+  EligibleCountriesSection
 } from '../components/organisms/sections';
 import { FAQSection } from '../components/molecules';
 import { SEO } from '../components/SEO';
@@ -33,6 +34,9 @@ const Home: React.FC = () => {
       
       {/* International Driving Permit Section - IDP application and verification */}
       <IdpSection />
+      
+      {/* Eligible Countries Section - Countries where IDP is valid */}
+      <EligibleCountriesSection />
       
       {/* Testimonials - Social proof from satisfied customers */}
       <TestimonialsSection />
