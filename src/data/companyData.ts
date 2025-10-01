@@ -151,6 +151,7 @@ export const navigationItems: ReadonlyArray<NavItem> = [
     children: [
       { label: 'Who We Are', path: '/about/who-we-are', icon: 'Flag' },
       { label: 'Our Team', path: '/about/team', icon: 'Groups' },
+      { label: 'Eligible Countries', path: '/about/eligible-countries', icon: 'Public' },
       { label: 'Affiliation', path: '/about/affiliation', icon: 'Handshake' },
       { label: 'Careers', path: '/about/careers', icon: 'Work' }
     ],

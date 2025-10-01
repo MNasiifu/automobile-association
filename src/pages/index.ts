@@ -13,6 +13,7 @@ export { default as WhoWeAre } from './about/WhoWeAre';
 export { default as Careers } from './about/Careers';
 export { default as Affiliation } from './about/Affiliation';
 export { default as Gallery } from './about/Gallery';
+export { default as EligibleCountries } from './about/EligibleCountries';
 
 // Service pages
 export { default as VehicleValuation } from './services/VehicleValuation';

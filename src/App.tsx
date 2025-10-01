@@ -49,7 +49,8 @@ import {
   Team,
   Affiliation,
   Gallery,
-  Careers
+  Careers,
+  EligibleCountries
 } from './pages';
 import { navigationItems } from './data/companyData';
 import * as Icons from '@mui/icons-material';
@@ -569,6 +570,7 @@ const App: React.FC = () => {
                 <Route path="/" element={<Home />} />
                 <Route path="/about/who-we-are" element={<WhoWeAre />} />
                 <Route path="/about/team" element={<Team />} />
+                <Route path="/about/eligible-countries" element={<EligibleCountries />} />
                 <Route path="/about/affiliation" element={<Affiliation />} />
                 <Route path="/about/careers" element={<Careers />} />
                 <Route path="/about/gallery" element={<Gallery />} />
