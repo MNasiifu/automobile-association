@@ -27,7 +27,9 @@ import {
   Verified as VerifiedIcon,
 } from '@mui/icons-material';
 import { eligibleCountriesData } from '../../../data/eligibleCountriesData';
+import { getFeaturedCountries } from '../../../utils/countryUtils';
 import { useInView } from 'react-intersection-observer';
+import { IDP_ESTABLISHMENT_YEAR } from '../../../constants';
 
 // Enhanced animations
 const float = keyframes`
@@ -223,13 +225,6 @@ const continentEmojis: Record<string, string> = {
   "Australasia": "🇦🇺",
 };
 
-interface CountryData {
-  continent: string;
-  country: string;
-  years: number[];
-  flag: string;
-}
-
 const EligibleCountriesSection: React.FC = () => {
   const theme = useTheme();
   const navigate = useNavigate();
@@ -244,17 +239,8 @@ const EligibleCountriesSection: React.FC = () => {
       new Set(eligibleCountriesData.map((item) => item.continent))
     );
     
-    // Get featured countries (most popular/important ones)
-    const featured = [
-      eligibleCountriesData.find(c => c.country === "United States of America"),
-      eligibleCountriesData.find(c => c.country === "United Kingdom"),
-      eligibleCountriesData.find(c => c.country === "Germany"),
-      eligibleCountriesData.find(c => c.country === "France"),
-      eligibleCountriesData.find(c => c.country === "Australia"),
-      eligibleCountriesData.find(c => c.country === "Canada"),
-      eligibleCountriesData.find(c => c.country === "South Africa"),
-      eligibleCountriesData.find(c => c.country === "Kenya"),
-    ].filter(Boolean) as CountryData[];
+    // Get featured countries using the utility function
+    const featured = getFeaturedCountries();
 
     return {
       continents,
@@ -411,7 +397,7 @@ const EligibleCountriesSection: React.FC = () => {
                         transition: 'all 0.3s ease',
                       }}
                     >
-                      1926
+                      {IDP_ESTABLISHMENT_YEAR}
                     </Typography>
                     <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
                       Since Year
