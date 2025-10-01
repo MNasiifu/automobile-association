@@ -1381,7 +1381,7 @@ const Contact: React.FC = () => {
                           letterSpacing: '0.05em',
                         }}
                       >
-                        {companyInfo.contact.emergency.phone}
+                        {config.company.rescue.primaryContact}
                       </Typography>
                       <Typography
                         variant="body1"
@@ -1408,7 +1408,7 @@ const Contact: React.FC = () => {
                         }}
                       >
                         <ContactSupportIcon sx={{ fontSize: '1.2rem' }} />
-                        Contact Person: {companyInfo.contact.emergency.name}
+                        Contact Person: {config.company.rescue.name}
                       </Typography>
                       <Typography
                         variant="body2"
@@ -1442,7 +1442,7 @@ const Contact: React.FC = () => {
                           aria-label="Call emergency hotline"
                           onClick={(e) => {
                             e.stopPropagation();
-                            window.open(`tel:${companyInfo.contact.emergency.phone}`, '_self');
+                            window.open(`tel:${config.company.rescue.primaryContact}`, '_self');
                           }}
                         >
                           <Phone />
@@ -1455,7 +1455,7 @@ const Contact: React.FC = () => {
                           onClick={(e) => {
                             e.stopPropagation();
                             const message = encodeURIComponent("🚨 EMERGENCY ASSISTANCE NEEDED - Please respond immediately");
-                            window.open(`https://wa.me/${config.company.whatsAppNumber}?text=${message}`, '_blank');
+                            window.open(`https://wa.me/${config.company.rescue.primaryContact}?text=${message}`, '_blank');
                           }}
                         >
                           <WhatsAppIcon />
@@ -1467,7 +1467,7 @@ const Contact: React.FC = () => {
                           aria-label="Send emergency SMS"
                           onClick={(e) => {
                             e.stopPropagation();
-                            window.open(`sms:${companyInfo.contact.emergency.phone}?body=EMERGENCY ASSISTANCE NEEDED`, '_self');
+                            window.open(`sms:${config.company.rescue.primaryContact}?body=EMERGENCY ASSISTANCE NEEDED`, '_self');
                           }}
                         >
                           <SmsIcon />

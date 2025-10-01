@@ -13,12 +13,11 @@ export { default as WhoWeAre } from './about/WhoWeAre';
 export { default as Careers } from './about/Careers';
 export { default as Affiliation } from './about/Affiliation';
 export { default as Gallery } from './about/Gallery';
+export { default as EligibleCountries } from './about/EligibleCountries';
 
 // Service pages
 export { default as VehicleValuation } from './services/VehicleValuation';
 export { default as FleetManagement } from './services/FleetManagement';
 export { default as RescueServices } from './services/RescueServices';
-export { default as VehicleInspection } from './services/VehicleInspection';
-export { default as InsuranceServices } from './services/InsuranceServices';
 export { default as AutomotiveAdvisory } from './services/AutomotiveAdvisory';
 export { default as MembershipPage } from './Membership';

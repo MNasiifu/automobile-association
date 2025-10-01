@@ -1,19 +1,15 @@
 import React from "react";
-import { Box, Container, Typography, Grid, Paper } from "@mui/material";
+import { Box, Container, Typography, Paper } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../atoms";
 import {
   DriveEta,
-  Public,
-  Verified,
   FlightTakeoff,
-  Security,
   Speed,
   CardMembership,
   Search,
 } from "@mui/icons-material";
-import { idpBenefits } from "../../../data/idpData";
 import theme from "../../../theme";
 
 const IdpSectionWrapper = styled(Box)(({ theme }) => ({
@@ -91,83 +87,6 @@ const HeroCard = styled(Paper)(({ theme }) => ({
   },
   [theme.breakpoints.down("sm")]: {
     padding: theme.spacing(3),
-  },
-}));
-
-const BenefitCard = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(4),
-  height: "100%",
-  borderRadius: theme.spacing(2),
-  background: "rgba(255, 255, 255, 0.9)",
-  backdropFilter: "blur(10px)",
-  border: "1px solid rgba(2, 79, 49, 0.1)",
-  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-  cursor: "pointer",
-  position: "relative",
-  overflow: "hidden",
-
-  "&::before": {
-    content: '""',
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    height: "4px",
-    background: `linear-gradient(90deg, 
-      ${theme.palette.primary.main} 0%, 
-      ${theme.palette.secondary.main} 100%)`,
-    transform: "scaleX(0)",
-    transformOrigin: "left",
-    transition: "transform 0.3s ease-in-out",
-  },
-
-  "&:hover": {
-    transform: "translateY(-8px)",
-    boxShadow: "0 20px 40px rgba(2, 79, 49, 0.15)",
-    background: "rgba(255, 255, 255, 1)",
-
-    "&::before": {
-      transform: "scaleX(1)",
-    },
-
-    "& .benefit-icon": {
-      transform: "scale(1.1) rotate(5deg)",
-      background: `linear-gradient(135deg, 
-        ${theme.palette.primary.main} 0%, 
-        ${theme.palette.secondary.main} 100%)`,
-    },
-  },
-
-  [theme.breakpoints.down("sm")]: {
-    padding: theme.spacing(3),
-  },
-}));
-
-const IconWrapper = styled(Box)(({ theme }) => ({
-  width: 70,
-  height: 70,
-  borderRadius: "50%",
-  background: `linear-gradient(135deg, 
-    ${theme.palette.primary.light} 0%, 
-    ${theme.palette.primary.main} 100%)`,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  margin: "0 auto 24px auto",
-  transition: "all 0.3s ease-in-out",
-  boxShadow: "0 8px 32px rgba(2, 79, 49, 0.2)",
-
-  "& .MuiSvgIcon-root": {
-    fontSize: 32,
-    color: theme.palette.primary.contrastText,
-  },
-
-  [theme.breakpoints.down("sm")]: {
-    width: 60,
-    height: 60,
-    "& .MuiSvgIcon-root": {
-      fontSize: 28,
-    },
   },
 }));
 
@@ -261,14 +180,6 @@ const AdditionalFeaturesCard = styled(Paper)(({ theme }) => ({
     padding: theme.spacing(3),
   },
 }));
-
-// Map icon names to actual icons
-const iconMap: { [key: string]: React.ElementType } = {
-  Public,
-  Gavel: Security,
-  Security,
-  Verified,
-};
 
 const IdpSection: React.FC = () => {
   const navigate = useNavigate();
@@ -413,73 +324,6 @@ const IdpSection: React.FC = () => {
             Available
           </Typography>
         </HeroCard>
-
-        {/* Benefits Section */}
-        <Box sx={{ textAlign: "center", mb: 6 }}>
-          <Typography
-            variant="h3"
-            sx={{
-              fontWeight: 700,
-              mb: 2,
-              fontSize: { xs: "1.75rem", sm: "2rem", md: "2.5rem" },
-              color: "primary.main",
-            }}
-          >
-            Why Choose Our IDP Service?
-          </Typography>
-          <Typography
-            variant="h6"
-            color="text.secondary"
-            sx={{
-              mb: 2,
-              maxWidth: 600,
-              mx: "auto",
-              fontSize: { xs: "1rem", sm: "1.1rem", md: "1.25rem" },
-            }}
-          >
-            Experience hassle-free international driving with our comprehensive
-            IDP solutions
-          </Typography>
-        </Box>
-
-        <Grid container spacing={4}>
-          {idpBenefits.map((benefit, index) => {
-            const IconComponent = iconMap[benefit.icon];
-
-            return (
-              <Grid item xs={12} sm={6} md={3} key={index}>
-                <BenefitCard elevation={0}>
-                  <IconWrapper className="benefit-icon">
-                    {IconComponent && <IconComponent />}
-                  </IconWrapper>
-
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontWeight: 700,
-                      mb: 2,
-                      color: "primary.main",
-                      fontSize: { xs: "1.1rem", sm: "1.2rem", md: "1.3rem" },
-                    }}
-                  >
-                    {benefit.title}
-                  </Typography>
-
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{
-                      lineHeight: 1.6,
-                      fontSize: { xs: "0.875rem", sm: "0.9rem", md: "1rem" },
-                    }}
-                  >
-                    {benefit.description}
-                  </Typography>
-                </BenefitCard>
-              </Grid>
-            );
-          })}
-        </Grid>
 
         {/* Additional Features */}
         <AdditionalFeaturesCard elevation={1}>

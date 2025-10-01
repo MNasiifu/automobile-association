@@ -6,6 +6,7 @@ export { default as Navigation } from './Navigation';
 export { default as PageHeader } from './PageHeader';
 export { default as ContactButtons } from './ContactButtons';
 export { default as PhotoValidationDisplay } from './PhotoValidationDisplay';
+export { default as FAQSection } from './FAQSection';
 
 // PageHeader subcomponents
 export { default as DecorativeBackground } from './DecorativeBackground';

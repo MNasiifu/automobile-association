@@ -366,7 +366,7 @@ const VerifyIdp: React.FC = () => {
                 Suite 8
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Phone: {config.company.contactNumber} • Email:{" "}
+                Phone: {config.company.idp.primaryContact} • Email:{" "}
                 {config.company.email}
               </Typography>
             </Box>
@@ -1954,7 +1954,7 @@ const VerifyIdp: React.FC = () => {
                     sx={{ mb: 4, maxWidth: 800, mx: "auto", lineHeight: 1.8 }}
                   >
                     Located at Plot 4 Old Portbell Road Suite 8, Kampala.
-                    Contact us at {config.company.contactNumber} or email{" "}
+                    Contact us at {config.company.idp.primaryContact} / {config.company.idp.secondaryContact} or email{" "}
                     {config.company.email} for IDP applications and inquiries.
                   </Typography>
                   <Box

@@ -220,7 +220,7 @@ const validationSchema = yup.object({
   streetRoadPlot: yup.string().required("Street/Road/Plot is required"),
 
   // Passport and visa information
-  passportNumber: yup.string().required("Passport number is required"),
+  passportNumber: yup.string().default(""),
 
   // File uploads
   passportBioDataPage: yup
@@ -300,12 +300,21 @@ const validationSchema = yup.object({
 export type IDPFormData = yup.InferType<typeof validationSchema>;
 
 export const drivingPermitClasses = [
-  { value: "A", label: "Class A - Motorcycles" },
-  { value: "B", label: "Class B - Light Motor Vehicles" },
-  { value: "C", label: "Class C - Medium Motor Vehicles" },
-  { value: "D", label: "Class D - Heavy Motor Vehicles" },
-  { value: "E", label: "Class E - Articulated Vehicles" },
-  { value: "F", label: "Class F - Public Service Vehicles" },
+  { value: "A", label: "Class A" },
+  { value: "A1", label: "Class A1" },
+  { value: "B1", label: "Class B1" },
+  { value: "B", label: "Class B" },
+  { value: "BE", label: "Class BE" },
+  { value: "C", label: "Class C1" },
+  { value: "C1", label: "Class C1" },
+  { value: "C1E", label: "Class C1E" },
+  { value: "CE", label: "Class CE" },
+  { value: "D1", label: "Class D1" },
+  { value: "D1E", label: "Class D1E" },
+  { value: "D", label: "Class D" },
+  { value: "DE", label: "Class DE" },
+  { value: "G", label: "Class G" },
+  { value: "F", label: "Class F" }
 ];
 
 export const membershipBenefits = [
@@ -428,9 +437,9 @@ const useApplyForIdp = () => {
       emailAddress: "",
       telephoneNumber: "",
       mobileNumber: "",
+      passportNumber: "",
       residentialAddress: "",
       streetRoadPlot: "",
-      passportNumber: "",
       passportBioDataPage: undefined,
       visaCopy: undefined,
       passportPhoto: undefined,
@@ -555,9 +564,6 @@ const useApplyForIdp = () => {
           "residentialAddress",
           "streetRoadPlot",
         ];
-        break;
-      case 2:
-        fieldsToValidate = ["passportNumber"];
         break;
       case 3:
         fieldsToValidate = ["passportBioDataPage", "visaCopy", "passportPhoto"];

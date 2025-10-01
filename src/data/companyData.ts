@@ -138,11 +138,9 @@ export const navigationItems: ReadonlyArray<NavItem> = [
     path: '#',
     skip: true,
     children: [
-      { label: "Vehicle Valuation", path: "/services/vehicle-valuation", icon: "Assessment" },
+      { label: "Vehicle Valuation & Inspection", path: "/services/vehicle-valuation", icon: "Assessment" },
       { label: "Fleet Management", path: "/services/fleet-management", icon: "DirectionsCar" },
       { label: "Rescue Services", path: "/services/rescue-services", icon: "BuildCircle" },
-      { label: "Vehicle Inspection", path: "/services/vehicle-inspection", icon: "Search" },
-      { label: "Insurance Services", path: "/services/insurance-services", icon: "Security" },
       { label: "Automotive Advisory", path: "/services/automotive-advisory", icon: "SupportAgent" },
     ],
   },
@@ -153,6 +151,7 @@ export const navigationItems: ReadonlyArray<NavItem> = [
     children: [
       { label: 'Who We Are', path: '/about/who-we-are', icon: 'Flag' },
       { label: 'Our Team', path: '/about/team', icon: 'Groups' },
+      { label: 'Eligible Countries', path: '/about/eligible-countries', icon: 'Public' },
       { label: 'Affiliation', path: '/about/affiliation', icon: 'Handshake' },
       { label: 'Careers', path: '/about/careers', icon: 'Work' }
     ],

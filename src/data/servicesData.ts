@@ -7,8 +7,6 @@
  * - vehicle-valuation -> /services/vehicle-valuation  
  * - rescue-services -> /services/rescue-services
  * - driving-school -> /driving-school/about
- * - vehicle-inspection -> /services/vehicle-inspection
- * - insurance-services -> /services/insurance-services
  * - automotive-advisory -> /services/automotive-advisory
  * - membership-benefits -> /membership
  */
@@ -47,9 +45,9 @@ export const services: Service[] = [
   },
   {
     id: "vehicle-valuation",
-    title: "Professional Vehicle Valuation",
+    title: "Vehicle Valuation & Inspection Services",
     description:
-      "Independent, market-aware vehicle valuations tailored to Uganda's automotive environment. Expert assessments for insurance, sales, finance, fleet management, and legal purposes.",
+      "Comprehensive vehicle valuation and inspection services combining independent market assessments with thorough safety inspections. Expert evaluations for insurance, sales, finance, fleet management, legal purposes, and regulatory compliance.",
     icon: "Assessment",
     category: "advisory",
     features: [
@@ -58,8 +56,13 @@ export const services: Service[] = [
       "Technical Brief Valuations",
       "Accident Damage Assessment",
       "Fleet Valuation Solutions",
+      "Pre-purchase Inspections",
+      "Annual Safety Inspections",
+      "Insurance Claim Inspections",
       "Comprehensive Inspection Reports",
       "VIN Verification & Documentation",
+      "Expert Recommendations",
+      "Compliance Certification",
       "Expert Follow-up Support",
     ],
     image: "/images/vehicle-valuation.jpg",
@@ -104,42 +107,6 @@ export const services: Service[] = [
     ],
     image: "/images/driving-school.jpg",
     route: "/driving-school/about",
-  },
-  {
-    id: "vehicle-inspection",
-    title: "Vehicle Inspection",
-    description:
-      "Comprehensive vehicle inspections to ensure your car meets safety standards and regulatory requirements.",
-    icon: "Search",
-    category: "advisory",
-    features: [
-      "Pre-purchase Inspections",
-      "Annual Safety Inspections",
-      "Insurance Claim Inspections",
-      "Detailed Inspection Reports",
-      "Expert Recommendations",
-      "Compliance Certification",
-    ],
-    image: "/images/vehicle-inspection.jpg",
-    route: "/services/vehicle-inspection",
-  },
-  {
-    id: "insurance-services",
-    title: "Insurance Services",
-    description:
-      "Comprehensive motor insurance solutions tailored to protect you and your vehicle on Uganda's roads.",
-    icon: "Security",
-    category: "insurance",
-    features: [
-      "Comprehensive Motor Insurance",
-      "Third Party Insurance",
-      "Personal Accident Coverage",
-      "Claims Processing Assistance",
-      "Quick Settlement Services",
-      "Competitive Premium Rates",
-    ],
-    image: "/images/insurance.jpg",
-    route: "/services/insurance-services",
   },
   {
     id: "automotive-advisory",

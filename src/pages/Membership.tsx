@@ -204,6 +204,8 @@ const MembershipPage: React.FC = () => {
           <ContactButtons
             phoneText="Talk to us"
             whatsappText="Chat with us"
+            phoneContact={config.company.membership.primaryContact}
+            whatsappContact={config.company.membership.primaryContact}
             whatsappMessage="Hello! I'm interested in becoming an AA Uganda member. Can you provide information about membership packages and benefits?"
             buttonSx={{
               px: { xs: 3, sm: 4 },
@@ -254,7 +256,7 @@ const MembershipPage: React.FC = () => {
                   color: "primary.contrastText"
                 }}
               >
-                {`${config.company.contactNumber} | ${config.company.secondaryContactNumber}`}
+                {`${config.company.membership.primaryContact} | ${config.company.membership.secondaryContact}`}
               </Typography>
             </Box>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>

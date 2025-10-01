@@ -97,18 +97,18 @@ const handleChatWithUs = () => {
   const whatsappMessage = "Hello! I would like to inquire about your services.";
   try {
     const message = encodeURIComponent(whatsappMessage);
-    const whatsappUrl = `https://wa.me/${config.company.whatsAppNumber}?text=${message}`;
+    const whatsappUrl = `https://wa.me/${config.company.membership.primaryContact}?text=${message}`;
     window.open(whatsappUrl, "_blank", "noopener,noreferrer");
   } catch (error) {
     console.error("Error opening WhatsApp:", error);
     // Fallback: copy number to clipboard
     if (navigator.clipboard) {
-      navigator.clipboard.writeText(config.company.whatsAppNumber);
+      navigator.clipboard.writeText(config.company.membership.primaryContact);
       alert(
-        `WhatsApp number copied to clipboard: ${config.company.whatsAppNumber}`
+        `WhatsApp number copied to clipboard: ${config.company.membership.primaryContact}`
       );
     } else {
-      alert(`Please message us on WhatsApp: ${config.company.whatsAppNumber}`);
+      alert(`Please message us on WhatsApp: ${config.company.membership.primaryContact}`);
     }
   }
 };
@@ -310,6 +310,10 @@ const navigate = useNavigate();
                       py: 1.5,
                       fontWeight: 600,
                       fontSize: { xs: "0.875rem", sm: "1rem" },
+
+                      "&:hover": {
+                        color: theme.palette.secondary.main,
+                      },
                     }}
                   >
                     {action.action}

@@ -43,15 +43,14 @@ import {
   VehicleValuation,
   FleetManagement,
   RescueServices,
-  VehicleInspection,
-  InsuranceServices,
   AutomotiveAdvisory,
   MembershipPage,
   WhoWeAre,
   Team,
   Affiliation,
   Gallery,
-  Careers
+  Careers,
+  EligibleCountries
 } from './pages';
 import { navigationItems } from './data/companyData';
 import * as Icons from '@mui/icons-material';
@@ -571,6 +570,7 @@ const App: React.FC = () => {
                 <Route path="/" element={<Home />} />
                 <Route path="/about/who-we-are" element={<WhoWeAre />} />
                 <Route path="/about/team" element={<Team />} />
+                <Route path="/about/eligible-countries" element={<EligibleCountries />} />
                 <Route path="/about/affiliation" element={<Affiliation />} />
                 <Route path="/about/careers" element={<Careers />} />
                 <Route path="/about/gallery" element={<Gallery />} />
@@ -578,8 +578,6 @@ const App: React.FC = () => {
                 <Route path="/services/vehicle-valuation" element={<VehicleValuation />} />
                 <Route path="/services/fleet-management" element={<FleetManagement />} />
                 <Route path="/services/rescue-services" element={<RescueServices />} />
-                <Route path="/services/vehicle-inspection" element={<VehicleInspection />} />
-                <Route path="/services/insurance-services" element={<InsuranceServices />} />
                 <Route path="/services/automotive-advisory" element={<AutomotiveAdvisory />} />
                 <Route path="/membership" element={<MembershipPage />} />
                 <Route path="/idp/about" element={<IdpAbout />} />

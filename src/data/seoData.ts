@@ -327,6 +327,37 @@ export const careersSEO: SEOData = {
   keywords: 'AA Uganda careers, automotive jobs, road safety careers, customer service jobs, technical positions Uganda',
 };
 
+export const eligibleCountriesSEO: SEOData = {
+  title: 'IDP Eligible Countries - Uganda International Driving Permit Valid in 150+ Countries | AA Uganda',
+  description: 'Discover where your Uganda International Driving Permit (IDP) is valid. Browse 150+ countries across all continents where AA Uganda IDP is recognized for international driving.',
+  keywords: 'IDP eligible countries, international driving permit Uganda, valid countries IDP, Uganda IDP recognition, driving abroad Uganda, international license countries, AA Uganda IDP',
+  structuredData: {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'IDP Eligible Countries',
+    description: 'Comprehensive list of countries where Uganda International Driving Permit is valid for international travel and driving.',
+    url: `${BASE_URL}/about/eligible-countries`,
+    mainEntity: {
+      '@type': 'Service',
+      name: 'International Driving Permit',
+      description: 'International Driving Permit valid in 150+ countries worldwide',
+      provider: {
+        '@type': 'Organization',
+        name: 'AA Uganda',
+        url: BASE_URL,
+      },
+      areaServed: [
+        'Africa', 'Europe', 'Asia', 'Middle East', 'America', 'Australasia'
+      ],
+    },
+    breadcrumb: createBreadcrumb([
+      { name: 'Home', url: '/' },
+      { name: 'About Us', url: '/about/who-we-are' },
+      { name: 'Eligible Countries', url: '/about/eligible-countries' },
+    ]),
+  } as StructuredDataWebPage,
+};
+
 // Driving school pages
 export const drivingSchoolAboutSEO: SEOData = {
   title: 'AA Uganda Driving School - Professional Driver Training & Education',
