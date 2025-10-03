@@ -7,7 +7,7 @@ import maureenImg from '../assets/images/people/Maureen.jpeg';
 import richardImg from '../assets/images/people/Richard.jpeg';
 import robinaImg from '../assets/images/people/Robina.jpeg';
 import margretImg from '../assets/images/people/Margret.jpeg';
-import ronaldImg from '../assets/images/people/Ronald.jpeg';
+import ronaldImg from '../assets/images/people/ronald.jpeg';
 
 // Person type and management array
 export type Person = {
