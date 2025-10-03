@@ -18,8 +18,8 @@ export const CORS_ORIGINS = {
     'http://127.0.0.1:4173'
   ],
   production: [
-    'https://aauganda.co.ug',
-    'https://www.aauganda.co.ug',
+    'https://aau.co.ug',
+    'https://www.aau.co.ug',
     'https://automobile-association.vercel.app'
   ]
 } as const
@@ -28,7 +28,7 @@ export const CORS_ORIGINS = {
 export const SECURITY_HEADERS = {
   'Content-Security-Policy': isDevelopment 
     ? "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: http://localhost:* http://127.0.0.1:* https://*.supabase.co https://*.supabase.io; img-src 'self' data: blob: https:; media-src 'self' data: blob:;"
-    : "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://aauganda.co.ug https://automobile-association.vercel.app https://*.supabase.co https://*.supabase.io;",
+    : "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://aau.co.ug https://automobile-association.vercel.app https://*.supabase.co https://*.supabase.io;",
   'X-Content-Type-Options': 'nosniff',
   'X-Frame-Options': 'DENY',
   'X-XSS-Protection': '1; mode=block',
@@ -54,7 +54,7 @@ export const API_CONFIG = {
       ? 'http://localhost:5173' 
       : (typeof window !== 'undefined' && window.location.origin === 'https://automobile-association.vercel.app')
         ? 'https://automobile-association.vercel.app'
-        : 'https://aauganda.co.ug'
+        : 'https://aau.co.ug'
   ),
   enableDebug: isDevelopment && import.meta.env.VITE_ENABLE_DEBUG === 'true',
   enableConsoleLogs: isDevelopment && import.meta.env.VITE_ENABLE_CONSOLE_LOGS === 'true'

@@ -250,16 +250,16 @@ const AutomotiveAdvisory: React.FC = () => {
       const body = encodeURIComponent(
         "Hello AA Uganda,\n\nI would like to request an automotive consultation. Please contact me to schedule an appointment.\n\nBest regards,"
       );
-      const emailUrl = `mailto:advisory@aauganda.co.ug?subject=${subject}&body=${body}`;
+      const emailUrl = `mailto:advisory@aau.co.ug?subject=${subject}&body=${body}`;
       window.location.href = emailUrl;
     } catch (error) {
       console.error("Error opening email client:", error);
       // Fallback: copy email to clipboard
       if (navigator.clipboard) {
-        navigator.clipboard.writeText("advisory@aauganda.co.ug");
-        alert("Email address copied to clipboard: advisory@aauganda.co.ug");
+        navigator.clipboard.writeText("advisory@aau.co.ug");
+        alert("Email address copied to clipboard: advisory@aau.co.ug");
       } else {
-        alert("Please email us at: advisory@aauganda.co.ug");
+        alert("Please email us at: advisory@aau.co.ug");
       }
     }
   };

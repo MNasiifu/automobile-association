@@ -411,7 +411,7 @@ const createVerificationCertificateHTML = async (
           <div class="footer-info">
             <h4>Automobile Association of Uganda</h4>
             <p>Plot 4 Old Portbell Road Suite 8, Kampala, Uganda</p>
-            <p>Phone: +256 786 623 001 | Email: info@aauganda.co.ug</p>
+            <p>Phone: +256 786 623 001 | Email: info@aau.co.ug</p>
             <p style="margin-top: 10px; font-size: 10px; color: #666;">
               Verification Time: ${verificationTime}<br>
               This is an automatically generated verification certificate.
