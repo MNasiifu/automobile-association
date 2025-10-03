@@ -7,6 +7,7 @@ import maureenImg from '../assets/images/people/Maureen.jpeg';
 import richardImg from '../assets/images/people/Richard.jpeg';
 import robinaImg from '../assets/images/people/Robina.jpeg';
 import margretImg from '../assets/images/people/Margret.jpeg';
+import ronaldImg from '../assets/images/people/Ronald.jpeg';
 
 // Person type and management array
 export type Person = {
@@ -75,7 +76,7 @@ export const management: Person[] = [
     name: 'MAUREEN BYARUGABA',
     role: 'Accountant',
     img: maureenImg,
-    category: 'senior-staff',
+    category: 'staff',
   },
   {
     name: 'MAGRATE ISIKO ',
@@ -93,6 +94,12 @@ export const management: Person[] = [
     name: 'Robiina Grace Namagembe ',
     role: 'Front desk  officer',
     img: robinaImg,
+    category: 'staff',
+  },
+  {
+    name: 'Ronald Naigedde',
+    role: 'Valuation & inspection Manager',
+    img: ronaldImg,
     category: 'staff',
   }
 ];
