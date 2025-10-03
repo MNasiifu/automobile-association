@@ -12,8 +12,8 @@ const getDevelopmentCorsOrigins = () => [
 ]
 
 const getProductionCorsOrigins = () => [
-  'https://aauganda.co.ug',
-  'https://www.aauganda.co.ug',
+  'https://aau.co.ug',
+  'https://www.aau.co.ug',
   'https://automobile-association.vercel.app'
 ]
 

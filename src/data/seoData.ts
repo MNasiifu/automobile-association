@@ -1,6 +1,6 @@
 import type { SEOData, StructuredDataService, StructuredDataWebPage } from '../types/seo';
 
-const BASE_URL = import.meta.env.VITE_PUBLIC_SITE_URL || 'https://aauganda.co.ug';
+const BASE_URL = import.meta.env.VITE_PUBLIC_SITE_URL || 'https://aau.co.ug';
 
 // Organization structured data (reused across pages)
 export const organizationStructuredData = {

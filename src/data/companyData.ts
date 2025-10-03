@@ -40,7 +40,7 @@ export const companyInfo = {
       name: "Mr. Richard Ssewagudde",
     },
     email: "odongkara@aau.co.ug",
-    website: "www.aauganda.co.ug",
+    website: "www.aau.co.ug",
   },
   social: {
     facebook: "https://www.facebook.com/profile.php?id=100054503438804",
