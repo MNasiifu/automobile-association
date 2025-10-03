@@ -24,6 +24,11 @@ export const config = {
             name: "Felix Dongokara",
             primaryContact: "+256752760252",
             secondaryContact: "+256776760252"
+        },
+        valuation: {
+            name: "Ronald Naigedde",
+            primaryContact: "+256786658097",
+            secondaryContact: "+256700609887",
         }
     }
 };
