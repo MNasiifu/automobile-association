@@ -517,10 +517,10 @@ export const generateIDPVerificationPDF = async (
     
     // Configure html2pdf options with better settings for content rendering
     const opt = {
-      margin: [5, 5, 5, 5], // Small margins instead of 0
+      margin: [5, 5, 5, 5] as [number, number, number, number], // Small margins instead of 0
       filename: `IDP_Verification_${data.id}_${new Date().toISOString().split('T')[0]}.pdf`,
       image: { 
-        type: 'jpeg', 
+        type: 'jpeg' as const, 
         quality: 0.95 // Higher quality
       },
       html2canvas: { 
@@ -528,7 +528,7 @@ export const generateIDPVerificationPDF = async (
         useCORS: true,
         allowTaint: true,
         letterRendering: true,
-        logging: process.env.NODE_ENV !== 'production', // Enable logging only in non-production environments, // Enable logging for debugging
+        logging: process.env.NODE_ENV !== 'production', // Enable logging only in non-production environments
         backgroundColor: '#ffffff',
         width: certificateElement.scrollWidth || 794, // A4 width in pixels at 96 DPI
         height: certificateElement.scrollHeight || 1123, // Let it auto-calculate height
@@ -540,10 +540,10 @@ export const generateIDPVerificationPDF = async (
       jsPDF: { 
         unit: 'mm', 
         format: 'a4', 
-        orientation: 'portrait',
+        orientation: 'portrait' as const,
         compress: process.env.NODE_ENV === 'production' // Enable compression in production
       },
-      pagebreak: { mode: 'avoid-all' }
+      pagebreak: { mode: 'avoid-all' as const }
     };
     
     // Generate the PDF using the certificate element
@@ -589,9 +589,9 @@ export const generateIDPVerificationPDFFromElement = async (
 
     // Configure html2pdf options
     const opt = {
-      margin: [10, 10, 10, 10],
+      margin: [10, 10, 10, 10] as [number, number, number, number],
       filename: filename,
-      image: { type: 'jpeg', quality: 0.9 },
+      image: { type: 'jpeg' as const, quality: 0.9 },
       html2canvas: { 
         scale: 2,
         useCORS: true,
@@ -603,7 +603,7 @@ export const generateIDPVerificationPDFFromElement = async (
       jsPDF: { 
         unit: 'mm', 
         format: 'a4', 
-        orientation: 'portrait',
+        orientation: 'portrait' as const,
         compress: true
       }
     };
