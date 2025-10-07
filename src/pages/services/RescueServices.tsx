@@ -7,6 +7,7 @@ import {
   Grid,
   Card,
   CardContent,
+  CardMedia,
   List,
   ListItem,
   ListItemIcon,
@@ -17,6 +18,13 @@ import {
   Alert,
   Chip,
   Snackbar,
+  ImageList,
+  ImageListItem,
+  useTheme,
+  useMediaQuery,
+  Fade,
+  Zoom,
+  Fab,
 } from "@mui/material";
 import {
   BuildCircle as RescueIcon,
@@ -54,6 +62,37 @@ import { SEO } from "../../components/SEO";
 import { rescueServicesSEO } from "../../data/seoData";
 import { config } from "../../utils/config/config";
 import { colors } from "../../theme/colors";
+
+// Import rescue images
+import rescue1 from "../../assets/images/rescue/rescue1.jpeg";
+import rescue2 from "../../assets/images/rescue/rescue2.jpeg";
+import rescue3 from "../../assets/images/rescue/rescue3.jpeg";
+import rescue4 from "../../assets/images/rescue/rescue4.jpeg";
+
+// Add global styles for animations
+const globalStyles = `
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+`;
+
+// Inject global styles
+if (typeof document !== 'undefined') {
+  const styleElement = document.createElement('style');
+  styleElement.textContent = globalStyles;
+  document.head.appendChild(styleElement);
+}
 
 const HeroSection = styled(Box)(({ theme }) => ({
   background: `linear-gradient(135deg, ${theme.palette.primary.main}15 0%, ${theme.palette.secondary.main}10 100%)`,
@@ -127,8 +166,89 @@ const PriorityIndicator = styled(Box)<{ priority: "high" | "medium" | "low" }>(
   })
 );
 
+const GalleryCard = styled(Card)(({ theme }) => ({
+  position: "relative",
+  borderRadius: theme.spacing(3),
+  overflow: "hidden",
+  cursor: "pointer",
+  transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+  "&:hover": {
+    transform: "translateY(-8px) scale(1.02)",
+    boxShadow: `0 20px 40px ${colors.primary.main}30`,
+    "& .gallery-overlay": {
+      opacity: 1,
+    },
+    "& .gallery-image": {
+      transform: "scale(1.1)",
+    },
+  },
+}));
+
+const GalleryOverlay = styled(Box)(({ theme }) => ({
+  position: "absolute",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  background: `linear-gradient(135deg, ${colors.primary.main}85 0%, ${colors.secondary.main}75 100%)`,
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center",
+  alignItems: "center",
+  opacity: 0,
+  transition: "all 0.3s ease-in-out",
+  color: "white",
+  textAlign: "center",
+  padding: theme.spacing(2),
+}));
+
+const ImageContainer = styled(Box)(() => ({
+  width: "100%",
+  height: "100%",
+  overflow: "hidden",
+  position: "relative",
+}));
+
+// Rescue gallery data
+const rescueGallery = [
+  {
+    id: 1,
+    src: rescue1,
+    title: "Professional Towing Service",
+    description: "Our heavy-duty tow trucks ensure safe vehicle recovery",
+    category: "Towing & Recovery",
+    featured: true,
+  },
+  {
+    id: 2,
+    src: rescue2,
+    title: "Emergency Roadside Assistance",
+    description: "24/7 professional help when you need it most",
+    category: "Emergency Response",
+    featured: true,
+  },
+  {
+    id: 3,
+    src: rescue3,
+    title: "Mobile Mechanic Service",
+    description: "On-site repairs by certified technicians",
+    category: "Mechanical Repairs",
+    featured: false,
+  },
+  {
+    id: 4,
+    src: rescue4,
+    title: "Advanced Rescue Equipment",
+    description: "State-of-the-art tools for any emergency",
+    category: "Equipment & Tools",
+    featured: false,
+  },
+];
+
 const RescueServices: React.FC = () => {
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   // State for managing user feedback and analytics
   const [notification, setNotification] = useState<{
@@ -514,42 +634,53 @@ const RescueServices: React.FC = () => {
 
       {/* Emergency Alert */}
       <Container maxWidth="md" sx={{ pt: 4, mb: 4 }}>
-        <EmergencyCard>
-          <Typography variant="h4" gutterBottom sx={{ fontWeight: 700 }}>
-            🚨 24/7 Emergency Hotline
-          </Typography>
-          <Typography
-            variant="caption"
-            gutterBottom
+        <Zoom in timeout={600}>
+          <EmergencyCard
             sx={{
-              fontWeight: "bold",
-              fontSize: { xs: "1.0rem", sm: "1.3rem" },
+              animation: "pulse 3s infinite",
+              "&:hover": {
+                animation: "none",
+                transform: "scale(1.02)",
+                transition: "transform 0.3s ease-in-out",
+              },
             }}
           >
-            {config.company.rescue.primaryContact} |{" "}
-            {config.company.rescue.secondaryContact} |{" "}
-            {config.company.rescue.otherContact}
-          </Typography>
-          <Typography variant="body1" sx={{ mb: 3, opacity: 0.9 }}>
-            Available 24 hours a day, 7 days a week for all emergency assistance
-          </Typography>
-          <Button
-            variant="contained"
-            size="large"
-            startIcon={<PhoneIcon />}
-            onClick={handleEmergencyCall}
-            sx={{
-              background: "white",
-              color: "error.light",
-              "&:hover": { background: "#eeeeee" },
-              px: 4,
-              py: 1.5,
-              fontSize: { xs: "0.9rem", sm: "1.1rem" },
-            }}
-          >
-            Call Now for Emergency
-          </Button>
-        </EmergencyCard>
+            <Typography variant="h4" gutterBottom sx={{ fontWeight: 700 }}>
+              🚨 24/7 Emergency Hotline
+            </Typography>
+            <Typography
+              variant="caption"
+              gutterBottom
+              sx={{
+                fontWeight: "bold",
+                fontSize: { xs: "1.0rem", sm: "1.3rem" },
+              }}
+            >
+              {config.company.rescue.primaryContact} |{" "}
+              {config.company.rescue.secondaryContact} |{" "}
+              {config.company.rescue.otherContact}
+            </Typography>
+            <Typography variant="body1" sx={{ mb: 3, opacity: 0.9 }}>
+              Available 24 hours a day, 7 days a week for all emergency assistance
+            </Typography>
+            <Button
+              variant="contained"
+              size="large"
+              startIcon={<PhoneIcon />}
+              onClick={handleEmergencyCall}
+              sx={{
+                background: "white",
+                color: "error.light",
+                "&:hover": { background: "#eeeeee" },
+                px: 4,
+                py: 1.5,
+                fontSize: { xs: "0.9rem", sm: "1.1rem" },
+              }}
+            >
+              Call Now for Emergency
+            </Button>
+          </EmergencyCard>
+        </Zoom>
       </Container>
 
       {/* Hero Section */}
@@ -557,45 +688,336 @@ const RescueServices: React.FC = () => {
         <Container maxWidth="lg">
           <Grid container spacing={4} alignItems="center">
             <Grid item xs={12} md={6}>
-              <Typography
-                variant="h3"
-                gutterBottom
-                sx={{ fontWeight: 700, mb: 3 }}
-              >
-                Your Trusted Partner When You're Stranded
-              </Typography>
-              <Typography
-                variant="h6"
-                color="text.secondary"
-                sx={{ mb: 4, lineHeight: 1.6 }}
-              >
-                When you're stranded on the road, AA Uganda is your trusted
-                partner. Our rescue teams deliver fast, professional help across
-                Uganda, backed by a nationwide network of 30+ rescue and
-                recovery vehicles.
-              </Typography>
-              <Alert sx={{ mb: 4, backgroundColor: "#bedaf0" }}>
-                <Typography variant="body1">
-                  <strong>Fast Response:</strong> Average response time of 30
-                  minutes in urban areas and 60 minutes in rural locations.
-                </Typography>
-              </Alert>
+              <Fade in timeout={1000}>
+                <Box>
+                  <Typography
+                    variant="h3"
+                    gutterBottom
+                    sx={{ fontWeight: 700, mb: 3 }}
+                  >
+                    Your Trusted Partner When You're Stranded
+                  </Typography>
+                  <Typography
+                    variant="h6"
+                    color="text.secondary"
+                    sx={{ mb: 4, lineHeight: 1.6 }}
+                  >
+                    When you're stranded on the road, AA Uganda is your trusted
+                    partner. Our rescue teams deliver fast, professional help across
+                    Uganda, backed by a nationwide network of 30+ rescue and
+                    recovery vehicles.
+                  </Typography>
+                  <Alert sx={{ mb: 4, backgroundColor: "#bedaf0" }}>
+                    <Typography variant="body1">
+                      <strong>Fast Response:</strong> Average response time of 30
+                      minutes in urban areas and 60 minutes in rural locations.
+                    </Typography>
+                  </Alert>
+                </Box>
+              </Fade>
             </Grid>
             <Grid item xs={12} md={6}>
-              <Box sx={{ textAlign: "center" }}>
-                <RescueIcon
-                  sx={{
-                    fontSize: 200,
-                    color: "primary.main",
-                    opacity: 0.1,
-                    display: { xs: "none", md: "block" },
-                  }}
-                />
-              </Box>
+              <Zoom in timeout={1200}>
+                <Box sx={{ textAlign: "center", position: "relative" }}>
+                  <Paper
+                    sx={{
+                      borderRadius: 4,
+                      overflow: "hidden",
+                      position: "relative",
+                      background: `linear-gradient(135deg, ${colors.primary.main}15 0%, ${colors.secondary.main}10 100%)`,
+                      p: 2,
+                      "&:hover": {
+                        transform: "scale(1.02)",
+                        transition: "transform 0.3s ease-in-out",
+                      },
+                    }}
+                  >
+                    <CardMedia
+                      component="img"
+                      image={rescue2}
+                      alt="AA Uganda Emergency Response Team"
+                      sx={{
+                        borderRadius: 3,
+                        width: "100%",
+                        height: { xs: 250, md: 350 },
+                        objectFit: "cover",
+                      }}
+                    />
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        bottom: 16,
+                        left: 16,
+                        right: 16,
+                        background: "rgba(0,0,0,0.7)",
+                        color: "white",
+                        p: 2,
+                        borderRadius: 2,
+                        backdropFilter: "blur(10px)",
+                      }}
+                    >
+                      <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                        Professional Emergency Response
+                      </Typography>
+                      <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                        Ready 24/7 to assist you anywhere in Uganda
+                      </Typography>
+                    </Box>
+                  </Paper>
+                </Box>
+              </Zoom>
             </Grid>
           </Grid>
         </Container>
       </HeroSection>
+
+      {/* Rescue Gallery Section */}
+      <Box sx={{ py: 8, backgroundColor: colors.background.section }}>
+        <Container maxWidth="lg">
+          <Heading variant="h2" align="center" gutterBottom>
+            Our Professional Rescue Operations
+          </Heading>
+          <Typography
+            variant="h6"
+            align="center"
+            color="text.secondary"
+            sx={{ mb: 6, maxWidth: 700, mx: "auto" }}
+          >
+            See our state-of-the-art equipment and professional rescue teams in action
+          </Typography>
+
+          <Grid container spacing={4}>
+            {/* Featured Large Image */}
+            <Grid item xs={12} md={6}>
+              <Zoom in timeout={800}>
+                <GalleryCard sx={{ height: { xs: 300, md: 400 } }}>
+                  <ImageContainer>
+                    <CardMedia
+                      component="img"
+                      image={rescueGallery[0].src}
+                      alt={rescueGallery[0].title}
+                      className="gallery-image"
+                      sx={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        transition: "transform 0.4s ease-in-out",
+                      }}
+                    />
+                    <GalleryOverlay className="gallery-overlay">
+                      <Typography variant="h4" gutterBottom sx={{ fontWeight: 700 }}>
+                        {rescueGallery[0].title}
+                      </Typography>
+                      <Typography variant="body1" sx={{ mb: 2, opacity: 0.9 }}>
+                        {rescueGallery[0].description}
+                      </Typography>
+                      <Chip
+                        label={rescueGallery[0].category}
+                        variant="filled"
+                        sx={{
+                          backgroundColor: colors.secondary.main,
+                          color: colors.secondary.contrastText,
+                          fontWeight: 600,
+                        }}
+                      />
+                    </GalleryOverlay>
+                  </ImageContainer>
+                </GalleryCard>
+              </Zoom>
+            </Grid>
+
+            {/* Secondary Featured Image */}
+            <Grid item xs={12} md={6}>
+              <Grid container spacing={2} sx={{ height: { xs: "auto", md: 400 } }}>
+                <Grid item xs={12}>
+                  <Zoom in timeout={1000}>
+                    <GalleryCard sx={{ height: { xs: 200, md: 190 } }}>
+                      <ImageContainer>
+                        <CardMedia
+                          component="img"
+                          image={rescueGallery[1].src}
+                          alt={rescueGallery[1].title}
+                          className="gallery-image"
+                          sx={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                            transition: "transform 0.4s ease-in-out",
+                          }}
+                        />
+                        <GalleryOverlay className="gallery-overlay">
+                          <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
+                            {rescueGallery[1].title}
+                          </Typography>
+                          <Typography variant="body2" sx={{ mb: 1, opacity: 0.9 }}>
+                            {rescueGallery[1].description}
+                          </Typography>
+                          <Chip
+                            label={rescueGallery[1].category}
+                            size="small"
+                            variant="filled"
+                            sx={{
+                              backgroundColor: colors.info.main,
+                              color: colors.info.contrastText,
+                              fontWeight: 600,
+                            }}
+                          />
+                        </GalleryOverlay>
+                      </ImageContainer>
+                    </GalleryCard>
+                  </Zoom>
+                </Grid>
+                
+                <Grid item xs={6}>
+                  <Zoom in timeout={1200}>
+                    <GalleryCard sx={{ height: { xs: 150, md: 190 } }}>
+                      <ImageContainer>
+                        <CardMedia
+                          component="img"
+                          image={rescueGallery[2].src}
+                          alt={rescueGallery[2].title}
+                          className="gallery-image"
+                          sx={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                            transition: "transform 0.4s ease-in-out",
+                          }}
+                        />
+                        <GalleryOverlay className="gallery-overlay">
+                          <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+                            {rescueGallery[2].title}
+                          </Typography>
+                          <Chip
+                            label={rescueGallery[2].category}
+                            size="small"
+                            variant="filled"
+                            sx={{
+                              backgroundColor: colors.success.main,
+                              color: colors.success.contrastText,
+                              fontWeight: 600,
+                            }}
+                          />
+                        </GalleryOverlay>
+                      </ImageContainer>
+                    </GalleryCard>
+                  </Zoom>
+                </Grid>
+
+                <Grid item xs={6}>
+                  <Zoom in timeout={1400}>
+                    <GalleryCard sx={{ height: { xs: 150, md: 190 } }}>
+                      <ImageContainer>
+                        <CardMedia
+                          component="img"
+                          image={rescueGallery[3].src}
+                          alt={rescueGallery[3].title}
+                          className="gallery-image"
+                          sx={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                            transition: "transform 0.4s ease-in-out",
+                          }}
+                        />
+                        <GalleryOverlay className="gallery-overlay">
+                          <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+                            {rescueGallery[3].title}
+                          </Typography>
+                          <Chip
+                            label={rescueGallery[3].category}
+                            size="small"
+                            variant="filled"
+                            sx={{
+                              backgroundColor: colors.warning.main,
+                              color: colors.warning.contrastText,
+                              fontWeight: 600,
+                            }}
+                          />
+                        </GalleryOverlay>
+                      </ImageContainer>
+                    </GalleryCard>
+                  </Zoom>
+                </Grid>
+              </Grid>
+            </Grid>
+          </Grid>
+
+          {/* Gallery Stats */}
+          <Box sx={{ mt: 6 }}>
+            <Grid container spacing={4}>
+              <Grid item xs={6} sm={3}>
+                <Paper
+                  sx={{
+                    p: 3,
+                    textAlign: "center",
+                    background: `linear-gradient(135deg, ${colors.primary.main}10 0%, ${colors.primary.main}05 100%)`,
+                    border: `1px solid ${colors.primary.main}20`,
+                  }}
+                >
+                  <Typography variant="h3" sx={{ fontWeight: 700, color: colors.primary.main, mb: 1 }}>
+                    30+
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Rescue Vehicles
+                  </Typography>
+                </Paper>
+              </Grid>
+              <Grid item xs={6} sm={3}>
+                <Paper
+                  sx={{
+                    p: 3,
+                    textAlign: "center",
+                    background: `linear-gradient(135deg, ${colors.info.main}10 0%, ${colors.info.main}05 100%)`,
+                    border: `1px solid ${colors.info.main}20`,
+                  }}
+                >
+                  <Typography variant="h3" sx={{ fontWeight: 700, color: colors.info.main, mb: 1 }}>
+                    24/7
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Available Always
+                  </Typography>
+                </Paper>
+              </Grid>
+              <Grid item xs={6} sm={3}>
+                <Paper
+                  sx={{
+                    p: 3,
+                    textAlign: "center",
+                    background: `linear-gradient(135deg, ${colors.success.main}10 0%, ${colors.success.main}05 100%)`,
+                    border: `1px solid ${colors.success.main}20`,
+                  }}
+                >
+                  <Typography variant="h3" sx={{ fontWeight: 700, color: colors.success.main, mb: 1 }}>
+                    95%
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Coverage Area
+                  </Typography>
+                </Paper>
+              </Grid>
+              <Grid item xs={6} sm={3}>
+                <Paper
+                  sx={{
+                    p: 3,
+                    textAlign: "center",
+                    background: `linear-gradient(135deg, ${colors.secondary.main}10 0%, ${colors.secondary.main}05 100%)`,
+                    border: `1px solid ${colors.secondary.main}20`,
+                  }}
+                >
+                  <Typography variant="h3" sx={{ fontWeight: 700, color: colors.secondary.dark, mb: 1 }}>
+                    30min
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Avg Response
+                  </Typography>
+                </Paper>
+              </Grid>
+            </Grid>
+          </Box>
+        </Container>
+      </Box>
 
       {/* Key Benefits */}
       <Container maxWidth="lg" sx={{ py: 8 }}>
@@ -655,8 +1077,32 @@ const RescueServices: React.FC = () => {
           <Grid container spacing={4}>
             {rescueServices.map((service, index) => (
               <Grid item xs={12} md={6} key={index}>
-                <FeatureCard>
-                  <CardContent sx={{ p: 4 }}>
+                <FeatureCard
+                  sx={{
+                    position: "relative",
+                    overflow: "hidden",
+                    background: index === 0 || index === 1 ? "transparent" : undefined,
+                  }}
+                >
+                  {/* Add background image for featured services */}
+                  {(index === 0 || index === 1) && (
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundImage: `url(${index === 0 ? rescue3 : rescue4})`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                        opacity: 0.1,
+                        filter: "blur(1px)",
+                        zIndex: 0,
+                      }}
+                    />
+                  )}
+                  <CardContent sx={{ p: 4, position: "relative", zIndex: 1 }}>
                     <IconWrapper>{service.icon}</IconWrapper>
                     <Typography
                       variant="h5"
@@ -1191,64 +1637,187 @@ const RescueServices: React.FC = () => {
           backgroundColor: "primary.main",
           color: "primary.contrastText",
           py: 8,
+          position: "relative",
+          overflow: "hidden",
         }}
       >
-        <Container maxWidth="lg">
+        {/* Background Image Overlay */}
+        <Box
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundImage: `url(${rescue1})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            opacity: 0.15,
+            filter: "blur(2px)",
+          }}
+        />
+        
+        <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1 }}>
           <Grid container spacing={6} alignItems="center">
             <Grid item xs={12} md={6}>
-              <Typography variant="h3" gutterBottom sx={{ fontWeight: 700 }}>
-                Nationwide Coverage
-              </Typography>
-              <Typography variant="body1" sx={{ mb: 4, opacity: 0.9 }}>
-                Our rescue network covers all major cities, highways, and remote
-                areas across Uganda, ensuring help is always within reach.
-              </Typography>
+              <Fade in timeout={1500}>
+                <Box>
+                  <Typography variant="h3" gutterBottom sx={{ fontWeight: 700 }}>
+                    Nationwide Coverage
+                  </Typography>
+                  <Typography variant="body1" sx={{ mb: 4, opacity: 0.9 }}>
+                    Our rescue network covers all major cities, highways, and remote
+                    areas across Uganda, ensuring help is always within reach.
+                  </Typography>
 
-              <Alert
-                severity="info"
-                sx={{
-                  mb: 3,
-                  backgroundColor: "rgba(255,255,255,0.1)",
-                  color: "inherit",
-                }}
-              >
-                <Typography variant="body2">
-                  <strong>Coverage Guarantee:</strong> We reach 95% of Uganda's
-                  road network within 2 hours.
-                </Typography>
-              </Alert>
+                  <Alert
+                    severity="info"
+                    sx={{
+                      mb: 3,
+                      backgroundColor: "rgba(255,255,255,0.1)",
+                      color: "inherit",
+                      backdropFilter: "blur(10px)",
+                      border: "1px solid rgba(255,255,255,0.2)",
+                    }}
+                  >
+                    <Typography variant="body2">
+                      <strong>Coverage Guarantee:</strong> We reach 95% of Uganda's
+                      road network within 2 hours.
+                    </Typography>
+                  </Alert>
+                </Box>
+              </Fade>
             </Grid>
             <Grid item xs={12} md={6}>
-              <Paper sx={{ p: 4, borderRadius: 3 }}>
-                <Typography
-                  variant="h5"
-                  gutterBottom
-                  color="primary.main"
-                  sx={{ fontWeight: 600 }}
+              <Zoom in timeout={1800}>
+                <Paper 
+                  sx={{ 
+                    p: 4, 
+                    borderRadius: 3,
+                    background: "rgba(255,255,255,0.95)",
+                    backdropFilter: "blur(10px)",
+                    border: "1px solid rgba(255,255,255,0.2)",
+                  }}
                 >
-                  Service Coverage Areas
-                </Typography>
-                <Grid container spacing={1}>
-                  {responseAreas.map((area, index) => (
-                    <Grid item xs={6} key={index}>
-                      <Box
-                        sx={{ display: "flex", alignItems: "center", mb: 1 }}
-                      >
-                        <CheckIcon
-                          sx={{
-                            color: "success.main",
-                            mr: 1,
-                            fontSize: "1rem",
+                  <Typography
+                    variant="h5"
+                    gutterBottom
+                    color="primary.main"
+                    sx={{ fontWeight: 600 }}
+                  >
+                    Service Coverage Areas
+                  </Typography>
+                  <Grid container spacing={1}>
+                    {responseAreas.map((area, index) => (
+                      <Grid item xs={6} key={index}>
+                        <Box
+                          sx={{ 
+                            display: "flex", 
+                            alignItems: "center", 
+                            mb: 1,
+                            transition: "transform 0.2s ease",
+                            "&:hover": {
+                              transform: "translateX(4px)",
+                            },
                           }}
-                        />
-                        <Typography variant="body2">{area}</Typography>
-                      </Box>
-                    </Grid>
-                  ))}
-                </Grid>
-              </Paper>
+                        >
+                          <CheckIcon
+                            sx={{
+                              color: "success.main",
+                              mr: 1,
+                              fontSize: "1rem",
+                            }}
+                          />
+                          <Typography variant="body2">{area}</Typography>
+                        </Box>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Paper>
+              </Zoom>
             </Grid>
           </Grid>
+        </Container>
+      </Box>
+
+      {/* Mobile Image Showcase */}
+      <Box sx={{ py: 6, display: { xs: "block", md: "none" } }}>
+        <Container maxWidth="sm">
+          <Typography variant="h4" align="center" gutterBottom sx={{ fontWeight: 700, mb: 4 }}>
+            Our Rescue Fleet
+          </Typography>
+          <ImageList 
+            cols={2} 
+            gap={16}
+            sx={{
+              mb: 0,
+              "& .MuiImageListItem-root": {
+                borderRadius: 3,
+                overflow: "hidden",
+                "&:hover": {
+                  transform: "scale(1.05)",
+                  transition: "transform 0.3s ease-in-out",
+                },
+              },
+            }}
+          >
+            {rescueGallery.map((item) => (
+              <ImageListItem 
+                key={item.id}
+                sx={{
+                  position: "relative",
+                  "&::after": {
+                    content: '""',
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: `linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.7) 100%)`,
+                    opacity: 0,
+                    transition: "opacity 0.3s ease",
+                  },
+                  "&:hover::after": {
+                    opacity: 1,
+                  },
+                }}
+              >
+                <img
+                  src={item.src}
+                  alt={item.title}
+                  loading="lazy"
+                  style={{
+                    width: "100%",
+                    height: isMobile ? 120 : 150,
+                    objectFit: "cover",
+                    borderRadius: "12px",
+                  }}
+                />
+                <Box
+                  sx={{
+                    position: "absolute",
+                    bottom: 8,
+                    left: 8,
+                    right: 8,
+                    color: "white",
+                    opacity: 0,
+                    transition: "opacity 0.3s ease",
+                    zIndex: 2,
+                    "&:hover": {
+                      opacity: 1,
+                    },
+                  }}
+                >
+                  <Typography variant="caption" sx={{ fontWeight: 600, display: "block" }}>
+                    {item.title}
+                  </Typography>
+                  <Typography variant="caption" sx={{ fontSize: "0.7rem", opacity: 0.8 }}>
+                    {item.category}
+                  </Typography>
+                </Box>
+              </ImageListItem>
+            ))}
+          </ImageList>
         </Container>
       </Box>
 
@@ -1352,6 +1921,30 @@ const RescueServices: React.FC = () => {
           {notification.message}
         </Alert>
       </Snackbar>
+
+      {/* Floating Emergency Call Button */}
+      <Fab
+        color="error"
+        size="large"
+        onClick={handleEmergencyCall}
+        sx={{
+          position: "fixed",
+          bottom: { xs: 16, md: 24 },
+          right: { xs: 16, md: 24 },
+          zIndex: 1000,
+          background: `linear-gradient(135deg, ${colors.error.main}, ${colors.error.dark})`,
+          boxShadow: `0 8px 25px ${colors.error.main}40`,
+          animation: "float 3s ease-in-out infinite",
+          "&:hover": {
+            background: `linear-gradient(135deg, ${colors.error.dark}, ${colors.error.main})`,
+            transform: "scale(1.1)",
+            boxShadow: `0 12px 30px ${colors.error.main}60`,
+          },
+        }}
+        aria-label="Emergency Call"
+      >
+        <PhoneIcon sx={{ fontSize: "2rem" }} />
+      </Fab>
     </Box>
   );
 };
