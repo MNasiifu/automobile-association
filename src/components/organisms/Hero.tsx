@@ -4,7 +4,7 @@ import { styled, keyframes } from "@mui/material/styles";
 import { Button, Heading } from "../atoms";
 import { ContactButtons } from "../molecules";
 import { heroContent } from "../../data/companyData";
-import HeroImage from "../../assets/images/TOWINGANDRECOVERYFRESHCAR.jpeg";
+import HeroImage from "../../assets/images/rescue/rescue2.jpeg";
 import { Star, Security, Speed, Groups } from "@mui/icons-material";
 import { config } from "../../utils/config/config";
 
