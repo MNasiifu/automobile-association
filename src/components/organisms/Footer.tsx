@@ -15,6 +15,7 @@ import {
   servicesNavItems,
 } from "../../data/companyData";
 import AAULogo from "../../assets/images/aau-logo.png";
+import MusadanLogo from "../../assets/images/logo-transparent.png";
 import { config } from "../../utils/config/config";
 import { useNavigate } from "react-router-dom";
 
@@ -418,9 +419,132 @@ const Footer: React.FC = () => {
       </FooterContent>
 
       <FooterBottom>
-        <Typography variant="body2" sx={{ opacity: 0.7 }}>
-          © {currentYear} {config.company.email}. All rights reserved.
-        </Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: { xs: 2, sm: 4 },
+            textAlign: 'center',
+          }}
+        >
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              opacity: 0.7,
+            }}
+          >
+            © {currentYear} {config.company.email}. All rights reserved.
+          </Typography>
+          
+          {/* Vertical Divider */}
+          <Box
+            sx={{
+              width: { xs: '60px', sm: '1px' },
+              height: { xs: '1px', sm: '20px' },
+              background: 'linear-gradient(90deg, #3bca6f, rgb(244 214 24), #cd1919f0)',
+              position: 'relative',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: { xs: '8px', sm: '3px' },
+                height: { xs: '3px', sm: '8px' },
+                background: 'linear-gradient(45deg, #ff6b6b, #4ecdc4)',
+                borderRadius: '50%',
+                boxShadow: '0 0 8px rgba(78, 205, 196, 0.5)',
+              },
+            }}
+          />
+          
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 1,
+            }}
+          >
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                opacity: 0.7,
+                fontSize: '0.75rem'
+              }}
+            >
+              Developed by
+            </Typography>
+            
+            <Box
+              component="a"
+              href="https://musadan.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                textDecoration: 'none',
+                color: 'secondary.main',
+                fontWeight: 600,
+                fontSize: '0.75rem',
+                padding: '4px 12px',
+                borderRadius: '16px',
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.04) 100%)',
+                border: '1px solid rgba(255,255,255,0.12)',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                position: 'relative',
+                overflow: 'hidden',
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: '-100%',
+                  width: '100%',
+                  height: '100%',
+                  background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+                  transition: 'left 0.5s ease',
+                },
+                '&:hover': {
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.08) 100%)',
+                  borderColor: 'rgba(255,255,255,0.25)',
+                  color: '#fff',
+                  '&::before': {
+                    left: '100%',
+                  },
+                },
+                '&:active': {
+                  transform: 'translateY(0)',
+                }
+              }}
+            >
+              <Box
+                component="img"
+                src={MusadanLogo}
+                alt="Musadan Logo"
+                sx={{
+                  width: 16,
+                  height: 16,
+                  marginRight: 0,
+                  transition: 'all 0.3s ease',
+                  filter: 'brightness(0) invert(1)',
+                  opacity: 0.9,
+                }}
+              />
+              <Box
+                sx={{
+                  width: 6,
+                  height: 6,
+                }}
+              />
+              Musadan
+            </Box>
+          </Box>
+        </Box>
       </FooterBottom>
     </FooterSection>
   );
