@@ -30,7 +30,6 @@ import {
   Launch as LaunchIcon,
   Emergency as EmergencyMuiIcon,
   AccessTime as AccessTimeIcon,
-  ContactSupport as ContactSupportIcon,
   Sms as SmsIcon,
   SignalCellularAlt as SignalIcon,
 } from "@mui/icons-material";
@@ -40,7 +39,6 @@ import { PageHeader } from "../components/molecules";
 import { SEO } from "../components/SEO";
 import { companyInfo } from "../data/companyData";
 import { contactSEO } from "../data/seoData";
-import emailjs from "@emailjs/browser";
 import ReCAPTCHA from "react-google-recaptcha";
 import { MuiTelInput } from "mui-tel-input";
 import type { MuiTelInputInfo } from "mui-tel-input";
@@ -97,9 +95,8 @@ interface FormErrors {
 
 // ---- Constants ----
 const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY || "";
-const EMAILJS_PUBLIC_KEY = "3cddm8-Ni7ObSmjjE";
-const EMAILJS_SERVICE_ID = "service_lp5vo2i";
-const EMAILJS_TEMPLATE_ID = "template_8rvs5ee";
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
+const CONTACT_EDGE_FN = `${SUPABASE_URL}/functions/v1/send-contact-email`;
 const DEFAULT_COUNTRY = "UG" as const;
 
 // ---- Utility Functions ----
@@ -303,17 +300,17 @@ const MapContainer = styled(Box)(({ theme }) => ({
 
 const EmergencyCard = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(0),
-  background: "#950404d1",
+  background: "#360404d1",
   color: theme.palette.common.white,
   borderRadius: theme.spacing(3),
   position: 'relative',
   overflow: 'hidden',
   cursor: 'pointer',
-  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+  //transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
   border: '2px solid rgba(255, 255, 255, 0.1)',
   
   // Pulsing animation for urgency
-  animation: 'emergencyPulse 2s ease-in-out infinite',
+  // animation: 'emergencyPulse 2s ease-in-out infinite',
   
   // Shimmer effect
   '&::before': {
@@ -346,7 +343,7 @@ const EmergencyCard = styled(Paper)(({ theme }) => ({
   },
   
   '&:hover': {
-    background: theme.palette.error.main,
+    background: '#560404',
     transform: 'translateY(-8px) scale(1.02)',
     boxShadow: `
       0 20px 60px rgba(211, 47, 47, 0.4),
@@ -803,30 +800,25 @@ const Contact: React.FC = () => {
     setFormErrors({});
 
     try {
-      // Initialize EmailJS
-      emailjs.init(EMAILJS_PUBLIC_KEY);
-
-      const emailSubject = `AAU Contact — ${formState.subject} — ${formState.firstName} ${formState.lastName} (${formState.email} | ${formState.phoneFull})`;
-
-      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-        to_email: companyInfo.contact.email,
-        reply_to: formState.email,
-        email_subject: emailSubject,
-        first_name: formState.firstName,
-        last_name: formState.lastName,
-        from_name: `${formState.firstName} ${formState.lastName}`,
-        from_email: formState.email,
-        phone_full: formState.phoneFull,
-        phone_country_iso2: formState.phoneCountry,
-        phone_country_name: countryNameOf(formState.phoneCountry),
-        phone_dial_code: formState.phoneDialCode,
-        phone_national: formState.phoneNational,
-        subject: formState.subject,
-        message: formState.message,
-        page_url: typeof window !== "undefined" ? window.location.href : "",
-        timestamp: new Date().toISOString(),
-        "g-recaptcha-response": recaptchaValue,
+      const res = await fetch(CONTACT_EDGE_FN, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName: formState.firstName,
+          lastName: formState.lastName,
+          email: formState.email,
+          phoneFull: formState.phoneFull,
+          subject: formState.subject,
+          message: formState.message,
+          pageUrl: typeof window !== "undefined" ? window.location.href : "",
+          timestamp: new Date().toISOString(),
+        }),
       });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data?.error ?? `Server error ${res.status}`);
+      }
 
       setSubmitSuccess(true);
       setSnackbar({
@@ -891,7 +883,7 @@ const Contact: React.FC = () => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [formState, recaptchaValue, validateForm]);
+  }, [formState, validateForm]);
 
   const handleFieldChange = useCallback((field: keyof FormState) => 
     (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -1381,7 +1373,7 @@ const Contact: React.FC = () => {
                           letterSpacing: '0.05em',
                         }}
                       >
-                        {config.company.rescue.primaryContact}
+                        {config.company.whatsAppNumber}
                       </Typography>
                       <Typography
                         variant="body1"
@@ -1397,7 +1389,7 @@ const Contact: React.FC = () => {
                     </EmergencyPhoneContainer>
 
                     <Box sx={{ mb: 3 }}>
-                      <Typography
+                      {/* <Typography
                         variant="body1"
                         sx={{
                           fontWeight: 600,
@@ -1408,8 +1400,8 @@ const Contact: React.FC = () => {
                         }}
                       >
                         <ContactSupportIcon sx={{ fontSize: '1.2rem' }} />
-                        Contact Person: {config.company.rescue.name}
-                      </Typography>
+                        Contact Person: {config.company.whatsAppNumber}
+                      </Typography> */}
                       <Typography
                         variant="body2"
                         sx={{
@@ -1442,7 +1434,7 @@ const Contact: React.FC = () => {
                           aria-label="Call emergency hotline"
                           onClick={(e) => {
                             e.stopPropagation();
-                            window.open(`tel:${config.company.rescue.primaryContact}`, '_self');
+                            window.open(`tel:${config.company.whatsAppNumber}`, '_self');
                           }}
                         >
                           <Phone />
@@ -1455,7 +1447,7 @@ const Contact: React.FC = () => {
                           onClick={(e) => {
                             e.stopPropagation();
                             const message = encodeURIComponent("🚨 EMERGENCY ASSISTANCE NEEDED - Please respond immediately");
-                            window.open(`https://wa.me/${config.company.rescue.primaryContact}?text=${message}`, '_blank');
+                            window.open(`https://wa.me/${config.company.whatsAppNumber}?text=${message}`, '_blank');
                           }}
                         >
                           <WhatsAppIcon />
@@ -1467,7 +1459,7 @@ const Contact: React.FC = () => {
                           aria-label="Send emergency SMS"
                           onClick={(e) => {
                             e.stopPropagation();
-                            window.open(`sms:${config.company.rescue.primaryContact}?body=EMERGENCY ASSISTANCE NEEDED`, '_self');
+                            window.open(`sms:${config.company.whatsAppNumber}?body=EMERGENCY ASSISTANCE NEEDED`, '_self');
                           }}
                         >
                           <SmsIcon />

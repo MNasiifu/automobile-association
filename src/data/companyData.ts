@@ -36,7 +36,7 @@ export const companyInfo = {
   contact: {
     phone: "+256752760252 | +256776760252",
     emergency: {
-      phone: "+256772366004",
+      phone: "+256786623001",
       name: "Mr. Richard Ssewagudde",
     },
     email: "odongkara@aau.co.ug",

@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Container, Typography, Grid, Avatar, Rating } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Card } from '../../atoms';
-import { FormatQuote } from '@mui/icons-material';
+import FormatQuote from '@mui/icons-material/FormatQuote';
 import AvatarImage from '../../../assets/images/avatar-15.png';
 
 const TestimonialsSection = styled(Box)(({ theme }) => ({

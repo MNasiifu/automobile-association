@@ -2,14 +2,12 @@ import React from 'react';
 import { Box, Container, Typography, Grid } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { CountUpAnimation } from '../../atoms';
-import { 
-  DirectionsCar, 
-  School, 
-  Security, 
-  SupportAgent,
-  Group,
-  Timeline
-} from '@mui/icons-material';
+import DirectionsCar from '@mui/icons-material/DirectionsCar';
+import School from '@mui/icons-material/School';
+import Security from '@mui/icons-material/Security';
+import SupportAgent from '@mui/icons-material/SupportAgent';
+import Group from '@mui/icons-material/Group';
+import Timeline from '@mui/icons-material/Timeline';
 import theme from '../../../theme';
 
 const StatsSection = styled(Box)(({ theme }) => ({

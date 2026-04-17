@@ -1,26 +1,24 @@
-import {
-  Timeline as JourneyIcon,
-  Groups as BoardIcon,
-  Business as ManagementIcon,
-  Handshake as AffiliationIcon,
-  PhotoLibrary as GalleryIcon,
-  Work as CareersIcon,
-  Flag as MissionIcon,
-  Star as PremierIcon,
-  Diamond as PrestigeIcon,
-  CardMembership as ClassicIcon,
-  BusinessCenter as CorporateIcon,
-  School as SchoolIcon,
-  SecurityUpdateGood as DefensiveIcon,
-  Replay as RefresherIcon,
-  DirectionsCar as InspectionIcon,
-  Security as InsuranceIcon,
-  FlightTakeoff as CarnetIcon,
-  LocalLibrary as InstituteIcon,
-  LocationOn as BranchesIcon,
-  Newspaper as MediaIcon,
-  Info as InfoIcon,
-} from '@mui/icons-material';
+import JourneyIcon from '@mui/icons-material/Timeline';
+import BoardIcon from '@mui/icons-material/Groups';
+import ManagementIcon from '@mui/icons-material/Business';
+import AffiliationIcon from '@mui/icons-material/Handshake';
+import GalleryIcon from '@mui/icons-material/PhotoLibrary';
+import CareersIcon from '@mui/icons-material/Work';
+import MissionIcon from '@mui/icons-material/Flag';
+import PremierIcon from '@mui/icons-material/Star';
+import PrestigeIcon from '@mui/icons-material/Diamond';
+import ClassicIcon from '@mui/icons-material/CardMembership';
+import CorporateIcon from '@mui/icons-material/BusinessCenter';
+import SchoolIcon from '@mui/icons-material/School';
+import DefensiveIcon from '@mui/icons-material/SecurityUpdateGood';
+import RefresherIcon from '@mui/icons-material/Replay';
+import InspectionIcon from '@mui/icons-material/DirectionsCar';
+import InsuranceIcon from '@mui/icons-material/Security';
+import CarnetIcon from '@mui/icons-material/FlightTakeoff';
+import InstituteIcon from '@mui/icons-material/LocalLibrary';
+import BranchesIcon from '@mui/icons-material/LocationOn';
+import MediaIcon from '@mui/icons-material/Newspaper';
+import InfoIcon from '@mui/icons-material/Info';
 
 export const menuIcons = {
   // Submenu items only

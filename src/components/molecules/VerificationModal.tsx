@@ -13,12 +13,10 @@ import {
   Chip,
   Divider,
 } from '@mui/material';
-import { 
-  Close as CloseIcon,
-  CheckCircle as CheckCircleIcon,
-  Error as ErrorIcon,
-  Info as InfoIcon,
-} from '@mui/icons-material';
+import CloseIcon from '@mui/icons-material/Close';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ErrorIcon from '@mui/icons-material/Error';
+import InfoIcon from '@mui/icons-material/Info';
 import { styled } from '@mui/material/styles';
 
 interface VerificationModalProps {

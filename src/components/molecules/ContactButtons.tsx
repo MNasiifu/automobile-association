@@ -4,10 +4,8 @@ import {
   Stack,
 } from '@mui/material';
 import type { StackProps } from '@mui/material';
-import {
-  Phone as PhoneIcon,
-  WhatsApp as WhatsAppIcon,
-} from '@mui/icons-material';
+import PhoneIcon from '@mui/icons-material/Phone';
+import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import { config } from '../../utils/config/config';
 
 export interface ContactButtonsProps extends Omit<StackProps, 'children'> {

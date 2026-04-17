@@ -290,7 +290,7 @@ const RescueServices: React.FC = () => {
           `Call attempt initiated: ${callType} at ${new Date().toISOString()}`
         );
 
-        const phoneNumber = config.company.rescue.primaryContact;
+        const phoneNumber = config.company.whatsAppNumber;
         const callUrl = `tel:${phoneNumber}`;
 
         // Attempt to initiate phone call
@@ -320,16 +320,16 @@ const RescueServices: React.FC = () => {
 
         // Fallback: copy number to clipboard if possible
         if (navigator.clipboard) {
-          navigator.clipboard.writeText(config.company.rescue.primaryContact);
+          navigator.clipboard.writeText(config.company.whatsAppNumber);
           setNotification({
             open: true,
-            message: `Phone number copied to clipboard: ${config.company.rescue.primaryContact}`,
+            message: `Phone number copied to clipboard: ${config.company.whatsAppNumber}`,
             severity: "warning",
           });
         } else {
           setNotification({
             open: true,
-            message: `Please call us at: ${config.company.rescue.primaryContact}`,
+            message: `Please call us at: ${config.company.whatsAppNumber}`,
             severity: "info",
           });
         }
@@ -656,9 +656,9 @@ const RescueServices: React.FC = () => {
                 fontSize: { xs: "1.0rem", sm: "1.3rem" },
               }}
             >
-              {config.company.rescue.primaryContact} |{" "}
-              {config.company.rescue.secondaryContact} |{" "}
-              {config.company.rescue.otherContact}
+              {config.company.whatsAppNumber} |{" "}
+              {config.company.contactNumber} |{" "}
+              {config.company.secondaryContactNumber}
             </Typography>
             <Typography variant="body1" sx={{ mb: 3, opacity: 0.9 }}>
               Available 24 hours a day, 7 days a week for all emergency assistance

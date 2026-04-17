@@ -1,5 +1,8 @@
 import { Box, Container, Grid, Typography } from '@mui/material';
-import { Timeline, People, EmojiEvents, Security } from '@mui/icons-material';
+import Timeline from '@mui/icons-material/Timeline';
+import People from '@mui/icons-material/People';
+import EmojiEvents from '@mui/icons-material/EmojiEvents';
+import Security from '@mui/icons-material/Security';
 import { Heading } from '../../atoms';
 import Counter from '../../atoms/CounterSection';
 

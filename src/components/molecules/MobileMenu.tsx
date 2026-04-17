@@ -10,11 +10,9 @@ import {
   ListItemButton,
   Button,
 } from '@mui/material';
-import {
-  Close as CloseIcon,
-  ExpandLess,
-  ExpandMore,
-} from '@mui/icons-material';
+import CloseIcon from '@mui/icons-material/Close';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
 import { navigationItems } from '../../data/companyData';
 
 interface MobileMenuProps {

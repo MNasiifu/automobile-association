@@ -1,6 +1,10 @@
 import React from 'react';
 import { Box, Container, Typography, Grid, Paper, Button } from '@mui/material';
-import { Phone, DirectionsCar, School, AccessTime, CardMembership } from '@mui/icons-material';
+import Phone from '@mui/icons-material/Phone';
+import DirectionsCar from '@mui/icons-material/DirectionsCar';
+import School from '@mui/icons-material/School';
+import AccessTime from '@mui/icons-material/AccessTime';
+import CardMembership from '@mui/icons-material/CardMembership';
 import { PageHeader } from '../../components/molecules';
 import { SEO } from '../../components/SEO';
 import { drivingSchoolAboutSEO } from '../../data/seoData';
@@ -168,14 +172,14 @@ const About: React.FC = () => {
               <Typography variant="body1" sx={{ mb: 2, fontSize: '1.1rem' }}>
                 Contact our driving school coordinator:
               </Typography>
-              <Typography variant="h6" sx={{ fontWeight: 500 }}>
+              {/* <Typography variant="h6" sx={{ fontWeight: 500 }}>
                 Ms. {config.company.drivingSchool.name}
-              </Typography>
+              </Typography> */}
               <Button
                 variant="contained"
                 size="large"
                 startIcon={<Phone />}
-                href={`tel:${config.company.drivingSchool.primaryContact}`}
+                href={`tel:${config.company.whatsAppNumber}`}
                 sx={{
                   mt: 2,
                   background: theme.palette.secondary.main,
@@ -199,9 +203,9 @@ const About: React.FC = () => {
                     transform: 'translateY(0px)',
                   }
                 }}
-                aria-label={`Call Ms. Robina at ${config.company.drivingSchool.primaryContact}`}
+                aria-label={`Call Ms. Robina at ${config.company.whatsAppNumber}`}
               >
-                {config.company.drivingSchool.primaryContact}
+                {config.company.whatsAppNumber}
               </Button>
             </Box>
           </Box>

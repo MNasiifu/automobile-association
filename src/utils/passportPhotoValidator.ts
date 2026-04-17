@@ -1,48 +1,14 @@
-import * as faceapi from 'face-api.js';
-import '@tensorflow/tfjs-backend-webgl';
-import '@tensorflow/tfjs-backend-cpu';
+import * as faceapi from '@vladmandic/face-api';
 
-// Initialize face-api.js models
 let modelsLoaded = false;
-let backendInitialized = false;
-
-// Initialize TensorFlow.js backend
-const initializeTensorFlowBackend = async (): Promise<void> => {
-  if (backendInitialized) return;
-  
-  try {
-    
-    // Import TensorFlow.js with backends
-    const tf = await import('@tensorflow/tfjs');
-    await import('@tensorflow/tfjs-backend-webgl');
-    await import('@tensorflow/tfjs-backend-cpu');
-    
-    // Set backend preference (WebGL is faster, CPU is more compatible)
-    try {
-      await tf.setBackend('webgl');
-    } catch (webglError) {
-      console.warn('WebGL backend failed, falling back to CPU:', webglError);
-      await tf.setBackend('cpu');
-    }
-    
-    // Wait for backend to be ready
-    await tf.ready();
-    
-    backendInitialized = true;
-  } catch (error) {
-    console.error('Failed to initialize TensorFlow.js backend:', error);
-    throw new Error('Failed to initialize TensorFlow.js backend');
-  }
-};
 
 // Preload models function that can be called early in the app lifecycle
 export const preloadFaceApiModels = async (): Promise<void> => {
   if (modelsLoaded) {
     return;
   }
-  
+
   try {
-    await initializeTensorFlowBackend();
     await loadFaceApiModels();
   } catch (error) {
     console.warn('⚠️ Failed to preload face-api models:', error);
@@ -114,9 +80,6 @@ export const loadFaceApiModels = async (): Promise<void> => {
   if (modelsLoaded) return;
   
   try {
-    // Ensure TensorFlow.js backend is initialized first
-    await initializeTensorFlowBackend();
-    
     // Use CDN as primary source since local models appear to be incomplete
     const MODEL_URL = 'https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights';
     
@@ -382,8 +345,6 @@ export const validatePassportPhoto = async (file: File): Promise<PhotoValidation
     
     while (!modelsLoaded && modelLoadAttempts < maxAttempts) {
       try {
-        // Initialize backend and load models
-        await initializeTensorFlowBackend();
         await loadFaceApiModels();
         break;
       } catch (loadError) {

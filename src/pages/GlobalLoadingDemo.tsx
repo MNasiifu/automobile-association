@@ -8,7 +8,9 @@ import {
   Grid,
   Stack
 } from '@mui/material';
-import { CloudUpload, Send, Refresh } from '@mui/icons-material';
+import CloudUpload from '@mui/icons-material/CloudUpload';
+import Send from '@mui/icons-material/Send';
+import Refresh from '@mui/icons-material/Refresh';
 import { useGlobalLoading } from '../contexts';
 
 /**

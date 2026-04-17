@@ -1456,6 +1456,7 @@ const ApplyForIdp: React.FC = () => {
                           </Grid>
 
                           <Grid item xs={12}>
+                            {/* Upload photo validation */}
                             <FileUploadField
                               fieldName="passportPhoto"
                               label="Passport Photo"

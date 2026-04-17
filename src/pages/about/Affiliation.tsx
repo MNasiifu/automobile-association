@@ -18,16 +18,14 @@ import {
   useTheme,
   alpha
 } from '@mui/material';
-import {
-  Public as GlobalIcon,
-  Groups as GroupsIcon,
-  EmojiEvents as AwardsIcon,
-  Security as SecurityIcon,
-  CheckCircle as CheckIcon,
-  Business as BusinessIcon,
-  Map as MapIcon,
-  Handshake as HandshakeIcon
-} from '@mui/icons-material';
+import GlobalIcon from '@mui/icons-material/Public';
+import GroupsIcon from '@mui/icons-material/Groups';
+import AwardsIcon from '@mui/icons-material/EmojiEvents';
+import SecurityIcon from '@mui/icons-material/Security';
+import CheckIcon from '@mui/icons-material/CheckCircle';
+import BusinessIcon from '@mui/icons-material/Business';
+import MapIcon from '@mui/icons-material/Map';
+import HandshakeIcon from '@mui/icons-material/Handshake';
 import { PageHeader } from '../../components/molecules';
 import { SEO } from '../../components/SEO';
 import { affiliationSEO } from '../../data/seoData';

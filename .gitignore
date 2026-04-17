@@ -12,6 +12,21 @@ dist
 dist-ssr
 *.local
 
+# Environment files
+.env
+.env.local
+.env.*.local
+.env.production
+.env.staging
+
+# Python virtual environments
+.venv
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -22,32 +37,4 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-.env
-.env.local
-.env.*.local
-.venv
-venv/
-ENV/
-env/
-env.bak/
-venv.bak/
-.idea
-.vscode
-*.code-workspace
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-.env
-.env.local
-.env.*.local
-.venv
-venv/
-ENV/
-env/
-env.bak/
-venv.bak/
-.idea
-.vscode
 *.code-workspace
