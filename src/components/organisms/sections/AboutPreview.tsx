@@ -3,12 +3,10 @@ import { Box, Container, Typography, Grid, Paper } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { ContactButtons } from '../../molecules';
 import { companyInfo } from '../../../data/companyData';
-import { 
-  Business,
-  Visibility,
-  EmojiObjects,
-  Star
-} from '@mui/icons-material';
+import Business from '@mui/icons-material/Business';
+import Visibility from '@mui/icons-material/Visibility';
+import EmojiObjects from '@mui/icons-material/EmojiObjects';
+import Star from '@mui/icons-material/Star';
 import theme from '../../../theme';
 
 const AboutSection = styled(Box)(({ theme }) => ({

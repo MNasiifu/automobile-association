@@ -19,19 +19,17 @@ import {
   CardContent,
   Button,
 } from '@mui/material';
-import {
-  CheckCircle,
-  Warning,
-  Error,
-  ExpandMore,
-  Visibility,
-  VisibilityOff,
-  Info,
-  Psychology,
-  CameraAlt,
-  Palette,
-  HighQuality,
-} from '@mui/icons-material';
+import CheckCircle from '@mui/icons-material/CheckCircle';
+import Warning from '@mui/icons-material/Warning';
+import Error from '@mui/icons-material/Error';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import Info from '@mui/icons-material/Info';
+import Psychology from '@mui/icons-material/Psychology';
+import CameraAlt from '@mui/icons-material/CameraAlt';
+import Palette from '@mui/icons-material/Palette';
+import HighQuality from '@mui/icons-material/HighQuality';
 import type { PhotoValidationResult, PhotoRequirement } from '../../types/photoValidation';
 import { passportPhotoRequirements } from '../../utils/passportPhotoValidator';
 

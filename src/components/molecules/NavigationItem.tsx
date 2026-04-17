@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Box } from '@mui/material';
-import { KeyboardArrowDown } from '@mui/icons-material';
+import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
 import { Link as RouterLink } from 'react-router-dom';
 import { SubMenu } from './SubMenu';
 import type { MenuIconKey } from '../../types/navigation';

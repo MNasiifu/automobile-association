@@ -1,5 +1,6 @@
 import { Container, Grid, Box } from '@mui/material';
-import { Flag, Visibility } from '@mui/icons-material';
+import Flag from '@mui/icons-material/Flag';
+import Visibility from '@mui/icons-material/Visibility';
 import { Heading } from '../../atoms';
 import { MissionVisionCard } from '../../molecules';
 import { companyInfo } from '../../../data/companyData';

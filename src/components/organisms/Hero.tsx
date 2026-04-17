@@ -307,7 +307,8 @@ const Hero: React.FC = () => {
                 <ContactButtons
                   phoneText="Emergency Help"
                   whatsappText="Get Info"
-                  phoneContact={config.company.rescue.primaryContact}
+                  phoneContact={config.company.whatsAppNumber}
+                  whatsappContact={config.company.whatsAppNumber}
                   whatsappMessage="Hello! I'm interested in AA Uganda services. Can you provide more information?"
                   buttonSx={{
                     borderRadius: 3,

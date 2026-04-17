@@ -11,7 +11,9 @@ import {
   ListItemText,
   Divider,
 } from '@mui/material';
-import { Check as CheckIcon, Schedule as ScheduleIcon, Language as LanguageIcon } from '@mui/icons-material';
+import CheckIcon from '@mui/icons-material/Check';
+import ScheduleIcon from '@mui/icons-material/Schedule';
+import LanguageIcon from '@mui/icons-material/Language';
 import { styled } from '@mui/material/styles';
 import { Button } from '../atoms';
 import type { IDPApplication } from '../../data/idpData';

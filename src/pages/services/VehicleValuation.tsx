@@ -655,8 +655,8 @@ const VehicleValuation: React.FC = () => {
                 safety compliance, and legal needs.
               </Typography>
               <ContactButtons
-                phoneContact={config.company.valuation.primaryContact}
-                whatsappContact={config.company.valuation.primaryContact}
+                phoneContact={config.company.whatsAppNumber}
+                whatsappContact={config.company.whatsAppNumber}
                 whatsappMessage="Hello! I would like to inquire about your vehicle valuation and inspection services."
               />
             </Grid>
@@ -1684,8 +1684,8 @@ const VehicleValuation: React.FC = () => {
           </Typography>
           <ContactButtons
             phoneText="Book Service"
-            phoneContact={config.company.valuation.primaryContact}
-            whatsappContact={config.company.valuation.primaryContact}
+            phoneContact={config.company.whatsAppNumber}
+            whatsappContact={config.company.whatsAppNumber}
             whatsappMessage="Hello! I would like to inquire about your vehicle valuation and inspection services."
             justifyContent="center"
             spacing={3}

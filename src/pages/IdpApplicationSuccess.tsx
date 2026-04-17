@@ -15,17 +15,15 @@ import {
   Avatar,
   useTheme,
 } from '@mui/material';
-import {
-  CheckCircle as CheckIcon,
-  Home as HomeIcon,
-  Email as EmailIcon,
-  Schedule as TimeIcon,
-  Assignment as DocumentIcon,
-  Phone as PhoneIcon,
-  Info as InfoIcon,
-  PersonAdd as TeamIcon,
-  Celebration as CelebrationIconMui,
-} from '@mui/icons-material';
+import CheckIcon from '@mui/icons-material/CheckCircle';
+import HomeIcon from '@mui/icons-material/Home';
+import EmailIcon from '@mui/icons-material/Email';
+import TimeIcon from '@mui/icons-material/Schedule';
+import DocumentIcon from '@mui/icons-material/Assignment';
+import PhoneIcon from '@mui/icons-material/Phone';
+import InfoIcon from '@mui/icons-material/Info';
+import TeamIcon from '@mui/icons-material/PersonAdd';
+import CelebrationIconMui from '@mui/icons-material/Celebration';
 import { styled, keyframes } from '@mui/material/styles';
 import { SEO } from '../components/SEO';
 import { companyInfo } from '../data/companyData';

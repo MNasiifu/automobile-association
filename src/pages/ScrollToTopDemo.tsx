@@ -14,13 +14,11 @@ import {
   ListItemIcon,
   Fab,
 } from '@mui/material';
-import {
-  CheckCircle,
-  ArrowUpward,
-  Navigation as NavigationIcon,
-  Speed,
-  Accessibility,
-} from '@mui/icons-material';
+import CheckCircle from '@mui/icons-material/CheckCircle';
+import ArrowUpward from '@mui/icons-material/ArrowUpward';
+import NavigationIcon from '@mui/icons-material/Navigation';
+import Speed from '@mui/icons-material/Speed';
+import Accessibility from '@mui/icons-material/Accessibility';
 import { styled } from '@mui/material/styles';
 import { Link as RouterLink } from 'react-router-dom';
 import { PageHeader } from '../components/molecules';

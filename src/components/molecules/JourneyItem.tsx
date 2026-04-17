@@ -1,6 +1,6 @@
 import React from 'react';
 import { Paper, Box, Typography } from '@mui/material';
-import { WorkspacePremium } from '@mui/icons-material';
+import WorkspacePremium from '@mui/icons-material/WorkspacePremium';
 
 interface JourneyItemProps {
   year: number;

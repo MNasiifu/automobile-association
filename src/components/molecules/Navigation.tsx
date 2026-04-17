@@ -11,7 +11,8 @@ import {
   Typography,
   useScrollTrigger,
 } from '@mui/material';
-import { Menu as MenuIcon, KeyboardArrowDown } from '@mui/icons-material';
+import MenuIcon from '@mui/icons-material/Menu';
+import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
 import { styled } from '@mui/material/styles';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { Button } from '../atoms';

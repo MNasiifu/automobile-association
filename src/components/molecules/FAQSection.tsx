@@ -9,11 +9,9 @@ import {
   AccordionDetails,
   Paper
 } from '@mui/material';
-import { 
-  ExpandMore as ExpandMoreIcon,
-  HelpOutline as HelpIcon,
-  Lightbulb as LightbulbIcon 
-} from '@mui/icons-material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import HelpIcon from '@mui/icons-material/HelpOutline';
+import LightbulbIcon from '@mui/icons-material/Lightbulb';
 import { styled } from '@mui/material/styles';
 import { Heading } from '../atoms';
 import { FormattedTypography } from '../../utils/textFormatter';

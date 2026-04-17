@@ -3,12 +3,10 @@ import { Box, Container, Typography, Grid, Paper } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Button } from '../../atoms';
 import { affiliates } from '../../../data/companyData';
-import { 
-  Public,
-  Handshake,
-  Security,
-  EmojiEvents
-} from '@mui/icons-material';
+import Public from '@mui/icons-material/Public';
+import Handshake from '@mui/icons-material/Handshake';
+import Security from '@mui/icons-material/Security';
+import EmojiEvents from '@mui/icons-material/EmojiEvents';
 import { useNavigate } from 'react-router-dom';
 
 const PartnershipSection = styled(Box)(({ theme }) => ({

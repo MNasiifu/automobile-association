@@ -18,20 +18,18 @@ import {
 import { ContactButtons, PageHeader } from '../../components/molecules';
 import { SEO } from '../../components/SEO';
 import { drivingSchoolRefresherSEO } from '../../data/seoData';
-import { 
-  RefreshRounded,
-  SchoolRounded,
-  DriveEtaRounded,
-  SecurityRounded,
-  AccessTimeRounded,
-  GroupRounded,
-  CheckCircleRounded,
-  TrendingUpRounded,
-  LocalOfferRounded,
-  StarRounded,
-  AutoAwesomeRounded,
-  SupportAgentRounded
-} from '@mui/icons-material';
+import RefreshRounded from '@mui/icons-material/RefreshRounded';
+import SchoolRounded from '@mui/icons-material/SchoolRounded';
+import DriveEtaRounded from '@mui/icons-material/DriveEtaRounded';
+import SecurityRounded from '@mui/icons-material/SecurityRounded';
+import AccessTimeRounded from '@mui/icons-material/AccessTimeRounded';
+import GroupRounded from '@mui/icons-material/GroupRounded';
+import CheckCircleRounded from '@mui/icons-material/CheckCircleRounded';
+import TrendingUpRounded from '@mui/icons-material/TrendingUpRounded';
+import LocalOfferRounded from '@mui/icons-material/LocalOfferRounded';
+import StarRounded from '@mui/icons-material/StarRounded';
+import AutoAwesomeRounded from '@mui/icons-material/AutoAwesomeRounded';
+import SupportAgentRounded from '@mui/icons-material/SupportAgentRounded';
 import { config } from '../../utils/config/config';
 
 // Feature Card Component
@@ -396,8 +394,8 @@ const RefresherCourses: React.FC = () => {
               size="large"
               whatsappText="Chat About Courses"
               phoneText="Call for Info"
-              phoneContact={config.company.drivingSchool.primaryContact}
-              whatsappContact={config.company.drivingSchool.primaryContact}
+              phoneContact={config.company.whatsAppNumber}
+              whatsappContact={config.company.whatsAppNumber}
               whatsappMessage="Hello! I'm interested in learning more about your refresher driving courses. Could you provide me with details about schedules, pricing, and enrollment?"
               buttonSx={{
                 '&.MuiButton-contained': {

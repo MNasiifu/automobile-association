@@ -18,21 +18,19 @@ import {
   AccordionDetails,
   Alert,
 } from '@mui/material';
-import {
-  GpsFixed as GpsIcon,
-  Security as SecurityIcon,
-  Analytics as AnalyticsIcon,
-  LocalGasStation as FuelIcon,
-  Route as RouteIcon,
-  Assignment as ReportIcon,
-  CheckCircle as CheckIcon,
-  ExpandMore as ExpandMoreIcon,
-  Schedule as ScheduleIcon,
-  Build as BuildIcon,
-  Person as PersonIcon,
-  HelpOutline as HelpIcon,
-  Lightbulb as LightbulbIcon,
-} from '@mui/icons-material';
+import GpsIcon from '@mui/icons-material/GpsFixed';
+import SecurityIcon from '@mui/icons-material/Security';
+import AnalyticsIcon from '@mui/icons-material/Analytics';
+import FuelIcon from '@mui/icons-material/LocalGasStation';
+import RouteIcon from '@mui/icons-material/Route';
+import ReportIcon from '@mui/icons-material/Assignment';
+import CheckIcon from '@mui/icons-material/CheckCircle';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ScheduleIcon from '@mui/icons-material/Schedule';
+import BuildIcon from '@mui/icons-material/Build';
+import PersonIcon from '@mui/icons-material/Person';
+import HelpIcon from '@mui/icons-material/HelpOutline';
+import LightbulbIcon from '@mui/icons-material/Lightbulb';
 import { styled } from '@mui/material/styles';
 import { ContactButtons, PageHeader } from '../../components/molecules';
 import { Heading } from '../../components/atoms';

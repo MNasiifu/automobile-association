@@ -5,13 +5,11 @@ import { Button, Heading } from '../atoms';
 import { ContactButtons } from '../molecules';
 import { heroContent } from '../../data/companyData';
 import HeroImage from '../../assets/images/TOWINGANDRECOVERYFRESHCAR.jpeg';
-import {
-  CheckCircle,
-  Star,
-  Security,
-  Speed,
-  Groups
-} from '@mui/icons-material';
+import CheckCircle from '@mui/icons-material/CheckCircle';
+import Star from '@mui/icons-material/Star';
+import Security from '@mui/icons-material/Security';
+import Speed from '@mui/icons-material/Speed';
+import Groups from '@mui/icons-material/Groups';
 
 const fadeInUp = keyframes`
   from {

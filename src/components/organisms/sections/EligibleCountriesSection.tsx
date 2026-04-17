@@ -17,15 +17,13 @@ import {
   useTheme,
 } from '@mui/material';
 import { styled, keyframes } from '@mui/material/styles';
-import {
-  Public as PublicIcon,
-  TravelExplore as TravelIcon,
-  Flight as FlightIcon,
-  Map as MapIcon,
-  ArrowForward as ArrowForwardIcon,
-  LocationOn as LocationIcon,
-  Verified as VerifiedIcon,
-} from '@mui/icons-material';
+import PublicIcon from '@mui/icons-material/Public';
+import TravelIcon from '@mui/icons-material/TravelExplore';
+import FlightIcon from '@mui/icons-material/Flight';
+import MapIcon from '@mui/icons-material/Map';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import LocationIcon from '@mui/icons-material/LocationOn';
+import VerifiedIcon from '@mui/icons-material/Verified';
 import { eligibleCountriesData } from '../../../data/eligibleCountriesData';
 import { getFeaturedCountries } from '../../../utils/countryUtils';
 import { useInView } from 'react-intersection-observer';

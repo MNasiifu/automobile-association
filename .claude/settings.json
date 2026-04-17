@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e ' *)",
+      "Bash(git checkout *)",
+      "Bash(yarn add *)",
+      "Bash(yarn info *)",
+      "Bash(git rm *)",
+      "Bash(git check-ignore *)"
+    ],
+    "additionalDirectories": [
+      "/Users/mulumbanasiifu/Myfiles/HP-Pavillion/Local-Disk-D/vuejs/templates/Backup/public-websites/aau/supabase/functions"
+    ]
+  }
+}
